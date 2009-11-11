@@ -28,6 +28,7 @@
 #include "LockedQueue.h"
 
 #include "Producer.h"
+#include "Consumer.h"
 
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
@@ -134,15 +135,18 @@ int main(int argc, char** argv) {
     //q->Put(42.0);
 
     Producer p(q);
-
+    Consumer c(q);
 
     p.Start();
+    c.Start();
 
     // Start the engine.
     setup->GetEngine().Start();
 
-    p.run = false;
+    p.run = c.run = false;
+    
     p.Wait();
+    c.Wait();
 
     // Return when the engine stops.
     return EXIT_SUCCESS;

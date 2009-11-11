@@ -21,12 +21,17 @@ public:
         m.Lock();
         _queue.push(e);
         m.Unlock();
-    }
+    }    
 
-    void Get(T e) {
+    bool IsEmpty() {
+        return _queue.empty(); // hopefully atomic.
+    }
+    
+    T Get() {
         T r;
         m.Lock();
-        r = _queue.pop();
+        r = _queue.front();
+        _queue.pop();
         m.Unlock();
         return r;
     }
