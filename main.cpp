@@ -25,6 +25,10 @@
 #include <Scene/TransformationNode.h>
 #include <Math/Vector.h>
 
+#include "LockedQueue.h"
+
+#include "Producer.h"
+
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
 // fx. import OpenEngine.Logging.*; in Java.
@@ -104,6 +108,7 @@ using namespace OpenEngine::Math;
 int main(int argc, char** argv) {
     // Create simple setup
     SimpleSetup* setup = new SimpleSetup("Example Project Title");
+ 
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.0,0.0,0.0,1.0));
 
@@ -121,8 +126,23 @@ int main(int argc, char** argv) {
     setup->GetCamera()->SetPosition(Vector<3,float>(0.0,-20.0,77.99375739));
     setup->GetCamera()->LookAt(Vector<3,float>(0.0,-20.0,0.0));
 
+ 
+
+
+    //LockedQueue<float> q;// = new LockedQueue<float>();
+    LockedQueue<float> *q = new LockedQueue<float>();
+    //q->Put(42.0);
+
+    Producer p(q);
+
+
+    p.Start();
+
     // Start the engine.
     setup->GetEngine().Start();
+
+    p.run = false;
+    p.Wait();
 
     // Return when the engine stops.
     return EXIT_SUCCESS;

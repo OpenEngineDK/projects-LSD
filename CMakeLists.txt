@@ -6,6 +6,8 @@ SET( PROJECT_NAME "LSD")
 SET( PROJECT_SOURCES
   # Add all the cpp source files here
   main.cpp
+  LockedQueue.h
+  
 )
 
 # Include needed to use SDL under Mac OS X
