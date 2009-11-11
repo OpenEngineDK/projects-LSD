@@ -44,4 +44,4 @@ darwin /libraries http://openengine.dk/data/libraries/pcrecpp-osx-i32.zip
 # linux libraries
 
 # project data
-
+any /projects/LSD/data    http://www.openengine.dk/data/projects/LSD/au-logo.png
