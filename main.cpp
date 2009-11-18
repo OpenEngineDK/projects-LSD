@@ -27,6 +27,7 @@
 #include <Math/Exceptions.h>
 
 #include "LockedQueue.h"
+#include "EmptyTextureResource.h"
 
 #include "Producer.h"
 #include "Consumer.h"
@@ -123,7 +124,7 @@ public:
     return data+ iy*width;
   }
 
-  T operator()(const unsigned int ix, const unsigned int iy) {
+  T& operator()(const unsigned int ix, const unsigned int iy) {
     return data[ix+iy*width];
   }
 
@@ -158,11 +159,14 @@ public:
   }
 };
 
-ITextureResourcePtr processImage(ITextureResourcePtr tex) {
+ITextureResourcePtr processImage(ITextureResourcePtr tex,
+                                 ITextureResourcePtr recv) {
   // load initial data fields
-  const unsigned int X = tex->GetHeight();
-  const unsigned int Y = tex->GetWidth();
+  const unsigned int Y = tex->GetHeight();
+  const unsigned int X = tex->GetWidth();
   const unsigned char* bw = tex->GetData();
+  const unsigned int depth = tex->GetDepth()/8;
+  unsigned char* out = recv->GetData();
 
   Tex<float> t(X,Y);
   float pixel = t(10.11f,19.28f);
@@ -170,8 +174,18 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex) {
   // make signed distence field phi from bw image (tex)
   Tex<float> phi(X,Y);
   for (unsigned int x=0; x<X; x++)
-    for (unsigned int y=0; y<Y; y++)
-      phi[x][y] = bw[x*X+y]; // dummy copy
+      for (unsigned int y=0; y<Y; y++) {
+          unsigned int gray = 0;
+          //unsigned int i = 3;
+          for (unsigned int i=0;i<depth;i++)
+              gray += bw[y*X*depth+x*depth+i]; // dummy copy
+          
+          gray = (gray > 256)?255:0;
+          
+          phi(x,y) = gray;
+
+          out[y*X+x] = phi(x,y);
+      }
 
   // make vector field V
   Vector<2,float> v[X][Y];
@@ -182,13 +196,14 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex) {
   // solve the equations
   unsigned char phi_plus[X][Y];
   for (unsigned int i=0; i<1; i++) {
-    for (unsigned int x=0; x<X; x++)
-      for (unsigned int y=0; y<Y; y++)
-	phi_plus[x][y] = phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
+      for (unsigned int x=0; x<X; x++)
+        for (unsigned int y=0; y<Y; y++)             
+            phi_plus[x][y] = 1;//phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
+        
     // swap
     //unsigned char** temp = phi_plus;
-    //phi_plus = phi;
-    //phi = temp;
+      //phi_plus = phi;
+      //phi = temp;
   }
   return tex;
 }
@@ -204,19 +219,36 @@ int main(int argc, char** argv) {
 
     DirectoryManager::AppendPath("./projects/LSD/data/");
     ITextureResourcePtr image = ResourceManager<ITextureResource>::Create("au-logo.png");
-    image->Load();
-    setup->GetTextureLoader().Load(image);
 
-    processImage(image);
+    image->Load();
+    setup->GetTextureLoader().Load(image);    
+
+    logger.info << "Image Depth = " << image->GetDepth() << logger.end;
+
+
+    ITextureResourcePtr empty =
+        ITextureResourcePtr(new EmptyTextureResource(image->GetWidth(),
+                                                     image->GetHeight(),
+                                                     8));
+    empty->Load();
+    setup->GetTextureLoader().Load(empty);
+
+
+    processImage(image,empty);
+
 
     TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
     imageNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
+    imageNode->Move(35,0,0);
     rootNode->AddNode(imageNode);
 
-    setup->GetCamera()->SetPosition(Vector<3,float>(0.0,-20.0,77.99375739));
-    setup->GetCamera()->LookAt(Vector<3,float>(0.0,-20.0,0.0));
+    TransformationNode* emptyNode = CreateTextureBillboard(empty,0.1);
+    emptyNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
+    emptyNode->Move(-35,0,0);
+    rootNode->AddNode(emptyNode);
 
- 
+    setup->GetCamera()->SetPosition(Vector<3,float>(0.0,-20.0,140));
+    setup->GetCamera()->LookAt(Vector<3,float>(0.0,-20.0,0.0));
 
 
     //LockedQueue<float> q;// = new LockedQueue<float>();

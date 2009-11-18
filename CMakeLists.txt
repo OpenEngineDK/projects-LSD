@@ -6,6 +6,7 @@ SET( PROJECT_NAME "LSD")
 SET( PROJECT_SOURCES
   # Add all the cpp source files here
   main.cpp
+  EmptyTextureResource.h
   LockedQueue.h
   LockedQueue.cpp  
 )
