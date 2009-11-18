@@ -257,13 +257,13 @@ void GenerateSDF( Grid &g )
 
 
 ITextureResourcePtr processImage(ITextureResourcePtr tex,
-                                 EmptyTextureResourcePtr recv) {
+                                 EmptyTextureResourcePtr recv,
+                                 EmptyTextureResourcePtr gradTex) {
     // load initial data fields
     const unsigned int Y = tex->GetHeight();
     const unsigned int X = tex->GetWidth();
     const unsigned char* bw = tex->GetData();
     const unsigned int depth = tex->GetDepth()/8;
-    unsigned char* out = recv->GetData();
 
     Tex<float> t(X,Y);
     float pixel = t(10.11f,19.28f);
@@ -298,19 +298,19 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
     GenerateSDF(*gridInner);
 	GenerateSDF(*gridOuter);
 
-    	int result[HEIGHT][WIDTH];
+    int result[HEIGHT][WIDTH];
 
-        //unsigned char buffer[WIDTH*HEIGHT];
-        //cout << "bah" << endl;
+    //unsigned char buffer[WIDTH*HEIGHT];
+    //cout << "bah" << endl;
 
-        Tex<float> phi(X,Y);
+    Tex<float> phi(X,Y);
 
 	int min = WIDTH*HEIGHT+1;
 	int max = -(WIDTH*HEIGHT+1);
 
 	int dist1 = 0, dist2 = 0, dist = 0;
-	for (int y=0; y<HEIGHT; y++) {
-		for (int x=0; x<WIDTH; x++) {
+	for (int y=0; y<Y; y++) {
+		for (int x=0; x<X; x++) {
 			dist1 = (int)( sqrt( (double)Get( *gridInner, x, y ).DistSq() ) );
             dist2 = (int)( sqrt( (double)Get( *gridOuter, x, y ).DistSq() ) );
             dist = -dist2 + dist1;
@@ -330,11 +330,14 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
     logger.info << "MAX = " << max << logger.end;
     logger.info << "MIN = " << min << logger.end;
 
-	for (unsigned int y=0; y<HEIGHT; y++) {
-		for (unsigned int x=0; x<WIDTH; x++) {
+	for (unsigned int y=0; y<Y; y++) {
+		for (unsigned int x=0; x<X; x++) {
 			//buffer[y*WIDTH + x] = (char)(((float)result[y][x] / (float)max)*256.0f);
             phi(x,y) = (char)(((float)result[y][x] / (float)max)*256.0f);
             (*recv)(x,y,0) = phi(x,y);
+
+            
+
             //cout << phi(x,y);
 			//cout << (char)(((float)result[y][x] / (float)max)*256.0f) << " ";
 		}
@@ -342,105 +345,110 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
 	}
 
 
-  // // make signed distence field phi from bw image (tex)
-  // 
-  // for (unsigned int x=0; x<X; x++)
-  //     for (unsigned int y=0; y<Y; y++) {
-  //         unsigned int gray = 0;
-  //         //unsigned int i = 3;
-  //         for (unsigned int i=0;i<depth;i++)
-  //             gray += bw[y*X*depth+x*depth+i]; // dummy copy
+    // // make signed distence field phi from bw image (tex)
+    // 
+    // for (unsigned int x=0; x<X; x++)
+    //     for (unsigned int y=0; y<Y; y++) {
+    //         unsigned int gray = 0;
+    //         //unsigned int i = 3;
+    //         for (unsigned int i=0;i<depth;i++)
+    //             gray += bw[y*X*depth+x*depth+i]; // dummy copy
           
-  //         gray = (gray > 256)?255:0;
+    //         gray = (gray > 256)?255:0;
           
-  //         phi(x,y) = gray;
+    //         phi(x,y) = gray;
 
-  //         (*recv)(x,y,0) = phi(x,y);
+    //         (*recv)(x,y,0) = phi(x,y);
           
-  //         //out[y*X+x] = phi(x,y);
-  //     }
+    //         //out[y*X+x] = phi(x,y);
+    //     }
 
-  // make vector field V
-  Vector<2,float> gradient[X][Y];
-  float dx = 1;
-  float dy = 1;
-  float cdX, cdY;
-  for (unsigned int x=0; x<X; x++)
-    for (unsigned int y=0; y<Y; y++) {
+    // make vector field V
+    Vector<2,float> gradient[X][Y];
+    float dx = 1;
+    float dy = 1;
+    float cdX, cdY;
+    for (unsigned int x=0; x<X; x++)
+        for (unsigned int y=0; y<Y; y++) {
       
-      //upper left corner
-      if (x == 0 && y == 0) {
-	cdX = (phi(x, y) + phi(x+1, y)) / dx;
-	cdY = (phi(x, y) + phi(x, y+1)) / dy;
+            //upper left corner
+            if (x == 0 && y == 0) {
+                cdX = (phi(x, y) + phi(x+1, y)) / dx;
+                cdY = (phi(x, y) + phi(x, y+1)) / dy;
 
-      } 
-      //upper right corner
-      else if (x == X - 1 && y == 0) {
-	cdX = (phi(x, y) + phi(x-1, y)) / dx;
-	cdY = (phi(x, y) + phi(x, y+1)) / dy;
+            } 
+            //upper right corner
+            else if (x == X - 1 && y == 0) {
+                cdX = (phi(x, y) + phi(x-1, y)) / dx;
+                cdY = (phi(x, y) + phi(x, y+1)) / dy;
 
-      }
-      //lower left corner
-      else if (x == 0 && y == 0) {
-	cdX = (phi(x, y) + phi(x+1, y)) / dx;
-	cdY = (phi(x, y) + phi(x, y-1)) / dy;
+            }
+            //lower left corner
+            else if (x == 0 && y == 0) {
+                cdX = (phi(x, y) + phi(x+1, y)) / dx;
+                cdY = (phi(x, y) + phi(x, y-1)) / dy;
 
-      }      
-      //lower right corner
-      else if (x == X - 1 && y == Y) {
-	cdX = (phi(x, y) + phi(x-1, y)) / dx;
-	cdY = (phi(x, y) + phi(x, y-1)) / dy;
+            }      
+            //lower right corner
+            else if (x == X - 1 && y == Y) {
+                cdX = (phi(x, y) + phi(x-1, y)) / dx;
+                cdY = (phi(x, y) + phi(x, y-1)) / dy;
 
-      }
+            }
 
-      // upper border
-      else if (y == 0 && (x > 0 && x < X - 1)) {
-	cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
-	cdY = (phi(x, y) + phi(x, y+1)) / dy;
+            // upper border
+            else if (y == 0 && (x > 0 && x < X - 1)) {
+                cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y) + phi(x, y+1)) / dy;
 
-      }       
-      // lower border
-      else if (y == Y - 1 && (x > 0 && x < X - 1)) {
-	cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
-	cdY = (phi(x, y) + phi(x, y-1)) / dy;
+            }       
+            // lower border
+            else if (y == Y - 1 && (x > 0 && x < X - 1)) {
+                cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y) + phi(x, y-1)) / dy;
 
-      }
-      // left border
-      else if (x == 0 && (y > 0 && y < Y - 1)) {
-	cdX = (phi(x, y) + phi(x+1, y)) / dx;
-	cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+            }
+            // left border
+            else if (x == 0 && (y > 0 && y < Y - 1)) {
+                cdX = (phi(x, y) + phi(x+1, y)) / dx;
+                cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
 
-      }
-      // right border
-      else if (x == X - 1 && (y > 0 && y < Y - 1)) {
-	cdX = (phi(x, y) + phi(x-1, y)) / dx;
-	cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+            }
+            // right border
+            else if (x == X - 1 && (y > 0 && y < Y - 1)) {
+                cdX = (phi(x, y) + phi(x-1, y)) / dx;
+                cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
 
-      }
-      // Normal case
-      else {
+            }
+            // Normal case
+            else {
 	
-	// central differences
-	cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
-	cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
-      }
+                // central differences
+                cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+            }
 
-      	gradient[x][y] = Vector<2, float>(cdX, cdY);
-    }
+            gradient[x][y] = Vector<2, float>(cdX, cdY);
 
-  // solve the equations
-  unsigned char phi_plus[X][Y];
-  for (unsigned int i=0; i<1; i++) {
-      for (unsigned int x=0; x<X; x++)
-        for (unsigned int y=0; y<Y; y++)             
-            phi_plus[x][y] = 1;//phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
+            (*gradTex)(x,y,0) = phi(x,y); //gradient[x][y][0];
+            (*gradTex)(x,y,1) = 0;//gradient[x][y][1];
+            (*gradTex)(x,y,2) = 0;
+            //logger.info << "x=" << x << " y=" << y << logger.end;
+        }
+
+    // solve the equations
+    unsigned char phi_plus[X][Y];
+    for (unsigned int i=0; i<1; i++) {
+        for (unsigned int x=0; x<X; x++)
+            for (unsigned int y=0; y<Y; y++)             
+                phi_plus[x][y] = 1;//phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
         
-    // swap
-    //unsigned char** temp = phi_plus;
-      //phi_plus = phi;
-      //phi = temp;
-  }
-  return tex;
+        // swap
+        //unsigned char** temp = phi_plus;
+        //phi_plus = phi;
+        //phi = temp;
+    }
+    return tex;
 }
 
 int main(int argc, char** argv) {
@@ -470,19 +478,33 @@ int main(int argc, char** argv) {
     empty->Load();
     setup->GetTextureLoader().Load(empty);
 
+    EmptyTextureResourcePtr empty2 =
+        EmptyTextureResource::Create(image->GetWidth(),
+                                     image->GetHeight(),
+                                     24);
+    empty2->Load();
+    setup->GetTextureLoader().Load(empty2);
 
-    processImage(image,empty);
+    
+
+    processImage(image,empty,empty2);
 
 
     TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
     imageNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-    imageNode->Move(35,0,0);
+    imageNode->Move(35,-25,0);
     rootNode->AddNode(imageNode);
 
     TransformationNode* emptyNode = CreateTextureBillboard(empty,0.1);
     emptyNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-    emptyNode->Move(-35,0,0);
+    emptyNode->Move(-35,-25,0);
     rootNode->AddNode(emptyNode);
+
+    TransformationNode* emptyNode2 = CreateTextureBillboard(empty2,0.1);
+    emptyNode2->SetScale(Vector<3,float>(1.0,-1.0,1.0));
+    emptyNode2->Move(-35,25,0);
+    rootNode->AddNode(emptyNode2);
+
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0.0,-20.0,140));
     setup->GetCamera()->LookAt(Vector<3,float>(0.0,-20.0,0.0));
