@@ -159,33 +159,206 @@ public:
   }
 };
 
+#define HEIGHT 400
+#define WIDTH 640
+
+
+struct Point
+{
+    int dx, dy;
+
+    int DistSq() const { return dx*dx + dy*dy; }
+};
+
+struct Grid
+{
+    Point grid[HEIGHT][WIDTH];
+};
+
+Point Get(Grid &g, int x, int y) {
+	Point* other = new Point();
+	other->dx = g.grid[y][x].dx;
+	other->dy = g.grid[y][x].dy;
+	return *other;
+}
+
+void Put(Grid &g, int x, int y, Point p) {
+	g.grid[y][x] = p;
+}
+
+
+void Compare( Grid &g, Point &p, int x, int y, int offsetx, int offsety )
+{
+	Point other = Get(g,x+offsetx,y+offsety);
+    other.dx += offsetx;
+    other.dy += offsety;
+
+	if (other.DistSq() < p.DistSq()) {
+        p = other;
+	}
+}
+
+
+void GenerateSDF( Grid &g )
+{
+    // Pass 0
+    for (int y=0;y<HEIGHT;y++)
+    {
+        for (int x=0;x<WIDTH;x++)
+        {
+            Point p = Get( g, x, y );
+			if(x>0)
+				Compare( g, p, x, y, -1,  0 );
+			if(y>0)
+				Compare( g, p, x, y,  0, -1 );
+			if(x>0 && y>0)
+				Compare( g, p, x, y, -1, -1 );
+			if(x<WIDTH-1 && y>0)
+				Compare( g, p, x, y,  1, -1 );
+            Put( g, x, y, p );
+        }
+
+        for (int x=WIDTH-1;x>=0;x--)
+        {
+            Point p = Get( g, x, y );
+			if(x<WIDTH-1)
+				Compare( g, p, x, y, 1, 0 );
+            Put( g, x, y, p );
+        }
+    }
+
+    // Pass 1
+    for (int y=HEIGHT-1;y>=0;y--)
+    {
+        for (int x=WIDTH-1;x>=0;x--)
+        {
+            Point p = Get( g, x, y );
+			if(x<WIDTH-1)
+				Compare( g, p, x, y,  1,  0 );
+			if(y<HEIGHT-1)
+				Compare( g, p, x, y,  0,  1 );
+			if(x>0 && y<HEIGHT-1)
+				Compare( g, p, x, y, -1,  1 );
+			if(x<WIDTH-1 && y<HEIGHT-1)
+				Compare( g, p, x, y,  1,  1 );
+            Put( g, x, y, p );
+        }
+
+        for (int x=0;x<WIDTH;x++)
+        {
+            Point p = Get( g, x, y );
+			if(x>0)
+				Compare( g, p, x, y, -1, 0 );
+            Put( g, x, y, p );
+        }
+    }
+}
+
+
+
 ITextureResourcePtr processImage(ITextureResourcePtr tex,
-                                 ITextureResourcePtr recv) {
-  // load initial data fields
-  const unsigned int Y = tex->GetHeight();
-  const unsigned int X = tex->GetWidth();
-  const unsigned char* bw = tex->GetData();
-  const unsigned int depth = tex->GetDepth()/8;
-  unsigned char* out = recv->GetData();
+                                 EmptyTextureResourcePtr recv) {
+    // load initial data fields
+    const unsigned int Y = tex->GetHeight();
+    const unsigned int X = tex->GetWidth();
+    const unsigned char* bw = tex->GetData();
+    const unsigned int depth = tex->GetDepth()/8;
+    unsigned char* out = recv->GetData();
 
-  Tex<float> t(X,Y);
-  float pixel = t(10.11f,19.28f);
+    Tex<float> t(X,Y);
+    float pixel = t(10.11f,19.28f);
 
-  // make signed distence field phi from bw image (tex)
-  Tex<float> phi(X,Y);
-  for (unsigned int x=0; x<X; x++)
-      for (unsigned int y=0; y<Y; y++) {
-          unsigned int gray = 0;
-          //unsigned int i = 3;
-          for (unsigned int i=0;i<depth;i++)
-              gray += bw[y*X*depth+x*depth+i]; // dummy copy
+    // hacking teh PHI!
+    Grid* grid = new Grid();
+    Grid* gridInner = new Grid();
+    Grid* gridOuter = new Grid();
+
+    for (int y=0; y<HEIGHT; y++) {
+		for (int x=0; x<WIDTH; x++) {
+            unsigned int gray = 0;
+            for (unsigned int i=0;i<depth;i++)
+                gray += bw[y*X*depth+x*depth+i]; // dummy copy
+
+            gray = (gray > 256)?255:0;
+
+            if(!gray){
+				gridInner->grid[y][x].dx = 0;
+				gridInner->grid[y][x].dy = 0;
+				gridOuter->grid[y][x].dx = 10000;
+				gridOuter->grid[y][x].dy = 10000;
+			} else {
+				gridInner->grid[y][x].dx = 10000;
+				gridInner->grid[y][x].dy = 10000;
+				gridOuter->grid[y][x].dx = 0;
+				gridOuter->grid[y][x].dy = 0;
+			}
+		}
+	}
+
+    GenerateSDF(*gridInner);
+	GenerateSDF(*gridOuter);
+
+    	int result[HEIGHT][WIDTH];
+
+        //unsigned char buffer[WIDTH*HEIGHT];
+        //cout << "bah" << endl;
+
+        Tex<float> phi(X,Y);
+
+	int min = WIDTH*HEIGHT+1;
+	int max = -(WIDTH*HEIGHT+1);
+
+	int dist1 = 0, dist2 = 0, dist = 0;
+	for (int y=0; y<HEIGHT; y++) {
+		for (int x=0; x<WIDTH; x++) {
+			dist1 = (int)( sqrt( (double)Get( *gridInner, x, y ).DistSq() ) );
+            dist2 = (int)( sqrt( (double)Get( *gridOuter, x, y ).DistSq() ) );
+            dist = -dist2 + dist1;
+			
+			result[y][x] = dist;
+
+			if(min > dist)
+				min = dist;
+			if(max < dist)
+				max = dist;
+			
+			//cout << dist;// << " and " << (dist / (sqrt(200.0)))*256 << " - ";
+		}
+		//cout << endl;
+	}
+
+    logger.info << "MAX = " << max << logger.end;
+    logger.info << "MIN = " << min << logger.end;
+
+	for (unsigned int y=0; y<HEIGHT; y++) {
+		for (unsigned int x=0; x<WIDTH; x++) {
+			//buffer[y*WIDTH + x] = (char)(((float)result[y][x] / (float)max)*256.0f);
+            phi(x,y) = (char)(((float)result[y][x] / (float)max)*256.0f);
+            (*recv)(x,y,0) = phi(x,y);
+            //cout << phi(x,y);
+			//cout << (char)(((float)result[y][x] / (float)max)*256.0f) << " ";
+		}
+		//cout << endl;
+	}
+
+
+  // // make signed distence field phi from bw image (tex)
+  // 
+  // for (unsigned int x=0; x<X; x++)
+  //     for (unsigned int y=0; y<Y; y++) {
+  //         unsigned int gray = 0;
+  //         //unsigned int i = 3;
+  //         for (unsigned int i=0;i<depth;i++)
+  //             gray += bw[y*X*depth+x*depth+i]; // dummy copy
           
-          gray = (gray > 256)?255:0;
+  //         gray = (gray > 256)?255:0;
           
-          phi(x,y) = gray;
+  //         phi(x,y) = gray;
 
-          out[y*X+x] = phi(x,y);
-      }
+  //         (*recv)(x,y,0) = phi(x,y);
+          
+  //         //out[y*X+x] = phi(x,y);
+  //     }
 
   // make vector field V
   Vector<2,float> gradient[X][Y];
@@ -286,12 +459,14 @@ int main(int argc, char** argv) {
     setup->GetTextureLoader().Load(image);    
 
     logger.info << "Image Depth = " << image->GetDepth() << logger.end;
+    logger.info << "Image Width = " << image->GetWidth() << logger.end;
+    logger.info << "Image Height = " << image->GetHeight() << logger.end;
 
 
-    ITextureResourcePtr empty =
-        ITextureResourcePtr(new EmptyTextureResource(image->GetWidth(),
-                                                     image->GetHeight(),
-                                                     8));
+    EmptyTextureResourcePtr empty =
+        EmptyTextureResource::Create(image->GetWidth(),
+                                     image->GetHeight(),
+                                     8);
     empty->Load();
     setup->GetTextureLoader().Load(empty);
 
