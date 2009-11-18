@@ -112,20 +112,21 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
 template <typename T>
 class Tex {
 private:
-  unsigned int width, height;
-  T* data;
+    unsigned int width, height;
+    T* data;
 public:
-  Tex(unsigned int height, unsigned int width)
-    :  width(width), height(height) {
-	data = new T[height*width];
+    Tex(unsigned int width, unsigned int height)
+      :  width(width), height(height) {
+      data = new T[height*width];
   }
 
   T* operator[](const unsigned int iy) {
-    return data+ iy*width;
+      return data+ iy*width;
   }
 
   T& operator()(const unsigned int ix, const unsigned int iy) {
-    return data[ix+iy*width];
+      
+      return data[ix+iy*width];
   }
 
   // look up pixel by interpolation
@@ -371,7 +372,7 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
     for (unsigned int x=0; x<X; x++)
         for (unsigned int y=0; y<Y; y++) {
       
-            //upper left corner
+            //lower left corner
             if (x == 0 && y == 0) {
                 cdX = (phi(x, y) + phi(x+1, y)) / dx;
                 cdY = (phi(x, y) + phi(x, y+1)) / dy;
@@ -383,14 +384,14 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
                 cdY = (phi(x, y) + phi(x, y+1)) / dy;
 
             }
-            //lower left corner
-            else if (x == 0 && y == 0) {
+            //upper left corner
+            else if (x == 0 && y == Y - 1) {
                 cdX = (phi(x, y) + phi(x+1, y)) / dx;
                 cdY = (phi(x, y) + phi(x, y-1)) / dy;
 
             }      
             //lower right corner
-            else if (x == X - 1 && y == Y) {
+            else if (x == X - 1 && y == Y - 1) {
                 cdX = (phi(x, y) + phi(x-1, y)) / dx;
                 cdY = (phi(x, y) + phi(x, y-1)) / dy;
 
@@ -430,24 +431,24 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
 
             gradient[x][y] = Vector<2, float>(cdX, cdY);
 
-            (*gradTex)(x,y,0) = phi(x,y); //gradient[x][y][0];
+            (*gradTex)(x,y,0) = 0;//gradient[x][y][0];
             (*gradTex)(x,y,1) = 0;//gradient[x][y][1];
-            (*gradTex)(x,y,2) = 0;
+            (*gradTex)(x,y,2) = gradient[x][y].GetLength();
             //logger.info << "x=" << x << " y=" << y << logger.end;
         }
 
     // solve the equations
-    unsigned char phi_plus[X][Y];
-    for (unsigned int i=0; i<1; i++) {
-        for (unsigned int x=0; x<X; x++)
-            for (unsigned int y=0; y<Y; y++)             
-                phi_plus[x][y] = 1;//phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
+    // unsigned char phi_plus[X][Y];
+    // for (unsigned int i=0; i<1; i++) {
+    //     for (unsigned int x=0; x<X; x++)
+    //         for (unsigned int y=0; y<Y; y++)             
+    //             phi_plus[x][y] = 1;//phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
         
-        // swap
-        //unsigned char** temp = phi_plus;
-        //phi_plus = phi;
-        //phi = temp;
-    }
+    //     // swap
+    //     //unsigned char** temp = phi_plus;
+    //     //phi_plus = phi;
+    //     //phi = temp;
+    // }
     return tex;
 }
 
