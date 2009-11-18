@@ -188,10 +188,72 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
       }
 
   // make vector field V
-  Vector<2,float> v[X][Y];
+  Vector<2,float> gradient[X][Y];
+  float dx = 1;
+  float dy = 1;
+  float cdX, cdY;
   for (unsigned int x=0; x<X; x++)
-    for (unsigned int y=0; y<Y; y++)
-      v[x][y] = Vector<2,float>(1.0,0.0);
+    for (unsigned int y=0; y<Y; y++) {
+      
+      //upper left corner
+      if (x == 0 && y == 0) {
+	cdX = (phi(x, y) + phi(x+1, y)) / dx;
+	cdY = (phi(x, y) + phi(x, y+1)) / dy;
+
+      } 
+      //upper right corner
+      else if (x == X - 1 && y == 0) {
+	cdX = (phi(x, y) + phi(x-1, y)) / dx;
+	cdY = (phi(x, y) + phi(x, y+1)) / dy;
+
+      }
+      //lower left corner
+      else if (x == 0 && y == 0) {
+	cdX = (phi(x, y) + phi(x+1, y)) / dx;
+	cdY = (phi(x, y) + phi(x, y-1)) / dy;
+
+      }      
+      //lower right corner
+      else if (x == X - 1 && y == Y) {
+	cdX = (phi(x, y) + phi(x-1, y)) / dx;
+	cdY = (phi(x, y) + phi(x, y-1)) / dy;
+
+      }
+
+      // upper border
+      else if (y == 0 && (x > 0 && x < X - 1)) {
+	cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
+	cdY = (phi(x, y) + phi(x, y+1)) / dy;
+
+      }       
+      // lower border
+      else if (y == Y - 1 && (x > 0 && x < X - 1)) {
+	cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
+	cdY = (phi(x, y) + phi(x, y-1)) / dy;
+
+      }
+      // left border
+      else if (x == 0 && (y > 0 && y < Y - 1)) {
+	cdX = (phi(x, y) + phi(x+1, y)) / dx;
+	cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+
+      }
+      // right border
+      else if (x == X - 1 && (y > 0 && y < Y - 1)) {
+	cdX = (phi(x, y) + phi(x-1, y)) / dx;
+	cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+
+      }
+      // Normal case
+      else {
+	
+	// central differences
+	cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
+	cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+      }
+
+      	gradient[x][y] = Vector<2, float>(cdX, cdY);
+    }
 
   // solve the equations
   unsigned char phi_plus[X][Y];
