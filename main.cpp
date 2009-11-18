@@ -129,6 +129,34 @@ public:
       return data[ix+iy*width];
   }
 
+    void ToTexture(EmptyTextureResourcePtr texture) {
+        
+        float min = 0;
+        float max = 0;
+
+        for(unsigned int x=0;x<width;x++) {
+            for(unsigned int y=0;y<height;y++) {
+                T pix = operator()(x,y);
+                
+                min = (min<pix)?min:pix;
+                max = (max>pix)?max:pix;
+                
+            }
+        }
+
+        for(unsigned int x=0;x<width;x++) {
+            for(unsigned int y=0;y<height;y++) {
+                T pix = operator()(x,y);
+                if (pix < 0)
+                    (*texture)(x,y,0) = (unsigned char)(pix/min * 256);
+                else
+                    (*texture)(x,y,0) = (unsigned char)(pix/max * 256);
+            }
+        }
+
+
+    }
+
   // look up pixel by interpolation
   T operator()(const float fx, const float fy) {
 #if OE_SAFE
@@ -160,37 +188,46 @@ public:
   }
 };
 
-#define HEIGHT 400
-#define WIDTH 640
 
-
-struct Point
-{
+struct Point {
     int dx, dy;
 
     int DistSq() const { return dx*dx + dy*dy; }
 };
 
-struct Grid
-{
-    Point grid[HEIGHT][WIDTH];
+class Grid {
+    
+    unsigned int width;
+    unsigned int height;
+    
+    Point *grid;//[HEIGHT][WIDTH];
+
+public:
+    Grid(unsigned int w, 
+         unsigned int h) : width(w), height(h) {
+        grid = new Point[width*height];
+    }
+    Point Get(unsigned int x,
+               unsigned int y) {
+        return grid[y*width+x];
+    }
+    void Put(unsigned int x,
+             unsigned int y,
+             Point v) {
+        grid[y*width+x] = v;
+    }
+
+    Point& operator()(unsigned int x,
+                      unsigned int y) {
+        return grid[y*width+x];
+    }
 };
 
-Point Get(Grid &g, int x, int y) {
-	Point* other = new Point();
-	other->dx = g.grid[y][x].dx;
-	other->dy = g.grid[y][x].dy;
-	return *other;
-}
-
-void Put(Grid &g, int x, int y, Point p) {
-	g.grid[y][x] = p;
-}
 
 
 void Compare( Grid &g, Point &p, int x, int y, int offsetx, int offsety )
 {
-	Point other = Get(g,x+offsetx,y+offsety);
+	Point other = g.Get(x+offsetx,y+offsety);
     other.dx += offsetx;
     other.dy += offsety;
 
@@ -200,57 +237,57 @@ void Compare( Grid &g, Point &p, int x, int y, int offsetx, int offsety )
 }
 
 
-void GenerateSDF( Grid &g )
+void GenerateSDF( Grid &g, int width, int height )
 {
     // Pass 0
-    for (int y=0;y<HEIGHT;y++)
+    for (int y=0;y<height;y++)
     {
-        for (int x=0;x<WIDTH;x++)
+        for (int x=0;x<width;x++)
         {
-            Point p = Get( g, x, y );
+            Point p = g.Get(x, y );
 			if(x>0)
 				Compare( g, p, x, y, -1,  0 );
 			if(y>0)
 				Compare( g, p, x, y,  0, -1 );
 			if(x>0 && y>0)
 				Compare( g, p, x, y, -1, -1 );
-			if(x<WIDTH-1 && y>0)
+			if(x<width-1 && y>0)
 				Compare( g, p, x, y,  1, -1 );
-            Put( g, x, y, p );
+            g.Put( x, y, p );
         }
 
-        for (int x=WIDTH-1;x>=0;x--)
+        for (int x=width-1;x>=0;x--)
         {
-            Point p = Get( g, x, y );
-			if(x<WIDTH-1)
+            Point p = g.Get( x, y );
+			if(x<width-1)
 				Compare( g, p, x, y, 1, 0 );
-            Put( g, x, y, p );
+            g.Put( x, y, p );
         }
     }
 
     // Pass 1
-    for (int y=HEIGHT-1;y>=0;y--)
+    for (int y=height-1;y>=0;y--)
     {
-        for (int x=WIDTH-1;x>=0;x--)
+        for (int x=width-1;x>=0;x--)
         {
-            Point p = Get( g, x, y );
-			if(x<WIDTH-1)
+            Point p = g.Get( x, y );
+			if(x<width-1)
 				Compare( g, p, x, y,  1,  0 );
-			if(y<HEIGHT-1)
+			if(y<height-1)
 				Compare( g, p, x, y,  0,  1 );
-			if(x>0 && y<HEIGHT-1)
+			if(x>0 && y<height-1)
 				Compare( g, p, x, y, -1,  1 );
-			if(x<WIDTH-1 && y<HEIGHT-1)
+			if(x<width-1 && y<height-1)
 				Compare( g, p, x, y,  1,  1 );
-            Put( g, x, y, p );
+            g.Put( x, y, p );
         }
 
-        for (int x=0;x<WIDTH;x++)
+        for (int x=0;x<width;x++)
         {
-            Point p = Get( g, x, y );
+            Point p = g.Get( x, y );
 			if(x>0)
 				Compare( g, p, x, y, -1, 0 );
-            Put( g, x, y, p );
+            g.Put( x, y, p );
         }
     }
 }
@@ -267,15 +304,15 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
     const unsigned int depth = tex->GetDepth()/8;
 
     Tex<float> t(X,Y);
-    float pixel = t(10.11f,19.28f);
+    //float pixel = t(10.11f,19.28f);
 
     // hacking teh PHI!
-    Grid* grid = new Grid();
-    Grid* gridInner = new Grid();
-    Grid* gridOuter = new Grid();
+    //Grid* grid = new Grid();
+    Grid* gridInner = new Grid(X,Y);
+    Grid* gridOuter = new Grid(X,Y);
 
-    for (int y=0; y<HEIGHT; y++) {
-		for (int x=0; x<WIDTH; x++) {
+    for (unsigned int y=0; y<Y; y++) {
+		for (unsigned int x=0; x<X; x++) {
             unsigned int gray = 0;
             for (unsigned int i=0;i<depth;i++)
                 gray += bw[y*X*depth+x*depth+i]; // dummy copy
@@ -283,40 +320,36 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
             gray = (gray > 256)?255:0;
 
             if(!gray){
-				gridInner->grid[y][x].dx = 0;
-				gridInner->grid[y][x].dy = 0;
-				gridOuter->grid[y][x].dx = 10000;
-				gridOuter->grid[y][x].dy = 10000;
+				(*gridInner)(x,y).dx = 0;
+				(*gridInner)(x,y).dy = 0;
+				(*gridOuter)(x,y).dx = X;
+				(*gridOuter)(x,y).dy = Y;
 			} else {
-				gridInner->grid[y][x].dx = 10000;
-				gridInner->grid[y][x].dy = 10000;
-				gridOuter->grid[y][x].dx = 0;
-				gridOuter->grid[y][x].dy = 0;
+				(*gridInner)(x,y).dx = X;
+				(*gridInner)(x,y).dy = Y;
+				(*gridOuter)(x,y).dx = 0;
+				(*gridOuter)(x,y).dy = 0;
 			}
 		}
 	}
 
-    GenerateSDF(*gridInner);
-	GenerateSDF(*gridOuter);
-
-    int result[HEIGHT][WIDTH];
-
-    //unsigned char buffer[WIDTH*HEIGHT];
-    //cout << "bah" << endl;
+    GenerateSDF(*gridInner,X,Y);
+	GenerateSDF(*gridOuter,X,Y);
 
     Tex<float> phi(X,Y);
 
-	int min = WIDTH*HEIGHT+1;
-	int max = -(WIDTH*HEIGHT+1);
+	int min = X*Y+1;
+	int max = -(X*Y+1);
 
 	int dist1 = 0, dist2 = 0, dist = 0;
-	for (int y=0; y<Y; y++) {
-		for (int x=0; x<X; x++) {
-			dist1 = (int)( sqrt( (double)Get( *gridInner, x, y ).DistSq() ) );
-            dist2 = (int)( sqrt( (double)Get( *gridOuter, x, y ).DistSq() ) );
+	for (unsigned int y=0; y<Y; y++) {
+		for (unsigned int x=0; x<X; x++) {
+			dist1 = (int)( sqrt( (double)gridInner->Get(x,y).DistSq() ) );
+            dist2 = (int)( sqrt( (double)gridOuter->Get(x,y).DistSq() ) );
             dist = -dist2 + dist1;
 			
-			result[y][x] = dist;
+			//result[y][x] = dist;
+            phi(x,y) = dist;
 
 			if(min > dist)
 				min = dist;
@@ -328,41 +361,8 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
 		//cout << endl;
 	}
 
-    logger.info << "MAX = " << max << logger.end;
-    logger.info << "MIN = " << min << logger.end;
+    phi.ToTexture(recv);
 
-	for (unsigned int y=0; y<Y; y++) {
-		for (unsigned int x=0; x<X; x++) {
-			//buffer[y*WIDTH + x] = (char)(((float)result[y][x] / (float)max)*256.0f);
-            phi(x,y) = (char)(((float)result[y][x] / (float)max)*256.0f);
-            (*recv)(x,y,0) = phi(x,y);
-
-            
-
-            //cout << phi(x,y);
-			//cout << (char)(((float)result[y][x] / (float)max)*256.0f) << " ";
-		}
-		//cout << endl;
-	}
-
-
-    // // make signed distence field phi from bw image (tex)
-    // 
-    // for (unsigned int x=0; x<X; x++)
-    //     for (unsigned int y=0; y<Y; y++) {
-    //         unsigned int gray = 0;
-    //         //unsigned int i = 3;
-    //         for (unsigned int i=0;i<depth;i++)
-    //             gray += bw[y*X*depth+x*depth+i]; // dummy copy
-          
-    //         gray = (gray > 256)?255:0;
-          
-    //         phi(x,y) = gray;
-
-    //         (*recv)(x,y,0) = phi(x,y);
-          
-    //         //out[y*X+x] = phi(x,y);
-    //     }
 
     // make vector field V
     Vector<2,float> gradient[X][Y];
