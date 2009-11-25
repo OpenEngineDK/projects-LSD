@@ -308,3 +308,44 @@ Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
         
 }
 
+Tex<float> LevelSetMethod::Union(Tex<float> sdf1, Tex<float> sdf2) {
+	unsigned int height = sdf1.GetHeight();
+	unsigned int width = sdf1.GetWidth();
+	
+	Tex<float> res(width,height);
+	
+	for (unsigned int y=0; y<height; y++) {
+		for (unsigned int x=0; x<width; x++) {
+			res(x,y) = min(sdf1(x,y),sdf2(x,y));
+		}
+	}
+	return res;
+}
+
+Tex<float> LevelSetMethod::Intersection(Tex<float> sdf1, Tex<float> sdf2) {
+	unsigned int height = sdf1.GetHeight();
+	unsigned int width = sdf1.GetWidth();
+	
+	Tex<float> res(width,height);
+	
+	for (unsigned int y=0; y<height; y++) {
+		for (unsigned int x=0; x<width; x++) {
+			res(x,y) = max(sdf1(x,y),sdf2(x,y));
+		}
+	}
+	return res;
+}
+
+Tex<float> LevelSetMethod::Subtract(Tex<float> sdf1, Tex<float> sdf2) {
+	unsigned int height = sdf1.GetHeight();
+	unsigned int width = sdf1.GetWidth();
+	
+	Tex<float> res(width,height);
+	
+	for (unsigned int y=0; y<height; y++) {
+		for (unsigned int x=0; x<width; x++) {
+			res(x,y) = max(sdf1(x,y),-sdf2(x,y));
+		}
+	}
+	return res;
+}

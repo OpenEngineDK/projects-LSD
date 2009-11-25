@@ -96,6 +96,11 @@ public:
 
     Tex<float> GetPhi() {return phi;}
 
+    Tex<float> Union(Tex<float> sdf1, Tex<float> sdf2);
+	Tex<float> Intersection(Tex<float> sdf1, Tex<float> sdf2);
+	Tex<float> Subtract(Tex<float> sdf1, Tex<float> sdf2);
+
+
 };
 
 #endif
