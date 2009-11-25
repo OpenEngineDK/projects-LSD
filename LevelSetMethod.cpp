@@ -1,15 +1,18 @@
 #include "LevelSetMethod.h"
 #include <Logging/Logger.h>
 
+
+
 LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
-    : inputTex(inputTex) {
-    
-    int w = inputTex->GetWidth(),
-        h = inputTex->GetHeight();
+    : inputTex(inputTex), 
+      width(inputTex->GetWidth()),
+      height(inputTex->GetHeight()),
+      phi(Tex<float>(width,height)),
+      sdfTex(EmptyTextureResource::Create(width,height,8))
+ {
     
 
-    sdfTex = EmptyTextureResource::Create(w,h,8);
-
+    
 
 }
 

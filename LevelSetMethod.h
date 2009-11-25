@@ -3,6 +3,7 @@
 
 #include "LockedQueue.h"
 #include <Core/Thread.h>
+#include "Tex.h"
 
 #include "EmptyTextureResource.h"
 
@@ -15,7 +16,15 @@ class LevelSetMethod : public Thread {
 
     ITextureResourcePtr inputTex;
 
+
+
+    int width;
+    int height;
+
+    Tex<float> phi;
+
     EmptyTextureResourcePtr sdfTex;
+
 
 public:
 
