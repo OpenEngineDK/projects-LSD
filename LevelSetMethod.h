@@ -59,6 +59,7 @@ class LevelSetMethod : public Thread {
     Tex<float> phi;
 
     Tex<Vector<2,float> > vf;
+    Tex<Vector<2,float> > grad;
 
     EmptyTextureResourcePtr sdfTex,vfTex,gradTex;
 

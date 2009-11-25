@@ -68,6 +68,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
       height(inputTex->GetHeight()),
       phi(Tex<float>(width,height)),
       vf(Tex<Vector<2,float> >(width,height)),
+      grad(Tex<Vector<2,float> >(width,height)),
       sdfTex(EmptyTextureResource::Create(width,height,8)),
       vfTex(EmptyTextureResource::Create(width,height,24)),
       gradTex(EmptyTextureResource::Create(width,height,24))
@@ -83,22 +84,20 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
     vf.ToTexture(vfTex);
     
     BuildGradient();
-
+    grad.ToTexture(gradTex);
 }
 
 
 void LevelSetMethod::BuildGradient() {    
 
-    for(unsigned int x=0; x<width;x++)
-        for(unsigned int y=0; y<height;y++) {
+#warning TODO: Vi burde fixe edge cases!111etetet
+
+    for(unsigned int x=0; x<width-1;x++)
+        for(unsigned int y=0; y<height-1;y++) {
             Vector<2,float> g = Gradient(x,y);
 
+            grad(x,y) = g;
             
-
-            (*gradTex)(x,y,0) = g[0];
-            (*gradTex)(x,y,1) = g[1];
-            (*gradTex)(x,y,2) = 0;
-            (*gradTex)(x,y,3) = -1;
         }
 
 }

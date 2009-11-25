@@ -3,7 +3,7 @@
 
 using namespace OpenEngine::Math;
 
-template<> void Tex<float>::ToTexture(EmptyTextureResourcePtr texture) {
+template<> void Tex<float>::ToTexture(EmptyTextureResourcePtr texture, bool dbg) {
         
         float min = 0;
         float max = 0;
@@ -33,7 +33,7 @@ template<> void Tex<float>::ToTexture(EmptyTextureResourcePtr texture) {
 
 using namespace std;
 
-template<> void Tex<Vector<2,float> >::ToTexture(EmptyTextureResourcePtr texture) {
+template<> void Tex<Vector<2,float> >::ToTexture(EmptyTextureResourcePtr texture, bool dbg) {
         
         float _min = 0;
         float _max = 0;
@@ -53,14 +53,25 @@ template<> void Tex<Vector<2,float> >::ToTexture(EmptyTextureResourcePtr texture
             }
         }
 
+        if (dbg) {
+            logger.info << _min << logger.end;
+            logger.info << _max << logger.end;
+        }
         for(unsigned int x=0;x<width;x++) {
             for(unsigned int y=0;y<height;y++) {
 
                 (*texture)(x,y,2) = 0;
                 (*texture)(x,y,3) = -1;
 
-            
                 Vector<2,float> pix = operator()(x,y);
+
+                if (dbg) {
+                    logger.info << x << "," << y << " =  "
+                                << pix[0] << ", " << pix[1] << logger.end;
+                }
+
+            
+
                 if (pix[0] < 0) {
                     (*texture)(x,y,0) = (unsigned char)(pix[0]/_min * 256);
                     //(*texture)(x,y,2) = -1;
@@ -73,6 +84,8 @@ template<> void Tex<Vector<2,float> >::ToTexture(EmptyTextureResourcePtr texture
                 else
                     (*texture)(x,y,1) = (unsigned char)(pix[1]/_max * 256);
 
+                //if (dbg)
+                    //logger.info << x << " " << y <<" " << int((*texture)(x,y,1)) << logger.end;
             
             }
         }

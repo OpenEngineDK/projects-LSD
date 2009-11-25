@@ -33,7 +33,7 @@ public:
       
         return data[ix+iy*width];
     }
-    void ToTexture(EmptyTextureResourcePtr t) ; 
+    void ToTexture(EmptyTextureResourcePtr t, bool dbg=false) ; 
 
 
   // look up pixel by interpolation
