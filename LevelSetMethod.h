@@ -9,7 +9,45 @@
 
 using namespace OpenEngine::Core;
 
+
+struct Point {
+    int dx, dy;
+
+    int DistSq() const { return dx*dx + dy*dy; }
+};
+
+class Grid {
+    
+    unsigned int width;
+    unsigned int height;
+    
+    Point *grid;//[HEIGHT][WIDTH];
+
+public:
+    Grid(unsigned int w, 
+         unsigned int h) : width(w), height(h) {
+        grid = new Point[width*height];
+    }
+    Point Get(unsigned int x,
+               unsigned int y) {
+        return grid[y*width+x];
+    }
+    void Put(unsigned int x,
+             unsigned int y,
+             Point v) {
+        grid[y*width+x] = v;
+    }
+
+    Point& operator()(unsigned int x,
+                      unsigned int y) {
+        return grid[y*width+x];
+    }
+};
+
+
 class LevelSetMethod : public Thread {
+
+    
 
     
     //LockedQueue<EmptyTextureResourcePtr>* texQueue;
@@ -18,17 +56,20 @@ class LevelSetMethod : public Thread {
 
 
 
-    int width;
-    int height;
+    unsigned int width;
+    unsigned int height;
 
     Tex<float> phi;
 
     EmptyTextureResourcePtr sdfTex;
 
 
+    void BuildSDF();
 public:
 
     LevelSetMethod(ITextureResourcePtr inputTex);
+
+
 
     bool run;
 
@@ -36,7 +77,7 @@ public:
 
     EmptyTextureResourcePtr GetDFSTexture() {return sdfTex;}
 
-    
+    Tex<float> GetPhi() {return phi;}
 
 };
 

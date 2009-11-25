@@ -112,177 +112,32 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
 }
 
 
-struct Point {
-    int dx, dy;
-
-    int DistSq() const { return dx*dx + dy*dy; }
-};
-
-class Grid {
-    
-    unsigned int width;
-    unsigned int height;
-    
-    Point *grid;//[HEIGHT][WIDTH];
-
-public:
-    Grid(unsigned int w, 
-         unsigned int h) : width(w), height(h) {
-        grid = new Point[width*height];
-    }
-    Point Get(unsigned int x,
-               unsigned int y) {
-        return grid[y*width+x];
-    }
-    void Put(unsigned int x,
-             unsigned int y,
-             Point v) {
-        grid[y*width+x] = v;
-    }
-
-    Point& operator()(unsigned int x,
-                      unsigned int y) {
-        return grid[y*width+x];
-    }
-};
 
 
 
-void Compare( Grid &g, Point &p, int x, int y, int offsetx, int offsety )
-{
-	Point other = g.Get(x+offsetx,y+offsety);
-    other.dx += offsetx;
-    other.dy += offsety;
-
-	if (other.DistSq() < p.DistSq()) {
-        p = other;
-	}
-}
-
-
-void GenerateSDF( Grid &g, int width, int height )
-{
-    // Pass 0
-    for (int y=0;y<height;y++)
-    {
-        for (int x=0;x<width;x++)
-        {
-            Point p = g.Get(x, y );
-			if(x>0)
-				Compare( g, p, x, y, -1,  0 );
-			if(y>0)
-				Compare( g, p, x, y,  0, -1 );
-			if(x>0 && y>0)
-				Compare( g, p, x, y, -1, -1 );
-			if(x<width-1 && y>0)
-				Compare( g, p, x, y,  1, -1 );
-            g.Put( x, y, p );
-        }
-
-        for (int x=width-1;x>=0;x--)
-        {
-            Point p = g.Get( x, y );
-			if(x<width-1)
-				Compare( g, p, x, y, 1, 0 );
-            g.Put( x, y, p );
-        }
-    }
-
-    // Pass 1
-    for (int y=height-1;y>=0;y--)
-    {
-        for (int x=width-1;x>=0;x--)
-        {
-            Point p = g.Get( x, y );
-			if(x<width-1)
-				Compare( g, p, x, y,  1,  0 );
-			if(y<height-1)
-				Compare( g, p, x, y,  0,  1 );
-			if(x>0 && y<height-1)
-				Compare( g, p, x, y, -1,  1 );
-			if(x<width-1 && y<height-1)
-				Compare( g, p, x, y,  1,  1 );
-            g.Put( x, y, p );
-        }
-
-        for (int x=0;x<width;x++)
-        {
-            Point p = g.Get( x, y );
-			if(x>0)
-				Compare( g, p, x, y, -1, 0 );
-            g.Put( x, y, p );
-        }
-    }
-}
 
 
 
-ITextureResourcePtr processImage(ITextureResourcePtr tex,
+
+ITextureResourcePtr processImage(LevelSetMethod& m,
+                                 ITextureResourcePtr tex,
                                  EmptyTextureResourcePtr recv,
                                  EmptyTextureResourcePtr gradTex) {
     // load initial data fields
     const unsigned int Y = tex->GetHeight();
     const unsigned int X = tex->GetWidth();
-    const unsigned char* bw = tex->GetData();
-    const unsigned int depth = tex->GetDepth()/8;
+    
 
     Tex<float> t(X,Y);
     //float pixel = t(10.11f,19.28f);
 
     // hacking teh PHI!
     //Grid* grid = new Grid();
-    Grid* gridInner = new Grid(X,Y);
-    Grid* gridOuter = new Grid(X,Y);
-
-    for (unsigned int y=0; y<Y; y++) {
-		for (unsigned int x=0; x<X; x++) {
-            unsigned int gray = 0;
-            for (unsigned int i=0;i<depth;i++)
-                gray += bw[y*X*depth+x*depth+i]; // dummy copy
-
-            gray = (gray > 256)?255:0;
-
-            if(!gray){
-				(*gridInner)(x,y).dx = 0;
-				(*gridInner)(x,y).dy = 0;
-				(*gridOuter)(x,y).dx = X;
-				(*gridOuter)(x,y).dy = Y;
-			} else {
-				(*gridInner)(x,y).dx = X;
-				(*gridInner)(x,y).dy = Y;
-				(*gridOuter)(x,y).dx = 0;
-				(*gridOuter)(x,y).dy = 0;
-			}
-		}
-	}
-
-    GenerateSDF(*gridInner,X,Y);
-	GenerateSDF(*gridOuter,X,Y);
 
     Tex<float> phi(X,Y);
 
-	int min = X*Y+1;
-	int max = -(X*Y+1);
+    phi = m.GetPhi();
 
-	int dist1 = 0, dist2 = 0, dist = 0;
-	for (unsigned int y=0; y<Y; y++) {
-		for (unsigned int x=0; x<X; x++) {
-			dist1 = (int)( sqrt( (double)gridInner->Get(x,y).DistSq() ) );
-            dist2 = (int)( sqrt( (double)gridOuter->Get(x,y).DistSq() ) );
-            dist = -dist2 + dist1;
-			
-			//result[y][x] = dist;
-            phi(x,y) = dist;
-
-			if(min > dist)
-				min = dist;
-			if(max < dist)
-				max = dist;
-			
-			//cout << dist;// << " and " << (dist / (sqrt(200.0)))*256 << " - ";
-		}
-		//cout << endl;
-	}
 
     phi.ToTexture(recv);
 
@@ -420,7 +275,7 @@ int main(int argc, char** argv) {
 
     
 
-    processImage(image,empty,empty2);
+    processImage(method,image,empty,empty2);
 
 
     TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
