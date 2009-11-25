@@ -25,6 +25,9 @@ public:
       data = new T[height*width];
     }
 
+    unsigned int GetWidth() { return width; }
+    unsigned int GetHeight() { return height; }
+
     T* operator[](const unsigned int iy) {
         return data+ iy*width;
     }
