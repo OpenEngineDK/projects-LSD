@@ -8,6 +8,7 @@
 #include "EmptyTextureResource.h"
 
 using namespace OpenEngine::Core;
+using namespace std;
 
 
 struct Point {
@@ -76,6 +77,10 @@ public:
     virtual void Run();
 
     EmptyTextureResourcePtr GetDFSTexture() {return sdfTex;}
+    
+    float GetValue(unsigned int i, unsigned int j);
+    
+    void Godunov(unsigned int i, unsigned int j, float a, float & dx, float & dy);
 
     Tex<float> GetPhi() {return phi;}
 

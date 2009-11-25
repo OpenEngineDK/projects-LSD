@@ -47,12 +47,6 @@ using namespace OpenEngine::Scene;
 using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Math;
 
-/**
- * Main method for the first quarter project of CGD.
- * Corresponds to the
- *   public static void main(String args[])
- * method in Java.
- */
 
 static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
 						  float scale) {
@@ -236,9 +230,17 @@ ITextureResourcePtr processImage(LevelSetMethod& m,
     return tex;
 }
 
+
+/**
+ * Main method for the first quarter project of CGD.
+ * Corresponds to the
+ *   public static void main(String args[])
+ * method in Java.
+ */
+
 int main(int argc, char** argv) {
     // Create simple setup
-    SimpleSetup* setup = new SimpleSetup("Example Project Title");
+    SimpleSetup* setup = new SimpleSetup("LevelSet Method");
  
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.0,0.0,0.0,1.0));

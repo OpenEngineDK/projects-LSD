@@ -146,3 +146,27 @@ void LevelSetMethod::Run() {
                
     }        
 }
+
+float LevelSetMethod::GetValue(unsigned int i, unsigned int j) {
+    return phi(i,j);
+}
+
+
+void LevelSetMethod::Godunov(unsigned int i, unsigned int j, float a, float & dx2, float & dy2) {
+
+    int dx = 1, dy = 1;
+
+    float diffXPositive = (phi(i, j)   - phi(i-1, j  )) / dx;
+    float diffXNegative = (phi(i, j)   - phi(i+1, j  )) / dx;
+    float diffYPositive = (phi(i, j)   - phi(i  , j-1)) / dy;
+    float diffYNegative = (phi(i, j)   - phi(i  , j+1)) / dy;
+
+    if (a > 0) {
+        dx2 = max( pow(max(diffXNegative,0.0f),2), pow(min(diffXPositive,0.0f),2) );
+        dy2 = max( pow(max(diffYNegative,0.0f),2), pow(min(diffYPositive,0.0f),2) );
+    } else {
+        dx2 = max( pow(min(diffXNegative,0.0f),2), pow(max(diffXPositive,0.0f),2) );
+        dy2 = max( pow(min(diffYNegative,0.0f),2), pow(max(diffYPositive,0.0f),2) );
+    }
+}
+
