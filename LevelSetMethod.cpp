@@ -66,6 +66,8 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
     : inputTex(inputTex),
       width(inputTex->GetWidth()),
       height(inputTex->GetHeight()),
+      dx(1),
+      dy(1),
       phi(Tex<float>(width,height)),
       vf(Tex<Vector<2,float> >(width,height)),
       grad(Tex<Vector<2,float> >(width,height)),
@@ -257,8 +259,6 @@ float LevelSetMethod::GetValue(unsigned int i, unsigned int j) {
 void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
                              float & dx2, float & dy2) {
 
-    int dx = 1, dy = 1;
-
     float diffXPositive = (phi(i, j)   - phi(i-1, j  )) / dx;
     float diffXNegative = (phi(i, j)   - phi(i+1, j  )) / dx;
     float diffYPositive = (phi(i, j)   - phi(i  , j-1)) / dy;
@@ -274,7 +274,6 @@ void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
 }
 
 Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
-    int dx = 1, dy = 1;
     // Upwind
     float ddx, ddy;
     

@@ -56,6 +56,8 @@ class LevelSetMethod : public Thread {
     unsigned int width;
     unsigned int height;
 
+    int dx, dy;
+
     Tex<float> phi;
 
     Tex<Vector<2,float> > vf;
