@@ -62,10 +62,11 @@ class LevelSetMethod : public Thread {
 
     Tex<float> phi;
 
-    EmptyTextureResourcePtr sdfTex;
+    EmptyTextureResourcePtr sdfTex,vfTex;
 
 
     void BuildSDF();
+    void BuildVF();
 public:
 
     LevelSetMethod(ITextureResourcePtr inputTex);
@@ -77,6 +78,7 @@ public:
     virtual void Run();
 
     EmptyTextureResourcePtr GetDFSTexture() {return sdfTex;}
+    EmptyTextureResourcePtr GetVFTexture() {return vfTex;}
     
     float GetValue(unsigned int i, unsigned int j);
     

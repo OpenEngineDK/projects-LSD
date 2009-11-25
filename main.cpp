@@ -49,171 +49,64 @@ using namespace OpenEngine::Math;
 
 
 static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
-						  float scale) {
-  unsigned int textureHosisontalSize = texture->GetWidth();
-  unsigned int textureVerticalSize = texture->GetHeight();
+                                                  float scale) {
+    unsigned int textureHosisontalSize = texture->GetWidth();
+    unsigned int textureVerticalSize = texture->GetHeight();
 
-  logger.info << "w x h = " << texture->GetWidth()
-	      << " x " << texture->GetHeight() << logger.end;
-  float fullxtexcoord = 1;
-  float fullytexcoord = 1;
+    logger.info << "w x h = " << texture->GetWidth()
+                << " x " << texture->GetHeight() << logger.end;
+    float fullxtexcoord = 1;
+    float fullytexcoord = 1;
   
-  FaceSet* faces = new FaceSet();
+    FaceSet* faces = new FaceSet();
 
-  float horisontalhalfsize = textureHosisontalSize * 0.5;
-  Vector<3,float>* lowerleft = new Vector<3,float>(horisontalhalfsize,0,0);
-  Vector<3,float>* lowerright = new Vector<3,float>(-horisontalhalfsize,0,0);
-  Vector<3,float>* upperleft = new Vector<3,float>(horisontalhalfsize,textureVerticalSize,0);
-  Vector<3,float>* upperright = new Vector<3,float>(-horisontalhalfsize,textureVerticalSize,0);
+    float horisontalhalfsize = textureHosisontalSize * 0.5;
+    Vector<3,float>* lowerleft = new Vector<3,float>(horisontalhalfsize,0,0);
+    Vector<3,float>* lowerright = new Vector<3,float>(-horisontalhalfsize,0,0);
+    Vector<3,float>* upperleft = new Vector<3,float>(horisontalhalfsize,textureVerticalSize,0);
+    Vector<3,float>* upperright = new Vector<3,float>(-horisontalhalfsize,textureVerticalSize,0);
 
-  FacePtr leftside = FacePtr(new Face(*lowerleft,*lowerright,*upperleft));
+    FacePtr leftside = FacePtr(new Face(*lowerleft,*lowerright,*upperleft));
 
-        /*
-          leftside->texc[1] = Vector<2,float>(1,0);
-          leftside->texc[0] = Vector<2,float>(0,0);
-          leftside->texc[2] = Vector<2,float>(0,1);
-        */
-  leftside->texc[1] = Vector<2,float>(0,fullytexcoord);
-  leftside->texc[0] = Vector<2,float>(fullxtexcoord,fullytexcoord);
-  leftside->texc[2] = Vector<2,float>(fullxtexcoord,0);
-  leftside->norm[0] = leftside->norm[1] = leftside->norm[2] = Vector<3,float>(0,0,1);
-  leftside->CalcHardNorm();
-  leftside->Scale(scale);
-  faces->Add(leftside);
+    /*
+      leftside->texc[1] = Vector<2,float>(1,0);
+      leftside->texc[0] = Vector<2,float>(0,0);
+      leftside->texc[2] = Vector<2,float>(0,1);
+    */
+    leftside->texc[1] = Vector<2,float>(0,fullytexcoord);
+    leftside->texc[0] = Vector<2,float>(fullxtexcoord,fullytexcoord);
+    leftside->texc[2] = Vector<2,float>(fullxtexcoord,0);
+    leftside->norm[0] = leftside->norm[1] = leftside->norm[2] = Vector<3,float>(0,0,1);
+    leftside->CalcHardNorm();
+    leftside->Scale(scale);
+    faces->Add(leftside);
 
-  FacePtr rightside = FacePtr(new Face(*lowerright,*upperright,*upperleft));
-        /*
-          rightside->texc[2] = Vector<2,float>(0,1);
-          rightside->texc[1] = Vector<2,float>(1,1);
-          rightside->texc[0] = Vector<2,float>(1,0);
-        */
-  rightside->texc[2] = Vector<2,float>(fullxtexcoord,0);
-  rightside->texc[1] = Vector<2,float>(0,0);
-  rightside->texc[0] = Vector<2,float>(0,fullytexcoord);
-  rightside->norm[0] = rightside->norm[1] = rightside->norm[2] = Vector<3,float>(0,0,1);
-  rightside->CalcHardNorm();
-  rightside->Scale(scale);
-  faces->Add(rightside);
+    FacePtr rightside = FacePtr(new Face(*lowerright,*upperright,*upperleft));
+    /*
+      rightside->texc[2] = Vector<2,float>(0,1);
+      rightside->texc[1] = Vector<2,float>(1,1);
+      rightside->texc[0] = Vector<2,float>(1,0);
+    */
+    rightside->texc[2] = Vector<2,float>(fullxtexcoord,0);
+    rightside->texc[1] = Vector<2,float>(0,0);
+    rightside->texc[0] = Vector<2,float>(0,fullytexcoord);
+    rightside->norm[0] = rightside->norm[1] = rightside->norm[2] = Vector<3,float>(0,0,1);
+    rightside->CalcHardNorm();
+    rightside->Scale(scale);
+    faces->Add(rightside);
 
-  MaterialPtr m = leftside->mat = rightside->mat = MaterialPtr(new Material());
-  m->texr = texture;
+    MaterialPtr m = leftside->mat = rightside->mat = MaterialPtr(new Material());
+    m->texr = texture;
 
-  GeometryNode* node = new GeometryNode();
-  node->SetFaceSet(faces);
-  TransformationNode* tnode = new TransformationNode();
-  tnode->AddNode(node);
-  return tnode;
+    GeometryNode* node = new GeometryNode();
+    node->SetFaceSet(faces);
+    TransformationNode* tnode = new TransformationNode();
+    tnode->AddNode(node);
+    return tnode;
 }
 
 
 
-
-
-
-
-
-
-ITextureResourcePtr processImage(LevelSetMethod& m,
-                                 ITextureResourcePtr tex,
-                                 EmptyTextureResourcePtr recv,
-                                 EmptyTextureResourcePtr gradTex) {
-    // load initial data fields
-    const unsigned int Y = tex->GetHeight();
-    const unsigned int X = tex->GetWidth();
-    
-
-    Tex<float> t(X,Y);
-    //float pixel = t(10.11f,19.28f);
-
-    // hacking teh PHI!
-    //Grid* grid = new Grid();
-
-    Tex<float> phi(X,Y);
-
-    phi = m.GetPhi();
-
-
-    phi.ToTexture(recv);
-
-
-    // make vector field V
-    
-    Vector<2,float> gradient[X][Y];
-    float dx = 1;
-    float dy = 1;
-    float cdX, cdY;
-    for (unsigned int x=0; x<X; x++)
-        for (unsigned int y=0; y<Y; y++) {
-      
-            //lower left corner
-            if (x == 0 && y == 0) {
-                cdX = (phi(x, y) - phi(x+1, y)) / dx;
-                cdY = (phi(x, y) - phi(x, y+1)) / dy;
-
-            } 
-            //upper right corner
-            else if (x == X - 1 && y == 0) {
-                cdX = (phi(x, y) - phi(x-1, y)) / dx;
-                cdY = (phi(x, y) - phi(x, y+1)) / dy;
-
-            }
-            //upper left corner
-            else if (x == 0 && y == Y - 1) {
-                cdX = (phi(x, y) - phi(x+1, y)) / dx;
-                cdY = (phi(x, y) - phi(x, y-1)) / dy;
-
-            }      
-            //lower right corner
-            else if (x == X - 1 && y == Y - 1) {
-                cdX = (phi(x, y) - phi(x-1, y)) / dx;
-                cdY = (phi(x, y) - phi(x, y-1)) / dy;
-
-            }
-
-            // upper border
-            else if (y == 0 && (x > 0 && x < X - 1)) {
-                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y)   - phi(x, y+1)) / dy;
-
-            }       
-            // lower border
-            else if (y == Y - 1 && (x > 0 && x < X - 1)) {
-                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y)   - phi(x, y-1)) / dy;
-
-            }
-            // left border
-            else if (x == 0 && (y > 0 && y < Y - 1)) {
-                cdX = (phi(x, y)   - phi(x+1, y)) / dx;
-                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
-
-            }
-            // right border
-            else if (x == X - 1 && (y > 0 && y < Y - 1)) {
-                cdX = (phi(x, y)   - phi(x-1, y)) / dx;
-                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
-
-            }
-            // Normal case
-            else {
-	
-                // central differences
-                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
-            }
-
-            gradient[x][y] = Vector<2, float>(cdX, cdY);
-
-            //(*gradTex)(x,y,0) = gradient[x][y][0];
-            //(*gradTex)(x,y,1) = gradient[x][y][1];
-            //(*gradTex)(x,y,2) = 0;//gradient[x][y][1];
-            
-            (*gradTex)(x,y,0) = 0;
-            (*gradTex)(x,y,1) = 0;
-
-            (*gradTex)(x,y,2) = gradient[x][y].GetLength()*100.0;
-            //logger.info << "x=" << x << " y=" << y << logger.end;
-        }
 
     // solve the equations
     // unsigned char phi_plus[X][Y];
@@ -227,8 +120,7 @@ ITextureResourcePtr processImage(LevelSetMethod& m,
     //     //phi_plus = phi;
     //     //phi = temp;
     // }
-    return tex;
-}
+
 
 
 /**
@@ -259,38 +151,23 @@ int main(int argc, char** argv) {
 
 
     LevelSetMethod method = LevelSetMethod(image);
-
-
-    EmptyTextureResourcePtr empty =
-        EmptyTextureResource::Create(image->GetWidth(),
-                                     image->GetHeight(),
-                                     8);
-    empty->Load();
-    setup->GetTextureLoader().Load(empty);
-
-    EmptyTextureResourcePtr empty2 =
-        EmptyTextureResource::Create(image->GetWidth(),
-                                     image->GetHeight(),
-                                     24);
-    empty2->Load();
-    setup->GetTextureLoader().Load(empty2);
-
     
-
-    processImage(method,image,empty,empty2);
-
 
     TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
     imageNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
     imageNode->Move(35,-25,0);
     rootNode->AddNode(imageNode);
 
-    TransformationNode* emptyNode = CreateTextureBillboard(empty,0.1);
+    setup->GetTextureLoader().Load(method.GetDFSTexture());
+
+    TransformationNode* emptyNode = CreateTextureBillboard(method.GetDFSTexture(),0.1);
     emptyNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
     emptyNode->Move(-35,-25,0);
     rootNode->AddNode(emptyNode);
 
-    TransformationNode* emptyNode2 = CreateTextureBillboard(empty2,0.1);
+    setup->GetTextureLoader().Load(method.GetVFTexture());
+
+    TransformationNode* emptyNode2 = CreateTextureBillboard(method.GetVFTexture(),0.1);
     emptyNode2->SetScale(Vector<3,float>(1.0,-1.0,1.0));
     emptyNode2->Move(-35,25,0);
     rootNode->AddNode(emptyNode2);

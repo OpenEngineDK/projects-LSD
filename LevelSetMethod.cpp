@@ -1,6 +1,8 @@
 #include "LevelSetMethod.h"
 #include <Logging/Logger.h>
 
+#include <Math/Vector.h>
+
 void Compare( Grid &g, Point &p, int x, int y, int offsetx, int offsety ) {
 	Point other = g.Get(x+offsetx,y+offsety);
     other.dx += offsetx;
@@ -29,7 +31,7 @@ void GenerateSDF( Grid &g, int width, int height ) {
             g.Put( x, y, p );
         }
 
-        for (int x=width-1;x>=0;x--) {            
+        for (int x=width-1;x>=0;x--) {
             Point p = g.Get( x, y );
 			if(x<width-1)
 				Compare( g, p, x, y, 1, 0 );
@@ -63,22 +65,111 @@ void GenerateSDF( Grid &g, int width, int height ) {
 
 
 LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
-    : inputTex(inputTex), 
+    : inputTex(inputTex),
       width(inputTex->GetWidth()),
       height(inputTex->GetHeight()),
       phi(Tex<float>(width,height)),
-      sdfTex(EmptyTextureResource::Create(width,height,8))
+      sdfTex(EmptyTextureResource::Create(width,height,8)),
+      vfTex(EmptyTextureResource::Create(width,height,24))
 {
-    
+    sdfTex->Load();
+    vfTex->Load();
     // Lets generate the SDF
     BuildSDF();
+    phi.ToTexture(sdfTex);
+
+    BuildVF();
     
 
 }
 
 
-void LevelSetMethod::BuildSDF() {
+void LevelSetMethod::BuildVF() {
+    // make vector field V
     
+    const unsigned int Y = inputTex->GetHeight();
+    const unsigned int X = inputTex->GetWidth();
+
+    Vector<2,float> gradient[X][Y];
+    float dx = 1;
+    float dy = 1;
+    float cdX, cdY;
+    for (unsigned int x=0; x<X; x++)
+        for (unsigned int y=0; y<Y; y++) {
+      
+            //lower left corner
+            if (x == 0 && y == 0) {
+                cdX = (phi(x, y) - phi(x+1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y+1)) / dy;
+
+            } 
+            //upper right corner
+            else if (x == X - 1 && y == 0) {
+                cdX = (phi(x, y) - phi(x-1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y+1)) / dy;
+
+            }
+            //upper left corner
+            else if (x == 0 && y == Y - 1) {
+                cdX = (phi(x, y) - phi(x+1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y-1)) / dy;
+
+            }      
+            //lower right corner
+            else if (x == X - 1 && y == Y - 1) {
+                cdX = (phi(x, y) - phi(x-1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y-1)) / dy;
+
+            }
+
+            // upper border
+            else if (y == 0 && (x > 0 && x < X - 1)) {
+                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y)   - phi(x, y+1)) / dy;
+
+            }       
+            // lower border
+            else if (y == Y - 1 && (x > 0 && x < X - 1)) {
+                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y)   - phi(x, y-1)) / dy;
+
+            }
+            // left border
+            else if (x == 0 && (y > 0 && y < Y - 1)) {
+                cdX = (phi(x, y)   - phi(x+1, y)) / dx;
+                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
+
+            }
+            // right border
+            else if (x == X - 1 && (y > 0 && y < Y - 1)) {
+                cdX = (phi(x, y)   - phi(x-1, y)) / dx;
+                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
+
+            }
+            // Normal case
+            else {
+	
+                // central differences
+                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
+            }
+
+            gradient[x][y] = Vector<2, float>(cdX, cdY);
+
+            //(*gradTex)(x,y,0) = gradient[x][y][0];
+            //(*gradTex)(x,y,1) = gradient[x][y][1];
+            //(*gradTex)(x,y,2) = 0;//gradient[x][y][1];
+            
+            (*vfTex)(x,y,0) = 0;
+            (*vfTex)(x,y,1) = 0;
+
+            (*vfTex)(x,y,2) = gradient[x][y].GetLength()*100.0;
+            //logger.info << "x=" << x << " y=" << y << logger.end;
+        }
+
+}
+void LevelSetMethod::BuildSDF() {
+
     const unsigned int Y = inputTex->GetHeight();
     const unsigned int X = inputTex->GetWidth();
     const unsigned char* bw = inputTex->GetData();
@@ -122,7 +213,7 @@ void LevelSetMethod::BuildSDF() {
 			dist1 = (int)( sqrt( (double)gridInner->Get(x,y).DistSq() ) );
             dist2 = (int)( sqrt( (double)gridOuter->Get(x,y).DistSq() ) );
             dist = -dist2 + dist1;
-			
+
 			//result[y][x] = dist;
             phi(x,y) = dist;
 
@@ -130,7 +221,7 @@ void LevelSetMethod::BuildSDF() {
 				min = dist;
 			if(max < dist)
 				max = dist;
-			
+
 		}
 	}
 
@@ -140,11 +231,11 @@ void LevelSetMethod::BuildSDF() {
 
 
 void LevelSetMethod::Run() {
-    
+
     while (run) {
         Thread::Sleep(1000000);
-               
-    }        
+
+    }
 }
 
 float LevelSetMethod::GetValue(unsigned int i, unsigned int j) {
@@ -152,7 +243,8 @@ float LevelSetMethod::GetValue(unsigned int i, unsigned int j) {
 }
 
 
-void LevelSetMethod::Godunov(unsigned int i, unsigned int j, float a, float & dx2, float & dy2) {
+void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
+                             float & dx2, float & dy2) {
 
     int dx = 1, dy = 1;
 
