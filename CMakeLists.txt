@@ -9,6 +9,8 @@ SET( PROJECT_SOURCES
   EmptyTextureResource.h
   LockedQueue.h
   LockedQueue.cpp  
+  LevelSetMethod.h
+  LevelSetMethod.cpp
 )
 
 # Include needed to use SDL under Mac OS X

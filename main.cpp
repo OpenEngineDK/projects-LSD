@@ -28,6 +28,7 @@
 
 #include "LockedQueue.h"
 #include "EmptyTextureResource.h"
+#include "LevelSetMethod.h"
 
 #include "Producer.h"
 #include "Consumer.h"
@@ -478,6 +479,9 @@ int main(int argc, char** argv) {
     logger.info << "Image Height = " << image->GetHeight() << logger.end;
 
 
+    LevelSetMethod method = LevelSetMethod(image);
+
+
     EmptyTextureResourcePtr empty =
         EmptyTextureResource::Create(image->GetWidth(),
                                      image->GetHeight(),
@@ -518,22 +522,22 @@ int main(int argc, char** argv) {
 
 
     //LockedQueue<float> q;// = new LockedQueue<float>();
-    LockedQueue<float> *q = new LockedQueue<float>();
+    //LockedQueue<EmptyTextureResourcePtr> *q = new LockedQueue<EmptyTextureResourcePtr>();
     //q->Put(42.0);
 
-    Producer p(q);
-    Consumer c(q);
+    //Producer p(q);
+    //Consumer c(q);
 
-    p.Start();
-    c.Start();
+
+
+    method.Start();
 
     // Start the engine.
     setup->GetEngine().Start();
 
-    p.run = c.run = false;
+    method.run  = false;
     
-    p.Wait();
-    c.Wait();
+    method.Wait();
 
     // Return when the engine stops.
     return EXIT_SUCCESS;
