@@ -10,9 +10,8 @@
 #ifndef _EMPTY_TEXTURE_RESOURCE_H_
 #define _EMPTY_TEXTURE_RESOURCE_H_
 
-#include <Resources/ITextureResource.h>
-
 #include <boost/serialization/weak_ptr.hpp>
+#include <Resources/ITextureResource.h>
 
 using namespace OpenEngine::Resources;
 
@@ -39,8 +38,9 @@ typedef boost::shared_ptr<EmptyTextureResource> EmptyTextureResourcePtr;
                 switch (depth){
                 case 8: format = LUMINANCE; break;
                 case 24: format = RGB; break;
-                case 32: format = RGBA; break;
+                case 32: format = RGBA; break;                    
                 }
+                data = new unsigned char[width*height*depth/8];
             }
         public:
             static EmptyTextureResourcePtr Create(unsigned int w,
@@ -51,9 +51,9 @@ typedef boost::shared_ptr<EmptyTextureResource> EmptyTextureResourcePtr;
                 return ptr;
             }
             
-            ~EmptyTextureResource() { delete data; }
-            void Load() { if (!data) data = new unsigned char[width * height * depth / 8]; }
-            void Unload() { delete data; }
+            ~EmptyTextureResource() { exit(-1);  delete data; }
+            void Load() {}
+            void Unload() {} //delete data; }
             int GetID() { return id; }
             void SetID(int id) { this->id = id; }
             unsigned int GetWidth() { return width; }

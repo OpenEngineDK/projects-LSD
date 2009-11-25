@@ -69,15 +69,19 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
       dx(1),
       dy(1),
       phi(Tex<float>(width,height)),
+      phiT(Tex<float>(width,height)),      
       vf(Tex<Vector<2,float> >(width,height)),
       grad(Tex<Vector<2,float> >(width,height)),
       sdfTex(EmptyTextureResource::Create(width,height,8)),
       vfTex(EmptyTextureResource::Create(width,height,24)),
-      gradTex(EmptyTextureResource::Create(width,height,24))
+      gradTex(EmptyTextureResource::Create(width,height,24)),
+      phiTTex(EmptyTextureResource::Create(width,height,8)),
+      run(true)
 {
     sdfTex->Load();
     vfTex->Load();
     gradTex->Load();
+    phiTTex->Load();
     // Lets generate the SDF
     BuildSDF();
     phi.ToTexture(sdfTex);
@@ -240,6 +244,20 @@ void LevelSetMethod::BuildSDF() {
 }
 
 void LevelSetMethod::ProcessImage() {
+    logger.info << "Process" << logger.end;
+       
+    for(unsigned int x=0; x<width;x++) {
+        for(unsigned int y=0; y<height;y++) {
+            phiT(x,y) = x;
+
+        }
+    }
+
+}
+
+void LevelSetMethod::Handle(ProcessEventArg arg) {
+    phiT.ToTexture(phiTTex);
+    phiTTex->RebindTexture();
     
 }
 

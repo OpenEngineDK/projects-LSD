@@ -4,6 +4,7 @@
 #include "LockedQueue.h"
 #include <Core/Thread.h>
 #include <Math/Vector.h>
+#include <Core/EngineEvents.h>
 
 #include "Tex.h"
 
@@ -48,7 +49,7 @@ public:
 };
 
 
-class LevelSetMethod : public Thread {
+class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     ITextureResourcePtr inputTex;
 
@@ -59,11 +60,14 @@ class LevelSetMethod : public Thread {
     int dx, dy;
 
     Tex<float> phi;
+    Tex<float> phiT;
 
     Tex<Vector<2,float> > vf;
     Tex<Vector<2,float> > grad;
+    
 
-    EmptyTextureResourcePtr sdfTex,vfTex,gradTex;
+
+    EmptyTextureResourcePtr sdfTex,vfTex,gradTex,phiTTex;
 
 
     void BuildSDF();
@@ -75,7 +79,7 @@ public:
 
     LevelSetMethod(ITextureResourcePtr inputTex);
 
-
+    void Handle(ProcessEventArg arg);
 
     bool run;
 
@@ -84,6 +88,7 @@ public:
     EmptyTextureResourcePtr GetDFSTexture() {return sdfTex;}
     EmptyTextureResourcePtr GetVFTexture() {return vfTex;}
     EmptyTextureResourcePtr GetGradientTexture() {return gradTex;}
+    EmptyTextureResourcePtr GetPhiTTexture() {return phiTTex;}
     
     float GetValue(unsigned int i, unsigned int j);        
     void Godunov(unsigned int i, unsigned int j, float a, float & dx, float & dy);

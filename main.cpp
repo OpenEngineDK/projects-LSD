@@ -46,6 +46,8 @@ using namespace OpenEngine::Resources;
 using namespace OpenEngine::Scene;
 using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Math;
+using namespace OpenEngine::Renderers;
+using namespace OpenEngine::Renderers::OpenGL;
 
 
 static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
@@ -150,8 +152,8 @@ int main(int argc, char** argv) {
     logger.info << "Image Height = " << image->GetHeight() << logger.end;
 
 
-    LevelSetMethod method = LevelSetMethod(image);
-    
+    LevelSetMethod& method = *(new LevelSetMethod(image));
+    setup->GetEngine().ProcessEvent().Attach(method);
 
     TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
     imageNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
@@ -165,9 +167,9 @@ int main(int argc, char** argv) {
     emptyNode->Move(-35,-25,0);
     rootNode->AddNode(emptyNode);
 
-    setup->GetTextureLoader().Load(method.GetVFTexture());
+    setup->GetTextureLoader().Load(method.GetPhiTTexture(),TextureLoader::RELOAD_QUEUED);
 
-    TransformationNode* emptyNode2 = CreateTextureBillboard(method.GetVFTexture(),0.1);
+    TransformationNode* emptyNode2 = CreateTextureBillboard(method.GetPhiTTexture(),0.1);
     emptyNode2->SetScale(Vector<3,float>(1.0,-1.0,1.0));
     emptyNode2->Move(-35,25,0);
     rootNode->AddNode(emptyNode2);
