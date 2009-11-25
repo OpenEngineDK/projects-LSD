@@ -172,6 +172,13 @@ int main(int argc, char** argv) {
     emptyNode2->Move(-35,25,0);
     rootNode->AddNode(emptyNode2);
 
+    setup->GetTextureLoader().Load(method.GetGradientTexture());
+
+    TransformationNode* emptyNode3 = CreateTextureBillboard(method.GetGradientTexture(),0.1);
+    emptyNode3->SetScale(Vector<3,float>(1.0,-1.0,1.0));
+    emptyNode3->Move(35,25,0);
+    rootNode->AddNode(emptyNode3);
+
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0.0,-20.0,140));
     setup->GetCamera()->LookAt(Vector<3,float>(0.0,-20.0,0.0));

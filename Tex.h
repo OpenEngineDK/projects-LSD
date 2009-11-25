@@ -6,6 +6,7 @@
 #include "EmptyTextureResource.h"
 #include <Math/Math.h>
 #include <Math/Exceptions.h>
+#include <Logging/Logger.h>
 
 using namespace OpenEngine;
 using namespace OpenEngine::Math;
@@ -22,44 +23,18 @@ public:
     Tex(unsigned int width, unsigned int height)
       :  width(width), height(height) {
       data = new T[height*width];
-  }
-
-  T* operator[](const unsigned int iy) {
-      return data+ iy*width;
-  }
-
-  T& operator()(const unsigned int ix, const unsigned int iy) {
-      
-      return data[ix+iy*width];
-  }
-
-    void ToTexture(EmptyTextureResourcePtr texture) {
-        
-        float min = 0;
-        float max = 0;
-
-        for(unsigned int x=0;x<width;x++) {
-            for(unsigned int y=0;y<height;y++) {
-                T pix = operator()(x,y);
-                
-                min = (min<pix)?min:pix;
-                max = (max>pix)?max:pix;
-                
-            }
-        }
-
-        for(unsigned int x=0;x<width;x++) {
-            for(unsigned int y=0;y<height;y++) {
-                T pix = operator()(x,y);
-                if (pix < 0)
-                    (*texture)(x,y,0) = (unsigned char)(pix/min * 256);
-                else
-                    (*texture)(x,y,0) = (unsigned char)(pix/max * 256);
-            }
-        }
-
-
     }
+
+    T* operator[](const unsigned int iy) {
+        return data+ iy*width;
+    }
+
+    T& operator()(const unsigned int ix, const unsigned int iy) {
+      
+        return data[ix+iy*width];
+    }
+    void ToTexture(EmptyTextureResourcePtr t) ; 
+
 
   // look up pixel by interpolation
   T operator()(const float fx, const float fy) {
@@ -91,5 +66,6 @@ public:
     return v;
   }
 };
+
 
 #endif

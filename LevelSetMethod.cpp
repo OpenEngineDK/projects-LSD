@@ -67,21 +67,41 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
       width(inputTex->GetWidth()),
       height(inputTex->GetHeight()),
       phi(Tex<float>(width,height)),
+      vf(Tex<Vector<2,float> >(width,height)),
       sdfTex(EmptyTextureResource::Create(width,height,8)),
-      vfTex(EmptyTextureResource::Create(width,height,24))
+      vfTex(EmptyTextureResource::Create(width,height,24)),
+      gradTex(EmptyTextureResource::Create(width,height,24))
 {
     sdfTex->Load();
     vfTex->Load();
+    gradTex->Load();
     // Lets generate the SDF
     BuildSDF();
     phi.ToTexture(sdfTex);
 
     BuildVF();
+    vf.ToTexture(vfTex);
     
+    BuildGradient();
 
 }
 
 
+void LevelSetMethod::BuildGradient() {    
+
+    for(unsigned int x=0; x<width;x++)
+        for(unsigned int y=0; y<height;y++) {
+            Vector<2,float> g = Gradient(x,y);
+
+            
+
+            (*gradTex)(x,y,0) = g[0];
+            (*gradTex)(x,y,1) = g[1];
+            (*gradTex)(x,y,2) = 0;
+            (*gradTex)(x,y,3) = -1;
+        }
+
+}
 void LevelSetMethod::BuildVF() {
     // make vector field V
     
@@ -152,17 +172,8 @@ void LevelSetMethod::BuildVF() {
                 cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
             }
 
-            gradient[x][y] = Vector<2, float>(cdX, cdY);
+            gradient[x][y] = vf(x,y) = Vector<2, float>(cdX, cdY);
 
-            //(*gradTex)(x,y,0) = gradient[x][y][0];
-            //(*gradTex)(x,y,1) = gradient[x][y][1];
-            //(*gradTex)(x,y,2) = 0;//gradient[x][y][1];
-            
-            (*vfTex)(x,y,0) = 0;
-            (*vfTex)(x,y,1) = 0;
-
-            (*vfTex)(x,y,2) = gradient[x][y].GetLength()*100.0;
-            //logger.info << "x=" << x << " y=" << y << logger.end;
         }
 
 }
@@ -227,12 +238,15 @@ void LevelSetMethod::BuildSDF() {
 
 }
 
+void LevelSetMethod::ProcessImage() {
+    
+}
 
 void LevelSetMethod::Run() {
 
     while (run) {
         Thread::Sleep(1000000);
-
+        ProcessImage();
     }
 }
 
@@ -260,13 +274,19 @@ void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
     }
 }
 
-Vector<2, float> LevelSetMethod::Gradient(Vector<2, float> v, unsigned int i, unsigned int j) {
+Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
     int dx = 1, dy = 1;
     // Upwind
     float ddx, ddy;
     
-    ddx = ( v[0] > 0.0f ) ? (phi(i, j)   - phi(i-1, j    )) / dx : (phi(i, j)   - phi(i+1, j    )) / dx;
-    ddy = ( v[1] > 0.0f ) ? (phi(i, j)   - phi(i  , j-1  )) / dx : (phi(i, j)   - phi(i  , j+1  )) / dy;
+    Vector<2,float> v = vf(i,j);
+
+    ddx = ( v[0] < 0.0f ) 
+        ? (phi(i, j)   - phi(i-1, j    )) / dx
+        : (phi(i, j)   - phi(i+1, j    )) / dx;
+    ddy = ( v[1] < 0.0f ) 
+        ? (phi(i, j)   - phi(i  , j-1  )) / dx 
+        : (phi(i, j)   - phi(i  , j+1  )) / dy;
 
     return Vector<2, float>(ddx, ddy);
         

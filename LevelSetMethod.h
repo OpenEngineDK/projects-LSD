@@ -50,13 +50,7 @@ public:
 
 class LevelSetMethod : public Thread {
 
-    
-
-    
-    //LockedQueue<EmptyTextureResourcePtr>* texQueue;
-
     ITextureResourcePtr inputTex;
-
 
 
     unsigned int width;
@@ -64,11 +58,16 @@ class LevelSetMethod : public Thread {
 
     Tex<float> phi;
 
-    EmptyTextureResourcePtr sdfTex,vfTex;
+    Tex<Vector<2,float> > vf;
+
+    EmptyTextureResourcePtr sdfTex,vfTex,gradTex;
 
 
     void BuildSDF();
     void BuildVF();
+    void BuildGradient();
+
+    void ProcessImage();
 public:
 
     LevelSetMethod(ITextureResourcePtr inputTex);
@@ -81,11 +80,11 @@ public:
 
     EmptyTextureResourcePtr GetDFSTexture() {return sdfTex;}
     EmptyTextureResourcePtr GetVFTexture() {return vfTex;}
+    EmptyTextureResourcePtr GetGradientTexture() {return gradTex;}
     
-    float GetValue(unsigned int i, unsigned int j);
-    
+    float GetValue(unsigned int i, unsigned int j);        
     void Godunov(unsigned int i, unsigned int j, float a, float & dx, float & dy);
-    Vector<2, float> Gradient(Vector<2, float> v, unsigned int i, unsigned j);
+    Vector<2, float> Gradient(unsigned int i, unsigned j);
 
     Tex<float> GetPhi() {return phi;}
 

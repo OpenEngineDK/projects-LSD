@@ -11,6 +11,9 @@ SET( PROJECT_SOURCES
   LockedQueue.cpp  
   LevelSetMethod.h
   LevelSetMethod.cpp
+
+  Tex.cpp
+  Tex.h
 )
 
 # Include needed to use SDL under Mac OS X
