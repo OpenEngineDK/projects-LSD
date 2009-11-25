@@ -365,6 +365,7 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
 
 
     // make vector field V
+    
     Vector<2,float> gradient[X][Y];
     float dx = 1;
     float dy = 1;
@@ -374,66 +375,71 @@ ITextureResourcePtr processImage(ITextureResourcePtr tex,
       
             //lower left corner
             if (x == 0 && y == 0) {
-                cdX = (phi(x, y) + phi(x+1, y)) / dx;
-                cdY = (phi(x, y) + phi(x, y+1)) / dy;
+                cdX = (phi(x, y) - phi(x+1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y+1)) / dy;
 
             } 
             //upper right corner
             else if (x == X - 1 && y == 0) {
-                cdX = (phi(x, y) + phi(x-1, y)) / dx;
-                cdY = (phi(x, y) + phi(x, y+1)) / dy;
+                cdX = (phi(x, y) - phi(x-1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y+1)) / dy;
 
             }
             //upper left corner
             else if (x == 0 && y == Y - 1) {
-                cdX = (phi(x, y) + phi(x+1, y)) / dx;
-                cdY = (phi(x, y) + phi(x, y-1)) / dy;
+                cdX = (phi(x, y) - phi(x+1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y-1)) / dy;
 
             }      
             //lower right corner
             else if (x == X - 1 && y == Y - 1) {
-                cdX = (phi(x, y) + phi(x-1, y)) / dx;
-                cdY = (phi(x, y) + phi(x, y-1)) / dy;
+                cdX = (phi(x, y) - phi(x-1, y)) / dx;
+                cdY = (phi(x, y) - phi(x, y-1)) / dy;
 
             }
 
             // upper border
             else if (y == 0 && (x > 0 && x < X - 1)) {
-                cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y) + phi(x, y+1)) / dy;
+                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y)   - phi(x, y+1)) / dy;
 
             }       
             // lower border
             else if (y == Y - 1 && (x > 0 && x < X - 1)) {
-                cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y) + phi(x, y-1)) / dy;
+                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y)   - phi(x, y-1)) / dy;
 
             }
             // left border
             else if (x == 0 && (y > 0 && y < Y - 1)) {
-                cdX = (phi(x, y) + phi(x+1, y)) / dx;
-                cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+                cdX = (phi(x, y)   - phi(x+1, y)) / dx;
+                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
 
             }
             // right border
             else if (x == X - 1 && (y > 0 && y < Y - 1)) {
-                cdX = (phi(x, y) + phi(x-1, y)) / dx;
-                cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+                cdX = (phi(x, y)   - phi(x-1, y)) / dx;
+                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
 
             }
             // Normal case
             else {
 	
                 // central differences
-                cdX = (phi(x-1, y) + phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y-1) + phi(x, y+1)) / 2 * dy;
+                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
             }
 
             gradient[x][y] = Vector<2, float>(cdX, cdY);
 
-            (*gradTex)(x,y,0) = 0;//gradient[x][y][0];
-            (*gradTex)(x,y,1) = 0;//gradient[x][y][1];
-            (*gradTex)(x,y,2) = gradient[x][y].GetLength();
+            //(*gradTex)(x,y,0) = gradient[x][y][0];
+            //(*gradTex)(x,y,1) = gradient[x][y][1];
+            //(*gradTex)(x,y,2) = 0;//gradient[x][y][1];
+            
+            (*gradTex)(x,y,0) = 0;
+            (*gradTex)(x,y,1) = 0;
+
+            (*gradTex)(x,y,2) = gradient[x][y].GetLength()*100.0;
             //logger.info << "x=" << x << " y=" << y << logger.end;
         }
 

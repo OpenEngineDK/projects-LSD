@@ -12,6 +12,8 @@
 
 #include <Resources/ITextureResource.h>
 
+#include <boost/serialization/weak_ptr.hpp>
+
 using namespace OpenEngine::Resources;
 
 //namespace OpenEngine {
