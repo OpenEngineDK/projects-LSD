@@ -89,9 +89,11 @@ public:
     EmptyTextureResourcePtr GetVFTexture() {return vfTex;}
     EmptyTextureResourcePtr GetGradientTexture() {return gradTex;}
     EmptyTextureResourcePtr GetPhiTTexture() {return phiTTex;}
+
+    static void SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t);
     
     float GetValue(unsigned int i, unsigned int j);        
-    void Godunov(unsigned int i, unsigned int j, float a, float & dx, float & dy);
+    Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);
     Vector<2, float> Gradient(unsigned int i, unsigned j);
 
     Tex<float> GetPhi() {return phi;}

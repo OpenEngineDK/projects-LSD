@@ -238,25 +238,53 @@ void LevelSetMethod::BuildSDF() {
 
 		}
 	}
-
-
-
 }
 
 void LevelSetMethod::ProcessImage() {
     logger.info << "Process" << logger.end;
        
-    for(unsigned int x=0; x<width;x++) {
-        for(unsigned int y=0; y<height;y++) {
-            phiT(x,y) = x;
+    float a = 100.0;
+
+#warning Oh fail, flere kant tilfælde...!!shift-en
+
+    for(unsigned int x=1; x<width-1;x++) {
+        for(unsigned int y=1; y<height-1;y++) {
+            
+            Vector<2,float> godunov = Godunov(x,y,a);
+            Vector<2,float> g = Gradient(x,y);
+
+
+            float phiX = sqrt(g[0]);
+            float phiY = sqrt(g[1]);
+            
+            Vector<2,float> v;
+            v[0] = phiX / g.GetLength();
+            v[1] = phiY / g.GetLength();
+
+            
+
+            phiT(x,y) += -v*g;;
 
         }
     }
 
 }
 
+void LevelSetMethod::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
+    for (unsigned int x=0;x<p.GetWidth();x++) {
+        for (unsigned int y=0;y<p.GetHeight();y++) {
+            //logger.info << p(x,y) << logger.end;
+            if (p(x,y) < 0 )
+                (*t)(x,y,0) = 0;
+            else 
+                (*t)(x,y,0) = -1;
+        }
+    }
+}
+
 void LevelSetMethod::Handle(ProcessEventArg arg) {
-    phiT.ToTexture(phiTTex);
+    //phiT.ToTexture(phiTTex);
+    SDFToTexture(phiT, phiTTex);
     phiTTex->RebindTexture();
     
 }
@@ -264,8 +292,9 @@ void LevelSetMethod::Handle(ProcessEventArg arg) {
 void LevelSetMethod::Run() {
 
     while (run) {
-        Thread::Sleep(1000000);
+
         ProcessImage();
+        Thread::Sleep(1000000);
     }
 }
 
@@ -274,13 +303,13 @@ float LevelSetMethod::GetValue(unsigned int i, unsigned int j) {
 }
 
 
-void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
-                             float & dx2, float & dy2) {
-
+Vector<2,float> LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a) {
     float diffXPositive = (phi(i, j)   - phi(i-1, j  )) / dx;
     float diffXNegative = (phi(i, j)   - phi(i+1, j  )) / dx;
     float diffYPositive = (phi(i, j)   - phi(i  , j-1)) / dy;
     float diffYNegative = (phi(i, j)   - phi(i  , j+1)) / dy;
+
+    float dx2,dy2;
 
     if (a > 0) {
         dx2 = max( pow(max(diffXNegative,0.0f),2), pow(min(diffXPositive,0.0f),2) );
@@ -289,6 +318,8 @@ void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
         dx2 = max( pow(min(diffXNegative,0.0f),2), pow(max(diffXPositive,0.0f),2) );
         dy2 = max( pow(min(diffYNegative,0.0f),2), pow(max(diffYPositive,0.0f),2) );
     }
+
+    return Vector<2,float>(dx2,dy2);
 }
 
 Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
