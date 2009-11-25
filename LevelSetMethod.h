@@ -3,6 +3,8 @@
 
 #include "LockedQueue.h"
 #include <Core/Thread.h>
+#include <Math/Vector.h>
+
 #include "Tex.h"
 
 #include "EmptyTextureResource.h"
@@ -83,6 +85,7 @@ public:
     float GetValue(unsigned int i, unsigned int j);
     
     void Godunov(unsigned int i, unsigned int j, float a, float & dx, float & dy);
+    Vector<2, float> Gradient(Vector<2, float> v, unsigned int i, unsigned j);
 
     Tex<float> GetPhi() {return phi;}
 

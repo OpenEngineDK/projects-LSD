@@ -1,8 +1,6 @@
 #include "LevelSetMethod.h"
 #include <Logging/Logger.h>
 
-#include <Math/Vector.h>
-
 void Compare( Grid &g, Point &p, int x, int y, int offsetx, int offsety ) {
 	Point other = g.Get(x+offsetx,y+offsety);
     other.dx += offsetx;
@@ -260,5 +258,17 @@ void LevelSetMethod::Godunov(unsigned int i, unsigned int j,  float a,
         dx2 = max( pow(min(diffXNegative,0.0f),2), pow(max(diffXPositive,0.0f),2) );
         dy2 = max( pow(min(diffYNegative,0.0f),2), pow(max(diffYPositive,0.0f),2) );
     }
+}
+
+Vector<2, float> LevelSetMethod::Gradient(Vector<2, float> v, unsigned int i, unsigned int j) {
+    int dx = 1, dy = 1;
+    // Upwind
+    float ddx, ddy;
+    
+    ddx = ( v[0] > 0.0f ) ? (phi(i, j)   - phi(i-1, j    )) / dx : (phi(i, j)   - phi(i+1, j    )) / dx;
+    ddy = ( v[1] > 0.0f ) ? (phi(i, j)   - phi(i  , j-1  )) / dx : (phi(i, j)   - phi(i  , j+1  )) / dy;
+
+    return Vector<2, float>(ddx, ddy);
+        
 }
 
