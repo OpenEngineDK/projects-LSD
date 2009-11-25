@@ -102,6 +102,9 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
     //SDFToTexture(phiTest,testTex);
 
     phiTest.ToTexture(testTex);
+
+    phiT = phi;
+
 }
 
 
@@ -262,7 +265,7 @@ Tex<float> LevelSetMethod::BuildPhi(ITextureResourcePtr in) {
 void LevelSetMethod::ProcessImage() {
     logger.info << "Process" << logger.end;
        
-    float a = 100.0;
+    float a = 1.0;
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
 
@@ -272,18 +275,15 @@ void LevelSetMethod::ProcessImage() {
             Vector<2,float> godunov = Godunov(x,y,a);
             Vector<2,float> g = Gradient(x,y);
 
-
-            float phiX = sqrt(g[0]);
-            float phiY = sqrt(g[1]);
+            float phiX = sqrt(godunov[0]);
+            float phiY = sqrt(godunov[1]);
             
             Vector<2,float> v;
             v[0] = phiX / g.GetLength();
             v[1] = phiY / g.GetLength();
 
-            
-
-            phiT(x,y) += -v*g;;
-
+            //phiT(x,y) += -v*g;
+            phiT(x,y) += -1.1;
         }
     }
 
@@ -302,8 +302,8 @@ void LevelSetMethod::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
 }
 
 void LevelSetMethod::Handle(ProcessEventArg arg) {
-    //phiT.ToTexture(phiTTex);
-    SDFToTexture(phiT, phiTTex);
+    phiT.ToTexture(phiTTex);
+    //SDFToTexture(phiT, phiTTex);
     phiTTex->RebindTexture();
     
 }
@@ -313,7 +313,7 @@ void LevelSetMethod::Run() {
     while (run) {
 
         ProcessImage();
-        Thread::Sleep(1000000);
+        //Thread::Sleep(1000000);
     }
 }
 
