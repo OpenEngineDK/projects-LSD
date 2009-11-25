@@ -62,27 +62,30 @@ void GenerateSDF( Grid &g, int width, int height ) {
 }
 
 
-LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
+LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr inputTex2)
     : inputTex(inputTex),
+      inputTex2(inputTex2),
       width(inputTex->GetWidth()),
       height(inputTex->GetHeight()),
       dx(1),
       dy(1),
       phi(Tex<float>(width,height)),
-      phiT(Tex<float>(width,height)),      
+      phiT(Tex<float>(width,height)),
       vf(Tex<Vector<2,float> >(width,height)),
       grad(Tex<Vector<2,float> >(width,height)),
       sdfTex(EmptyTextureResource::Create(width,height,8)),
       vfTex(EmptyTextureResource::Create(width,height,24)),
       gradTex(EmptyTextureResource::Create(width,height,24)),
       phiTTex(EmptyTextureResource::Create(width,height,8)),
+      testTex(EmptyTextureResource::Create(width,height,8)),
       run(true)
 {
     sdfTex->Load();
     vfTex->Load();
     gradTex->Load();
     phiTTex->Load();
-    // Lets generate the SDF
+    testTex->Load();
+    // Lets generate the SDF    
     BuildSDF();
     phi.ToTexture(sdfTex);
 
@@ -91,6 +94,14 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex)
     
     BuildGradient();
     grad.ToTexture(gradTex);
+
+    
+    // Testing
+    Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
+    
+    //SDFToTexture(phiTest,testTex);
+
+    phiTest.ToTexture(testTex);
 }
 
 
@@ -182,13 +193,20 @@ void LevelSetMethod::BuildVF() {
         }
 
 }
+
 void LevelSetMethod::BuildSDF() {
+    phi = BuildPhi(inputTex);
+}
 
-    const unsigned int Y = inputTex->GetHeight();
-    const unsigned int X = inputTex->GetWidth();
-    const unsigned char* bw = inputTex->GetData();
-    const unsigned int depth = inputTex->GetDepth()/8;
+Tex<float> LevelSetMethod::BuildPhi(ITextureResourcePtr in) {
 
+    const unsigned int Y = in->GetHeight();
+    const unsigned int X = in->GetWidth();
+    const unsigned char* bw = in->GetData();
+    const unsigned int depth = in->GetDepth()/8;
+
+
+    Tex<float> pphi(X,Y);
 
     Grid* gridInner = new Grid(X,Y);
     Grid* gridOuter = new Grid(X,Y);
@@ -229,7 +247,7 @@ void LevelSetMethod::BuildSDF() {
             dist = -dist2 + dist1;
 
 			//result[y][x] = dist;
-            phi(x,y) = dist;
+            pphi(x,y) = dist;
 
 			if(min > dist)
 				min = dist;
@@ -238,6 +256,7 @@ void LevelSetMethod::BuildSDF() {
 
 		}
 	}
+    return pphi;
 }
 
 void LevelSetMethod::ProcessImage() {

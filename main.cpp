@@ -28,6 +28,8 @@
 #include <Math/Vector.h>
 #include <Math/Exceptions.h>
 
+#include <Display/SDLEnvironment.h>
+
 #include "LockedQueue.h"
 #include "EmptyTextureResource.h"
 #include "LevelSetMethod.h"
@@ -48,6 +50,7 @@ using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Math;
 using namespace OpenEngine::Renderers;
 using namespace OpenEngine::Renderers::OpenGL;
+using namespace OpenEngine::Display;
 
 
 static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
@@ -134,7 +137,12 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
 
 int main(int argc, char** argv) {
     // Create simple setup
-    SimpleSetup* setup = new SimpleSetup("LevelSet Method");
+    
+
+    SDLEnvironment* env = new SDLEnvironment(1024,768);
+    
+
+    SimpleSetup* setup = new SimpleSetup("LevelSet Method",NULL,env);
  
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.0,0.0,0.0,1.0));
@@ -142,17 +150,22 @@ int main(int argc, char** argv) {
     ISceneNode* rootNode = setup->GetScene();
 
     DirectoryManager::AppendPath("./projects/LSD/data/");
-    ITextureResourcePtr image = ResourceManager<ITextureResource>::Create("au-logo.png");
+    ITextureResourcePtr image2 = ResourceManager<ITextureResource>::Create("au-logo.png");
+    ITextureResourcePtr image = ResourceManager<ITextureResource>::Create("circle.png");
 
     image->Load();
     setup->GetTextureLoader().Load(image);    
+
+    image2->Load();
+    setup->GetTextureLoader().Load(image2);    
+
 
     logger.info << "Image Depth = " << image->GetDepth() << logger.end;
     logger.info << "Image Width = " << image->GetWidth() << logger.end;
     logger.info << "Image Height = " << image->GetHeight() << logger.end;
 
 
-    LevelSetMethod& method = *(new LevelSetMethod(image));
+    LevelSetMethod& method = *(new LevelSetMethod(image,image2));
     setup->GetEngine().ProcessEvent().Attach(method);
 
     TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
@@ -174,9 +187,10 @@ int main(int argc, char** argv) {
     emptyNode2->Move(-35,25,0);
     rootNode->AddNode(emptyNode2);
 
-    setup->GetTextureLoader().Load(method.GetGradientTexture());
-
-    TransformationNode* emptyNode3 = CreateTextureBillboard(method.GetGradientTexture(),0.1);
+    setup->GetTextureLoader().Load(method.GetTestTexture());
+    TransformationNode* emptyNode3 = CreateTextureBillboard(method.GetTestTexture(),0.1);
+    // setup->GetTextureLoader().Load(method.GetGradientTexture());
+    // TransformationNode* emptyNode3 = CreateTextureBillboard(method.GetGradientTexture(),0.1);
     emptyNode3->SetScale(Vector<3,float>(1.0,-1.0,1.0));
     emptyNode3->Move(35,25,0);
     rootNode->AddNode(emptyNode3);

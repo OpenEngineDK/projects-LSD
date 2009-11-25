@@ -52,6 +52,7 @@ public:
 class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     ITextureResourcePtr inputTex;
+    ITextureResourcePtr inputTex2;
 
 
     unsigned int width;
@@ -67,7 +68,7 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
     
 
 
-    EmptyTextureResourcePtr sdfTex,vfTex,gradTex,phiTTex;
+    EmptyTextureResourcePtr sdfTex,vfTex,gradTex,phiTTex,testTex;
 
 
     void BuildSDF();
@@ -75,9 +76,13 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
     void BuildGradient();
 
     void ProcessImage();
+
+    Tex<float> BuildPhi(ITextureResourcePtr in);
+
 public:
 
-    LevelSetMethod(ITextureResourcePtr inputTex);
+    LevelSetMethod(ITextureResourcePtr inputTex,
+                   ITextureResourcePtr inputTex2);
 
     void Handle(ProcessEventArg arg);
 
@@ -89,12 +94,15 @@ public:
     EmptyTextureResourcePtr GetVFTexture() {return vfTex;}
     EmptyTextureResourcePtr GetGradientTexture() {return gradTex;}
     EmptyTextureResourcePtr GetPhiTTexture() {return phiTTex;}
+    EmptyTextureResourcePtr GetTestTexture() {return testTex;}
 
     static void SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t);
     
     float GetValue(unsigned int i, unsigned int j);        
     Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);
     Vector<2, float> Gradient(unsigned int i, unsigned j);
+
+
 
     Tex<float> GetPhi() {return phi;}
 
