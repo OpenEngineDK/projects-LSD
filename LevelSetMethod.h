@@ -67,7 +67,7 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
     Tex<Vector<2,float> > vf;
     Tex<Vector<2,float> > grad;
     
-
+    LockedQueue<EmptyTextureResourcePtr> updateQueue;
 
     EmptyTextureResourcePtr sdfTex,vfTex,gradTex,phiTTex,testTex;
 

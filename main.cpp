@@ -25,6 +25,7 @@
 #include <Geometry/FaceSet.h>
 #include <Scene/GeometryNode.h>
 #include <Scene/TransformationNode.h>
+#include <Scene/SceneNode.h>
 #include <Math/Vector.h>
 #include <Math/Exceptions.h>
 
@@ -127,6 +128,37 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
     // }
 
 
+struct Wall {
+    ITextureResourcePtr tex[9];
+    TextureLoader& loader;
+
+    Wall(TextureLoader& l) : loader(l) {}
+
+    ITextureResourcePtr& operator()(int x, int y) {
+        return tex[x*3+y];
+    }
+    ISceneNode* MakeScene() {
+        SceneNode *sn = new SceneNode();
+        
+
+        for (int x=0;x<3;x++) {
+            for (int y=0;y<3;y++) {
+                ITextureResourcePtr t = (*this)(x,y);
+                if (t) {                
+                    loader.Load(t,TextureLoader::RELOAD_QUEUED);
+                    TransformationNode* node = CreateTextureBillboard(t,0.05);
+                    node->SetScale(Vector<3,float>(1.0,-1.0,1.0));
+                    node->Move(x*35-35,y*25-25,0);
+
+                    sn->AddNode(node);
+                }
+            }
+        }
+
+        return sn;
+    }
+};
+
 
 /**
  * Main method for the first quarter project of CGD.
@@ -150,68 +182,33 @@ int main(int argc, char** argv) {
     ISceneNode* rootNode = setup->GetScene();
 
     DirectoryManager::AppendPath("./projects/LSD/data/");
-    ITextureResourcePtr image2 = ResourceManager<ITextureResource>::Create("au-logo.png");
-    ITextureResourcePtr image = ResourceManager<ITextureResource>::Create("circle.png");
+    ITextureResourcePtr auLogo = ResourceManager<ITextureResource>::Create("au-logo.png");
+    ITextureResourcePtr circle = ResourceManager<ITextureResource>::Create("circle.png");
 
-    image->Load();
-    setup->GetTextureLoader().Load(image);    
+    circle->Load();
+    auLogo->Load();
 
-    image2->Load();
-    setup->GetTextureLoader().Load(image2);    
-
-
-    logger.info << "Image Depth = " << image->GetDepth() << logger.end;
-    logger.info << "Image Width = " << image->GetWidth() << logger.end;
-    logger.info << "Image Height = " << image->GetHeight() << logger.end;
-
-
-    LevelSetMethod& method = *(new LevelSetMethod(image,image2));
+    LevelSetMethod& method = *(new LevelSetMethod(circle,auLogo));
     setup->GetEngine().ProcessEvent().Attach(method);
 
-    TransformationNode* imageNode = CreateTextureBillboard(image,0.1);
-    imageNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-    imageNode->Move(35,-25,0);
-    rootNode->AddNode(imageNode);
 
-    setup->GetTextureLoader().Load(method.GetDFSTexture());
+    Wall wall(setup->GetTextureLoader());
+    
+    wall(0,0) = auLogo;
+    wall(2,0) = circle;
 
-    TransformationNode* emptyNode = CreateTextureBillboard(method.GetDFSTexture(),0.1);
-    emptyNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-    emptyNode->Move(-35,-25,0);
-    rootNode->AddNode(emptyNode);
+    wall(0,1) = method.GetDFSTexture();
+    wall(1,1) = method.GetPhiTTexture();
 
-    setup->GetTextureLoader().Load(method.GetPhiTTexture(),TextureLoader::RELOAD_QUEUED);
+    wall(0,2) = method.GetTestTexture();
+    wall(1,2) = method.GetGradientTexture();
 
-    TransformationNode* emptyNode2 = CreateTextureBillboard(method.GetPhiTTexture(),0.1);
-    emptyNode2->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-    emptyNode2->Move(-35,25,0);
-    rootNode->AddNode(emptyNode2);
+    setup->SetScene((*wall.MakeScene()));
 
-    ITextureResourcePtr t = method.GetTestTexture();
-    //ITextureResourcePtr t = method.GetGradientTexture();
+    float h = -25/2;
 
-    setup->GetTextureLoader().Load(t);
-    TransformationNode* emptyNode3 = CreateTextureBillboard(t,0.1);
-    //setup->GetTextureLoader().Load(method.GetGradientTexture());
-    //TransformationNode* emptyNode3 = CreateTextureBillboard(method.GetGradientTexture(),0.1);
-
-
-    emptyNode3->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-    emptyNode3->Move(35,25,0);
-    rootNode->AddNode(emptyNode3);
-
-
-    setup->GetCamera()->SetPosition(Vector<3,float>(0.0,-20.0,140));
-    setup->GetCamera()->LookAt(Vector<3,float>(0.0,-20.0,0.0));
-
-
-    //LockedQueue<float> q;// = new LockedQueue<float>();
-    //LockedQueue<EmptyTextureResourcePtr> *q = new LockedQueue<EmptyTextureResourcePtr>();
-    //q->Put(42.0);
-
-    //Producer p(q);
-    //Consumer c(q);
-
+    setup->GetCamera()->SetPosition(Vector<3,float>(0.0,h,100));
+    setup->GetCamera()->LookAt(Vector<3,float>(0.0,h,0.0));
 
 
     method.Start();

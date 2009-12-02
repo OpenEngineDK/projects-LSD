@@ -303,6 +303,13 @@ void LevelSetMethod::ProcessImage() {
     
     phi0 = phi;
     phi = phiT;
+    
+    phi.ToTexture(sdfTex);
+    phiT.ToTexture(phiTTex);
+
+    updateQueue.Put(sdfTex);
+    updateQueue.Put(phiTTex);
+    
 }
 
 void LevelSetMethod::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
@@ -318,9 +325,15 @@ void LevelSetMethod::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
 }
 
 void LevelSetMethod::Handle(ProcessEventArg arg) {
-    phiT.ToTexture(phiTTex);
+
+    while(!updateQueue.IsEmpty()) {
+        EmptyTextureResourcePtr t = updateQueue.Get();
+        t->RebindTexture();
+    }
+
+    //phiT.ToTexture(phiTTex);
     //SDFToTexture(phiT, phiTTex);
-    phiTTex->RebindTexture();
+    //phiTTex->RebindTexture();
     
 }
 
