@@ -209,6 +209,7 @@ void LevelSetMethod::BuildVF() {
 
 void LevelSetMethod::BuildSDF() {
     phi = BuildPhi(inputTex);
+    phi0 = phi;
 }
 
 Tex<float> LevelSetMethod::BuildPhi(ITextureResourcePtr in) {
@@ -297,7 +298,10 @@ void LevelSetMethod::ProcessImage() {
             //phiT(x,y) += -1.1;
         }
     }
-
+    
+    
+    phi0 = phi;
+    phi = phiT;
 }
 
 void LevelSetMethod::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
@@ -367,6 +371,18 @@ Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
 
     return Vector<2, float>(ddx, ddy);
         
+}
+
+void LevelSetMethod::ReInitialization() {
+    // Equation 7.4
+    
+    for (unsigned int y=0; y<height ; y++) {
+        for (unsigned int x=0; x<width; x++) {
+            
+        }
+    }
+
+  
 }
 
 Tex<float> LevelSetMethod::Union(Tex<float> sdf1, Tex<float> sdf2) {

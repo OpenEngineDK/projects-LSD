@@ -61,6 +61,7 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
     int dx, dy;
 
     Tex<float> phi;
+    Tex<float> phi0;
     Tex<float> phiT;
 
     Tex<Vector<2,float> > vf;
@@ -101,6 +102,7 @@ public:
     float GetValue(unsigned int i, unsigned int j);        
     Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);
     Vector<2, float> Gradient(unsigned int i, unsigned j);
+    void ReInitialization();
 
 
 
