@@ -101,7 +101,17 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
     
     //SDFToTexture(phiTest,testTex);
 
-    phiTest.ToTexture(testTex);
+    //phiTest.ToTexture(testTex);
+
+    
+    for(unsigned int x=0; x<width-1;x++)
+        for(unsigned int y=0; y<height-1;y++) {
+            Vector<2,float> g = vf(x,y);
+            
+            (*testTex)(x,y,0) = g.GetLength()*100.0;
+            
+        }
+
 
     phiT = phi;
 
@@ -273,8 +283,9 @@ void LevelSetMethod::ProcessImage() {
         for(unsigned int y=1; y<height-1;y++) {
             
             Vector<2,float> godunov = Godunov(x,y,a);
-            Vector<2,float> g = Gradient(x,y);
-
+            //Vector<2,float> g = Gradient(x,y);
+            Vector<2,float> g = vf(x,y);
+ 
             float phiX = sqrt(godunov[0]);
             float phiY = sqrt(godunov[1]);
             
@@ -282,8 +293,8 @@ void LevelSetMethod::ProcessImage() {
             v[0] = phiX / g.GetLength();
             v[1] = phiY / g.GetLength();
 
-            //phiT(x,y) += -v*g;
-            phiT(x,y) += -1.1;
+            phiT(x,y) += -v*g;
+            //phiT(x,y) += -1.1;
         }
     }
 
@@ -313,7 +324,7 @@ void LevelSetMethod::Run() {
     while (run) {
 
         ProcessImage();
-        //Thread::Sleep(1000000);
+        Thread::Sleep(1000000);
     }
 }
 
