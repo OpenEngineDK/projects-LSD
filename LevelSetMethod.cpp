@@ -284,16 +284,16 @@ void LevelSetMethod::ProcessImage() {
     for(unsigned int x=1; x<width-1;x++) {
         for(unsigned int y=1; y<height-1;y++) {
             
-            Vector<2,float> godunov = Godunov(x,y,a);
+            //Vector<2,float> godunov = Godunov(x,y,a);
             //Vector<2,float> g = Gradient(x,y);
             Vector<2,float> g = vf(x,y);
  
-            float phiX = sqrt(godunov[0]);
-            float phiY = sqrt(godunov[1]);
+            //float phiX = sqrt(godunov[0]);
+            //float phiY = sqrt(godunov[1]);
             
             Vector<2,float> v;
-            v[0] = phiX / g.GetLength();
-            v[1] = phiY / g.GetLength();
+            v[0] = g[0] / g.GetLength();
+            v[1] = g[1] / g.GetLength();
 
             phiT(x,y) += -v*g;
             //phiT(x,y) += -1.1;
@@ -309,6 +309,11 @@ void LevelSetMethod::ProcessImage() {
 
     updateQueue.Put(sdfTex);
     updateQueue.Put(phiTTex);
+
+    for(unsigned int x=1; x<width/2 ;x++) {    
+        //logger.info << "Reinitialize - iteration: " << x << logger.end;
+        ReInitialize();
+    }
     
 }
 
@@ -387,16 +392,24 @@ Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
         
 }
 
-void LevelSetMethod::ReInitialization() {
+void LevelSetMethod::ReInitialize() {
     // Equation 7.4
     
-    for (unsigned int y=0; y<height ; y++) {
-        for (unsigned int x=0; x<width; x++) {
-            
+    for (unsigned int y=2; y<height-2 ; y++) {
+        for (unsigned int x=2; x<width-2; x++) { 
+             
+            Vector<2,float> g = Gradient(x,y);
+            phi(x,y) += S(phi, x, y) * (g.GetLength() - 1);
         }
     }
 
   
+}
+
+// Fortegns funktion fra bogen.
+int LevelSetMethod::S(Tex<float>& field, unsigned int x, unsigned int y) {
+    float res = field(x,y);
+    return (res > 0 ? 1 : -1);
 }
 
 Tex<float> LevelSetMethod::Union(Tex<float> sdf1, Tex<float> sdf2) {

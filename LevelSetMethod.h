@@ -102,8 +102,8 @@ public:
     float GetValue(unsigned int i, unsigned int j);        
     Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);
     Vector<2, float> Gradient(unsigned int i, unsigned j);
-    void ReInitialization();
-
+    void ReInitialize();
+    int S(Tex<float>& field, unsigned int x, unsigned int y);
 
 
     Tex<float> GetPhi() {return phi;}
