@@ -18,6 +18,12 @@ template<> void Tex<float>::ToTexture(EmptyTextureResourcePtr texture, bool dbg)
             }
         }
 
+        if (dbg) {
+            logger.info << min << logger.end;
+            logger.info << max << logger.end;
+        }
+
+
         for(unsigned int x=0;x<width;x++) {
             for(unsigned int y=0;y<height;y++) {
             

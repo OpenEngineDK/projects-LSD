@@ -314,7 +314,7 @@ void LevelSetMethod::ProcessImage() {
     phi0.SetTex(phi);
     //phi.SetTex(phiT);
     
-    phi.ToTexture(sdfTex);
+    phi.ToTexture(sdfTex,true);
     phi0.ToTexture(phiTTex);
 
     updateQueue.Put(sdfTex);
@@ -401,14 +401,27 @@ Vector<2, float> LevelSetMethod::Gradient(unsigned int i, unsigned int j) {
 void LevelSetMethod::ReInitialize() {
     // Equation 7.4
     
-    for (unsigned int y=2; y<height-2 ; y++) {
-        for (unsigned int x=2; x<width-2; x++) { 
+    for (unsigned int y=1; y<height-1 ; y++) {
+        for (unsigned int x=1; x<width-1; x++) { 
              
-            Vector<2,float> g = Gradient(x,y);
-            phi(x,y) += S(phi, x, y) * (g.GetLength() - 1);
+            Vector<2,float> g = vf(x,y);
+            phi(x,y) = phi0(x,y) +  S(phi0, x, y) * (g.GetLength() - 1.0);
+            
+            
+            if (isnan(g.GetLength()))
+                logger.info << g << logger.end;
+            //phi(x,y) = (phi0(x,y) > 0)*100;
         }
     }
-
+    
+    for (unsigned int y=0; y<height ; y++) {
+        phi(0,y) = phi(1,y);
+        phi(width-1,y) = phi(width-2,y);
+    }
+    for (unsigned int x=0; x<width; x++) { 
+        phi(x,0) = phi(x,1);
+        phi(x,height-1) = phi(x,height-2);
+    }
   
 }
 
