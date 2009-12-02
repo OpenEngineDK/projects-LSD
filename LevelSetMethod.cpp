@@ -303,10 +303,16 @@ void LevelSetMethod::ProcessImage() {
     //         //phiT(x,y) += -1.1;
     //     }
     // }
+
+
+    for(unsigned int x=1; x<width/2 ;x++) {    
+        //logger.info << "Reinitialize - iteration: " << x << logger.end;
+        ReInitialize();
+    }
     
     
     phi0.SetTex(phi);
-    phi.SetTex(phiT);
+    //phi.SetTex(phiT);
     
     phi.ToTexture(sdfTex);
     phi0.ToTexture(phiTTex);
@@ -314,10 +320,6 @@ void LevelSetMethod::ProcessImage() {
     updateQueue.Put(sdfTex);
     updateQueue.Put(phiTTex);
 
-    for(unsigned int x=1; x<width/2 ;x++) {    
-        //logger.info << "Reinitialize - iteration: " << x << logger.end;
-        ReInitialize();
-    }
     
 }
 
