@@ -21,6 +21,8 @@
 #include <Resources/ResourceManager.h>
 #include <Resources/DirectoryManager.h>
 #include <Resources/ITextureResource.h>
+#include <Resources/CairoResource.h>
+
 #include <Renderers/TextureLoader.h>
 #include <Geometry/FaceSet.h>
 #include <Scene/GeometryNode.h>
@@ -29,6 +31,8 @@
 #include <Math/Vector.h>
 #include <Math/Exceptions.h>
 
+
+#include <Utils/CairoTextTool.h>
 #include <Display/SDLEnvironment.h>
 
 #include "LockedQueue.h"
@@ -112,44 +116,46 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
 }
 
 
-
-
-    // solve the equations
-    // unsigned char phi_plus[X][Y];
-    // for (unsigned int i=0; i<1; i++) {
-    //     for (unsigned int x=0; x<X; x++)
-    //         for (unsigned int y=0; y<Y; y++)             
-    //             phi_plus[x][y] = 1;//phi[x+(int)(v[x][y][0])][y+(int)(v[x][y][1])];
-        
-    //     // swap
-    //     //unsigned char** temp = phi_plus;
-    //     //phi_plus = phi;
-    //     //phi = temp;
-    // }
-
-
 struct Wall {
-    ITextureResourcePtr tex[9];
+    pair<ITextureResourcePtr,string> tex[9];
     TextureLoader& loader;
 
-    Wall(TextureLoader& l) : loader(l) {}
+    Wall(TextureLoader& l) : loader(l) {        
+    }
 
-    ITextureResourcePtr& operator()(int x, int y) {
+    pair<ITextureResourcePtr,string>& operator()(int x, int y) {
         return tex[x*3+y];
     }
     ISceneNode* MakeScene() {
         SceneNode *sn = new SceneNode();
+        CairoTextTool textTool;
         
-
         for (int x=0;x<3;x++) {
             for (int y=0;y<3;y++) {
-                ITextureResourcePtr t = (*this)(x,y);
-                if (t) {                
+                pair<ITextureResourcePtr,string> itm = (*this)(x,y);
+                ITextureResourcePtr t = itm.first;
+                if (t) {
                     loader.Load(t,TextureLoader::RELOAD_QUEUED);
                     TransformationNode* node = CreateTextureBillboard(t,0.05);
                     node->SetScale(Vector<3,float>(1.0,-1.0,1.0));
                     node->Move(x*35-35,y*25-25,0);
 
+                    CairoResourcePtr textRes = CairoResource::Create(128,32);
+                    textRes->Load();
+
+                    ostringstream out;
+                    out << "(" << x << "," << y << ") " << itm.second;
+
+                    textTool.DrawText(out.str(), textRes);
+
+                    loader.Load(textRes);
+                    TransformationNode* textNode = CreateTextureBillboard(textRes,0.1);
+                    textNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));                    
+                    textNode->Move(0,22.0,0);
+
+
+                    node->AddNode(textNode);
+                    //sn->AddNode(textNode);
                     sn->AddNode(node);
                 }
             }
@@ -194,14 +200,16 @@ int main(int argc, char** argv) {
 
     Wall wall(setup->GetTextureLoader());
     
-    wall(0,0) = auLogo;
-    wall(2,0) = circle;
+    wall(0,0) = make_pair<>(auLogo,"AU Logo");
+    wall(2,0) = make_pair<>(circle,"Circle");
 
-    wall(0,1) = method.GetDFSTexture();
-    wall(1,1) = method.GetPhiTTexture();
+    wall(0,1) = make_pair<>(method.GetDFSTexture(),"Phi");
+    wall(1,1) = make_pair<>(method.GetPhiTTexture(),"Phi_0");
 
-    wall(0,2) = method.GetTestTexture();
-    wall(1,2) = method.GetGradientTexture();
+    wall(0,2) = make_pair<>(method.GetTestTexture(),"Test");
+    wall(1,2) = make_pair<>(method.GetGradientTexture(),"Gradient");
+
+    wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");
 
     setup->SetScene((*wall.MakeScene()));
 

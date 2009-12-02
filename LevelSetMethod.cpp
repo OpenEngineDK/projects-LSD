@@ -69,11 +69,14 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
       height(inputTex->GetHeight()),
       dx(1),
       dy(1),
-      phi(Tex<float>(width,height)),
-      phi0(Tex<float>(width,height)),
-      phiT(Tex<float>(width,height)),
-      vf(Tex<Vector<2,float> >(width,height)),
-      grad(Tex<Vector<2,float> >(width,height)),
+      // phi(*(new Tex<float>(width,height))),
+      // phi0(*(new Tex<float>(width,height))),
+      // phiT(*(new Tex<float>(width,height))),
+      phi(width,height),
+      phi0(width,height),
+      phiT(width,height),
+      vf(width,height),
+      grad(width,height),
       sdfTex(EmptyTextureResource::Create(width,height,8)),
       vfTex(EmptyTextureResource::Create(width,height,24)),
       gradTex(EmptyTextureResource::Create(width,height,24)),
@@ -98,7 +101,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
 
     
     // Testing
-    Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
+    //Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
     
     //SDFToTexture(phiTest,testTex);
 
@@ -114,7 +117,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
         }
 
 
-    phiT = phi;
+    phiT.SetTex(phi);
 
 }
 
@@ -209,11 +212,12 @@ void LevelSetMethod::BuildVF() {
 }
 
 void LevelSetMethod::BuildSDF() {
-    phi = BuildPhi(inputTex);
-    phi0 = phi;
+    BuildPhi(inputTex,phi);   
+    logger.info << "copy please" << logger.end;
+    phi0.SetTex(phi);
 }
 
-Tex<float> LevelSetMethod::BuildPhi(ITextureResourcePtr in) {
+void LevelSetMethod::BuildPhi(ITextureResourcePtr in, Tex<float>& pphi) {
 
     const unsigned int Y = in->GetHeight();
     const unsigned int X = in->GetWidth();
@@ -221,7 +225,7 @@ Tex<float> LevelSetMethod::BuildPhi(ITextureResourcePtr in) {
     const unsigned int depth = in->GetDepth()/8;
 
 
-    Tex<float> pphi(X,Y);
+    //Tex<float> pphi(X,Y);
 
     Grid* gridInner = new Grid(X,Y);
     Grid* gridOuter = new Grid(X,Y);
@@ -271,7 +275,7 @@ Tex<float> LevelSetMethod::BuildPhi(ITextureResourcePtr in) {
 
 		}
 	}
-    return pphi;
+    //return pphi;
 }
 
 void LevelSetMethod::ProcessImage() {
@@ -281,31 +285,31 @@ void LevelSetMethod::ProcessImage() {
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
 
-    for(unsigned int x=1; x<width-1;x++) {
-        for(unsigned int y=1; y<height-1;y++) {
+    // for(unsigned int x=1; x<width-1;x++) {
+    //     for(unsigned int y=1; y<height-1;y++) {
             
-            //Vector<2,float> godunov = Godunov(x,y,a);
-            //Vector<2,float> g = Gradient(x,y);
-            Vector<2,float> g = vf(x,y);
+    //         //Vector<2,float> godunov = Godunov(x,y,a);
+    //         //Vector<2,float> g = Gradient(x,y);
+    //         Vector<2,float> g = vf(x,y);
  
-            //float phiX = sqrt(godunov[0]);
-            //float phiY = sqrt(godunov[1]);
+    //         //float phiX = sqrt(godunov[0]);
+    //         //float phiY = sqrt(godunov[1]);
             
-            Vector<2,float> v;
-            v[0] = g[0] / g.GetLength();
-            v[1] = g[1] / g.GetLength();
+    //         Vector<2,float> v;
+    //         v[0] = g[0] / g.GetLength();
+    //         v[1] = g[1] / g.GetLength();
 
-            phiT(x,y) += -v*g;
-            //phiT(x,y) += -1.1;
-        }
-    }
+    //         phiT(x,y) += -v*g;
+    //         //phiT(x,y) += -1.1;
+    //     }
+    // }
     
     
-    phi0 = phi;
-    phi = phiT;
+    phi0.SetTex(phi);
+    phi.SetTex(phiT);
     
     phi.ToTexture(sdfTex);
-    phiT.ToTexture(phiTTex);
+    phi0.ToTexture(phiTTex);
 
     updateQueue.Put(sdfTex);
     updateQueue.Put(phiTTex);

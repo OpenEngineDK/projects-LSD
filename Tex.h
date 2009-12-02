@@ -20,13 +20,54 @@ private:
     unsigned int width, height;
     T* data;
 public:
+    // Tex(const Tex<T> & copyFromMe) : width(copyFromMe.width),
+    //                                  height(copyFromMe.height),
+    //                                  data(new T[width*height])
+    // {
+    //     //throw 42;
+
+    //     logger.info << this << " Copy " << &copyFromMe << " " << data << " | "<< copyFromMe.data << logger.end;
+        
+    //     memcpy(data,copyFromMe.data,sizeof(float)*width*height);
+        
+    //     // std::copy(copyFromMe.data, 
+    //     //           copyFromMe.data + (width*height), 
+    //     //           data);    // #include <algorithm> for std::copy            
+    // }
+
     Tex(unsigned int width, unsigned int height)
       :  width(width), height(height) {
       data = new T[height*width];
     }
 
+
+    // Tex<T> operator=(const Tex<T>& copy) {
+    //     logger.info << "Assign" << logger.end;
+    //     Tex<T> r(copy);
+    //     r.data = new T[r.width*r.height];
+    //     memcpy(r.data,copy.data,sizeof(float)*r.width*r.height);
+    //     return r;
+    // }
+
+    ~Tex() {        
+        //logger.info << this << " delete " << data << logger.end;
+        delete[] data;
+        data = 0;
+    }
+
     unsigned int GetWidth() { return width; }
     unsigned int GetHeight() { return height; }
+
+    void SetTex(Tex<T>& t) {
+        width = t.width;
+        height = t.height;
+        if (data)
+            delete[] data;
+        data = new T[width*height];
+        std::copy(t.data, 
+                  t.data + (width*height), 
+                  data);
+    }
 
     T* operator[](const unsigned int iy) {
         return data+ iy*width;

@@ -78,7 +78,7 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     void ProcessImage();
 
-    Tex<float> BuildPhi(ITextureResourcePtr in);
+    void BuildPhi(ITextureResourcePtr in, Tex<float>& pphi);
 
 public:
 
