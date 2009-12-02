@@ -70,6 +70,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
       dx(1),
       dy(1),
       phi(Tex<float>(width,height)),
+      phi0(Tex<float>(width,height)),
       phiT(Tex<float>(width,height)),
       vf(Tex<Vector<2,float> >(width,height)),
       grad(Tex<Vector<2,float> >(width,height)),
