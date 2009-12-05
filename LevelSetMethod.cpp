@@ -107,6 +107,8 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
 
     //phiTest.ToTexture(testTex);
 
+    phiT = phi;
+
     
     for(unsigned int x=0; x<width-1;x++)
         for(unsigned int y=0; y<height-1;y++) {
@@ -117,7 +119,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
         }
 
 
-    phiT.SetTex(phi);
+    
 
 }
 
@@ -285,33 +287,36 @@ void LevelSetMethod::ProcessImage() {
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
 
-    // for(unsigned int x=1; x<width-1;x++) {
-    //     for(unsigned int y=1; y<height-1;y++) {
+    for(unsigned int x=1; x<width-1;x++) {
+        for(unsigned int y=1; y<height-1;y++) {
             
-    //         //Vector<2,float> godunov = Godunov(x,y,a);
-    //         //Vector<2,float> g = Gradient(x,y);
-    //         Vector<2,float> g = vf(x,y);
+            //Vector<2,float> godunov = Godunov(x,y,a);
+            //Vector<2,float> g = Gradient(x,y);
+            Vector<2,float> g = vf(x,y);
  
-    //         //float phiX = sqrt(godunov[0]);
-    //         //float phiY = sqrt(godunov[1]);
+            //float phiX = sqrt(godunov[0]);
+            //float phiY = sqrt(godunov[1]);
             
-    //         Vector<2,float> v;
-    //         v[0] = g[0] / g.GetLength();
-    //         v[1] = g[1] / g.GetLength();
+            Vector<2,float> v;
+            v[0] = g[0] / g.GetLength();
+            v[1] = g[1] / g.GetLength();
 
-    //         phiT(x,y) += -v*g;
-    //         //phiT(x,y) += -1.1;
-    //     }
-    // }
-
-
-    for(unsigned int x=1; x<width/2 ;x++) {    
-        //logger.info << "Reinitialize - iteration: " << x << logger.end;
-        ReInitialize();
+            phiT(x,y) += -v*g;
+            //phiT(x,y) += -1.1;
+        }
     }
+
+    // int iterations = 4; //width/2;
+
+    // while(iterations--) {
+    //     //logger.info << "Reinitialize - iteration: " << x << logger.end;
+    //     ReInitialize();
+    // }
     
     
-    phi0.SetTex(phi);
+    phi0 = phiT;
+
+    //phi0.SetTex(phi);
     //phi.SetTex(phiT);
     
     phi.ToTexture(sdfTex,true);
@@ -353,7 +358,7 @@ void LevelSetMethod::Run() {
     while (run) {
 
         ProcessImage();
-        Thread::Sleep(1000000);
+        //Thread::Sleep(1000000);
     }
 }
 

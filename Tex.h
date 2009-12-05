@@ -20,20 +20,13 @@ private:
     unsigned int width, height;
     T* data;
 public:
-    // Tex(const Tex<T> & copyFromMe) : width(copyFromMe.width),
-    //                                  height(copyFromMe.height),
-    //                                  data(new T[width*height])
-    // {
-    //     //throw 42;
-
-    //     logger.info << this << " Copy " << &copyFromMe << " " << data << " | "<< copyFromMe.data << logger.end;
-        
-    //     memcpy(data,copyFromMe.data,sizeof(float)*width*height);
-        
-    //     // std::copy(copyFromMe.data, 
-    //     //           copyFromMe.data + (width*height), 
-    //     //           data);    // #include <algorithm> for std::copy            
-    // }
+    Tex(const Tex<T> & copyFromMe) : width(copyFromMe.width),
+                                     height(copyFromMe.height),
+                                     data(new T[width*height]) {    
+         std::copy(copyFromMe.data, 
+                   copyFromMe.data + (width*height), 
+                   data);    
+    }
 
     Tex(unsigned int width, unsigned int height)
       :  width(width), height(height) {
@@ -41,16 +34,19 @@ public:
     }
 
 
-    // Tex<T> operator=(const Tex<T>& copy) {
-    //     logger.info << "Assign" << logger.end;
-    //     Tex<T> r(copy);
-    //     r.data = new T[r.width*r.height];
-    //     memcpy(r.data,copy.data,sizeof(float)*r.width*r.height);
-    //     return r;
-    // }
+    Tex<T> operator=(const Tex<T>& copy) {
+        if (width != copy.width && height != copy.height)
+            throw 42;
 
-    ~Tex() {        
-        //logger.info << this << " delete " << data << logger.end;
+        std::copy(copy.data,
+                  copy.data+(width*height),
+                  data);
+
+
+        return *this;
+    }
+
+    ~Tex() {
         delete[] data;
         data = 0;
     }
