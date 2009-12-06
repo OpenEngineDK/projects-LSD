@@ -41,32 +41,36 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
 void LevelSetMethod::ProcessImage() {
     logger.info << "Process" << logger.end;
        
-    float a = 1.0;
+    float a = -1.0;
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
     
+    //sdf1->Reinitialize(10);
+
     Tex<float> phiT = sdf1->GetPhi();
 
     for(unsigned int x=1; x<width-1;x++) {
         for(unsigned int y=1; y<height-1;y++) {
             
             // //Vector<2,float> godunov = Godunov(x,y,a);
-            // //Vector<2,float> g = Gradient(x,y);
+            Vector<2,float> g = sdf1->Gradient(x,y);
             // Vector<2,float> g = vf(x,y);
  
             // //float phiX = sqrt(godunov[0]);
             // //float phiY = sqrt(godunov[1]);
             
-            // Vector<2,float> v;
-            // v[0] = g[0] / g.GetLength();
-            // v[1] = g[1] / g.GetLength();
+            Vector<2,float> v;
+            v[0] = g[0] / g.GetLength();
+            v[1] = g[1] / g.GetLength();
 
-            // phiT(x,y) += -v*g;
-            phiT(x,y) += -1.1;
+            phiT(x,y) += a*(v*g);
+            //phiT(x,y) += -1.1;
         }
     }
 
     sdf1->SetPhi(phiT);
+
+    
 
     // int iterations = 4; //width/2;
 
@@ -110,7 +114,7 @@ void LevelSetMethod::Run() {
     while (run) {
 
         ProcessImage();
-        Thread::Sleep(1000000);
+        Thread::Sleep(100000);
     }
 }
 

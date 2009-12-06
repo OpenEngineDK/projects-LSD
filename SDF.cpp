@@ -1,4 +1,5 @@
 #include "SDF.h"
+#include <Logging/Logger.h>
 
 struct Point {
     int dx, dy;
@@ -175,6 +176,9 @@ void SDF::BuildSDF() {
 			//result[y][x] = dist;
             phi(x,y) = dist;
 
+            if (dist == 0.0f)
+                logger.info << "WTF" << logger.end;
+
 			if(min > dist)
 				min = dist;
 			if(max < dist)
@@ -211,10 +215,16 @@ void SDF::BuildGradient() {
                 cdY = (phi(x, y) - phi(x, y+1)) / dy;
 
             } 
-            //upper right corner
+            //lower right corner
             else if (x == X - 1 && y == 0) {
+                logger.info << "[lr] phi(x-1,y) " << phi(x-1, y)
+                            << " phi(x,y+1) " << phi(x, y+1)
+                            << " phi(x,y) " << phi(x,y) 
+                            << logger.end;
+
                 cdX = (phi(x, y) - phi(x-1, y)) / dx;
                 cdY = (phi(x, y) - phi(x, y+1)) / dy;
+                logger.info << cdX << " " << cdY << logger.end;
 
             }
             //upper left corner
@@ -223,7 +233,7 @@ void SDF::BuildGradient() {
                 cdY = (phi(x, y) - phi(x, y-1)) / dy;
 
             }      
-            //lower right corner
+            //upper right corner
             else if (x == X - 1 && y == Y - 1) {
                 cdX = (phi(x, y) - phi(x-1, y)) / dx;
                 cdY = (phi(x, y) - phi(x, y-1)) / dy;
@@ -262,7 +272,13 @@ void SDF::BuildGradient() {
                 cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
             }
 
-            gradient(x,y)  = Vector<2, float>(cdX, cdY);
+            
+            Vector<2, float> g(cdX, cdY);
+            if (g.IsZero()) 
+                g = Vector<2,float>(0,1);
+                
+            g.Normalize();
+            gradient(x,y) = g;
 
         }
     gradient.ToTexture(gradientTexture);
@@ -307,6 +323,7 @@ int SDF::S(unsigned int x, unsigned int y) {
 void SDF::Reinitialize(unsigned int iterations) {
     // Equation 7.4
     while (iterations--) {
+        BuildGradient();
         for (unsigned int y=1; y<height-1 ; y++) {
             for (unsigned int x=1; x<width-1; x++) { 
              
@@ -327,7 +344,10 @@ void SDF::Reinitialize(unsigned int iterations) {
             phi(x,0) = phi(x,1);
             phi(x,height-1) = phi(x,height-2);
         }
+
     }
+
+    
 }
 
 

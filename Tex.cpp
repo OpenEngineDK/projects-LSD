@@ -29,9 +29,9 @@ template<> void Tex<float>::ToTexture(EmptyTextureResourcePtr texture, bool dbg)
             
                 float pix = operator()(x,y);
                 if (pix < 0)
-                    (*texture)(x,y,0) = (unsigned char)(pix/min * 256);
+                    (*texture)(x,y,0) = (unsigned char)(pix/min * 255);
                 else
-                    (*texture)(x,y,0) = (unsigned char)(pix/max * 256);
+                    (*texture)(x,y,0) = (unsigned char)(pix/max * 255);
             
             }
         }
@@ -79,16 +79,19 @@ template<> void Tex<Vector<2,float> >::ToTexture(EmptyTextureResourcePtr texture
             
 
                 if (pix[0] < 0) {
-                    (*texture)(x,y,0) = (unsigned char)(pix[0]/_min * 256);
+                    (*texture)(x,y,0) = (unsigned char)(pix[0]/_min * 255);
                     //(*texture)(x,y,2) = -1;
                 }
                 else
-                    (*texture)(x,y,0) = (unsigned char)(pix[0]/_max * 256);
+                    (*texture)(x,y,0) = (unsigned char)(pix[0]/_max * 255);
 
                 if (pix[1] < 0)
-                    (*texture)(x,y,1) = (unsigned char)(pix[1]/_min * 256);
+                    (*texture)(x,y,1) = (unsigned char)(pix[1]/_min * 255);
                 else
-                    (*texture)(x,y,1) = (unsigned char)(pix[1]/_max * 256);
+                    (*texture)(x,y,1) = (unsigned char)(pix[1]/_max * 255);
+
+                
+                (*texture)(x,y,2) = pix.GetLength()*255;
 
                 //if (dbg)
                     //logger.info << x << " " << y <<" " << int((*texture)(x,y,1)) << logger.end;

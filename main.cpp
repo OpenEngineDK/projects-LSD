@@ -195,11 +195,15 @@ int main(int argc, char** argv) {
     circle->Load();
     auLogo->Load();
 
-    LevelSetMethod& method = *(new LevelSetMethod(circle,auLogo));
+    LevelSetMethod& method = *(new LevelSetMethod(auLogo,circle));
     setup->GetEngine().ProcessEvent().Attach(method);
 
 
     SDF* sdf1 = method.GetSDF1();
+
+    int x=5,y=5;
+    
+    logger.info << "g(" << x << "," << y << ") = " << sdf1->Gradient(x,y).GetLength() << logger.end;
 
     Wall wall(setup->GetTextureLoader());
     
