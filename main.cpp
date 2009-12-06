@@ -205,11 +205,12 @@ int main(int argc, char** argv) {
     
     wall(0,0) = make_pair<>(auLogo,"AU Logo");
     wall(1,0) = make_pair<>(circle,"Circle"); // input 1
+    wall(2,0) = make_pair<>(sdf1->GetOutputTexture(),"Output");
 
-    wall(2,0) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
-    wall(1,1) = make_pair<>(sdf1->GetOutputTexture(),"Output");
+    wall(0,1) = make_pair<>(sdf1->GetPhi0Texture(),"Phi0");
+    wall(1,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
 
-     wall(2,1) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
+    wall(2,1) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
     // wall(1,2) = make_pair<>(method.GetGradientTexture(),"Gradient");
 
     // wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");

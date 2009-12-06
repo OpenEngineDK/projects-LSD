@@ -37,7 +37,7 @@ public:
     Tex<T> operator=(const Tex<T>& copy) {
         if (width != copy.width && height != copy.height)
             throw 42;
-
+        
         std::copy(copy.data,
                   copy.data+(width*height),
                   data);

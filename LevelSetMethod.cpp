@@ -44,25 +44,29 @@ void LevelSetMethod::ProcessImage() {
     float a = 1.0;
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
+    
+    Tex<float> phiT = sdf1->GetPhi();
 
-    // for(unsigned int x=1; x<width-1;x++) {
-    //     for(unsigned int y=1; y<height-1;y++) {
+    for(unsigned int x=1; x<width-1;x++) {
+        for(unsigned int y=1; y<height-1;y++) {
             
-    //         //Vector<2,float> godunov = Godunov(x,y,a);
-    //         //Vector<2,float> g = Gradient(x,y);
-    //         Vector<2,float> g = vf(x,y);
+            // //Vector<2,float> godunov = Godunov(x,y,a);
+            // //Vector<2,float> g = Gradient(x,y);
+            // Vector<2,float> g = vf(x,y);
  
-    //         //float phiX = sqrt(godunov[0]);
-    //         //float phiY = sqrt(godunov[1]);
+            // //float phiX = sqrt(godunov[0]);
+            // //float phiY = sqrt(godunov[1]);
             
-    //         Vector<2,float> v;
-    //         v[0] = g[0] / g.GetLength();
-    //         v[1] = g[1] / g.GetLength();
+            // Vector<2,float> v;
+            // v[0] = g[0] / g.GetLength();
+            // v[1] = g[1] / g.GetLength();
 
-    //         phiT(x,y) += -v*g;
-    //         //phiT(x,y) += -1.1;
-    //     }
-    // }
+            // phiT(x,y) += -v*g;
+            phiT(x,y) += -1.1;
+        }
+    }
+
+    sdf1->SetPhi(phiT);
 
     // int iterations = 4; //width/2;
 

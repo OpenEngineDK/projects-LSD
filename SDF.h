@@ -22,6 +22,7 @@ private:
     unsigned int width,height;
 
     EmptyTextureResourcePtr phiTexture;
+    EmptyTextureResourcePtr phi0Texture;
     EmptyTextureResourcePtr outputTexture;
     EmptyTextureResourcePtr gradientTexture;
 
@@ -45,8 +46,12 @@ public:
     // Returns the isosurface?
     EmptyTextureResourcePtr GetOutputTexture() {return outputTexture;} 
     EmptyTextureResourcePtr GetPhiTexture() {return phiTexture;}
+    EmptyTextureResourcePtr GetPhi0Texture() {return phi0Texture;}
     EmptyTextureResourcePtr GetGradientTexture() {return gradientTexture;}
 
+    Tex<float> GetPhi();
+    void SetPhi(Tex<float>);
+    
 
     float operator()(unsigned int, unsigned int);
 

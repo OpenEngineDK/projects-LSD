@@ -103,6 +103,7 @@ SDF::SDF(ITextureResourcePtr input)
   , width(inputTexture->GetWidth())
   , height(inputTexture->GetHeight())
   , phiTexture(EmptyTextureResource::Create(width,height,8))
+  , phi0Texture(EmptyTextureResource::Create(width,height,8))
   , outputTexture(EmptyTextureResource::Create(width,height,8))
   , gradientTexture(EmptyTextureResource::Create(width,height,24))
   , phi(width,height)
@@ -110,6 +111,7 @@ SDF::SDF(ITextureResourcePtr input)
   , gradient(width,height)
  {
      phiTexture->Load();
+     phi0Texture->Load();
      outputTexture->Load();
      gradientTexture->Load();
      
@@ -182,6 +184,10 @@ void SDF::BuildSDF() {
 
     phi.ToTexture(phiTexture);
     updateQueue.Put(phiTexture);
+
+    phi0 = phi;
+    phi0.ToTexture(phi0Texture);
+    updateQueue.Put(phi0Texture);
 
 
     SDFToTexture(phi,outputTexture);
@@ -317,7 +323,6 @@ void SDF::Reinitialize() {
         phi(x,0) = phi(x,1);
         phi(x,height-1) = phi(x,height-2);
     }
-
 }
 
 
@@ -333,7 +338,30 @@ void SDF::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
     }
 }
 
+Tex<float> SDF::GetPhi() {
+    //return phi;
+
+    Tex<float> cp(width,height);
+    cp = phi;
+    return cp;
+}
+
+void SDF::SetPhi(Tex<float> phiT) {
+    phi0 = phi;
+    phi = phiT;
+
+    phi.ToTexture(phiTexture);
+    updateQueue.Put(phiTexture);
+
+    phi0.ToTexture(phi0Texture);
+    updateQueue.Put(phi0Texture);
+}
+
+
 void SDF::Refresh() {
+    SDFToTexture(phi,outputTexture);
+    updateQueue.Put(outputTexture);
+
     while(!updateQueue.IsEmpty()) {
         EmptyTextureResourcePtr t = updateQueue.Get();
         t->RebindTexture();
