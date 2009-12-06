@@ -4,7 +4,7 @@
 #include <Resources/ITextureResource.h>
 #include <Math/Vector.h>
 #include "Tex.h"
-
+#include "LockedQueue.h"
 
 using namespace OpenEngine::Resources;
 using namespace OpenEngine::Math;
@@ -35,6 +35,8 @@ private:
     int S(Tex<float>& field, unsigned int x, unsigned int y);
     void SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t);
 
+    LockedQueue<EmptyTextureResourcePtr> updateQueue;
+
 public:
     SDF(ITextureResourcePtr);
     
@@ -49,6 +51,8 @@ public:
     float operator()(unsigned int, unsigned int);
 
     Vector<2,float> Gradient(unsigned int, unsigned int);
+
+    void Refresh();
 
 };
 

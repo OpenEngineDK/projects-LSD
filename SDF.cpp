@@ -177,22 +177,19 @@ void SDF::BuildSDF() {
 				min = dist;
 			if(max < dist)
 				max = dist;
-
 		}
 	}
 
-
     phi.ToTexture(phiTexture);
+    updateQueue.Put(phiTexture);
+
+
     SDFToTexture(phi,outputTexture);
+    updateQueue.Put(outputTexture);
 }
 
 
-void SDF::BuildGradient() {
-
-
-// void LevelSetMethod::BuildVF() {
-//     // make vector field V
-    
+void SDF::BuildGradient() {   
     const unsigned int Y = inputTexture->GetHeight();
     const unsigned int X = inputTexture->GetWidth();
 
@@ -263,19 +260,9 @@ void SDF::BuildGradient() {
 
         }
     gradient.ToTexture(gradientTexture);
+    updateQueue.Put(gradientTexture);
+
 }
-
-
-// #warning TODO: Vi burde fixe edge cases!111etetet
-
-//     for(unsigned int x=0; x<width-1;x++)
-//         for(unsigned int y=0; y<height-1;y++) {
-//             Vector<2,float> g = Gradient(x,y);
-
-//             gradient(x,y) = g;
-            
-//         }
-//}
 
 
 Vector<2, float> SDF::Gradient(unsigned int i, unsigned int j) {
@@ -344,4 +331,12 @@ void SDF::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
                 (*t)(x,y,0) = -1;
         }
     }
+}
+
+void SDF::Refresh() {
+    while(!updateQueue.IsEmpty()) {
+        EmptyTextureResourcePtr t = updateQueue.Get();
+        t->RebindTexture();
+    }
+
 }

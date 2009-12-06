@@ -88,10 +88,12 @@ void LevelSetMethod::ProcessImage() {
 
 void LevelSetMethod::Handle(ProcessEventArg arg) {
 
-    while(!updateQueue.IsEmpty()) {
-        EmptyTextureResourcePtr t = updateQueue.Get();
-        t->RebindTexture();
-    }
+    sdf1->Refresh();
+
+    // while(!updateQueue.IsEmpty()) {
+    //     EmptyTextureResourcePtr t = updateQueue.Get();
+    //     t->RebindTexture();
+    // }
 
     //phiT.ToTexture(phiTTex);
     //SDFToTexture(phiT, phiTTex);
