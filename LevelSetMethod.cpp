@@ -5,18 +5,19 @@
 
 LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr inputTex2)
     : sdf1(new SDF(inputTex)),
+      sdf2(new SDF(inputTex2)),
       inputTex(inputTex),
       inputTex2(inputTex2),
       width(inputTex->GetWidth()),
       height(inputTex->GetHeight()),
       dx(1),
-      dy(1),
-      testTex(EmptyTextureResource::Create(width,height,8)),
+      dy(1),      
       run(true)
 {
-    testTex->Load();
-
+    testSDF = Subtract(sdf2,sdf1);
     
+    testSDF->Refresh();
+    testSDF->Reinitialize(1);
     // Testing
     //Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
     
@@ -34,26 +35,31 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
     //         (*testTex)(x,y,0) = g.GetLength()*100.0;
             
     //     }
-  
+ 
+        
+ 
 }
 
 
 void LevelSetMethod::ProcessImage() {
+
+    SDF* sdf = testSDF;
+
     logger.info << "Process" << logger.end;
        
-    float a = -1.0;
+    float a = 1.0;
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
     
-    sdf1->Reinitialize(2);
+    sdf->Reinitialize(2);
 
-    Tex<float> phi = sdf1->GetPhi();
+    Tex<float> phi = sdf->GetPhi();
 
     for(unsigned int x=1; x<width-1;x++) {
         for(unsigned int y=1; y<height-1;y++) {
             
             // //Vector<2,float> godunov = Godunov(x,y,a);
-            Vector<2,float> g = sdf1->Gradient(x,y);
+            Vector<2,float> g = sdf->Gradient(x,y);
  
             // //float phiX = sqrt(godunov[0]);
             // //float phiY = sqrt(godunov[1]);
@@ -68,7 +74,7 @@ void LevelSetMethod::ProcessImage() {
         }
     }
 
-    sdf1->SetPhi(phi);
+    sdf->SetPhi(phi);
 
     
 
@@ -95,13 +101,13 @@ void LevelSetMethod::ProcessImage() {
 }
 
 void LevelSetMethod::Handle(ProcessEventArg arg) {
+    
+    testSDF->Refresh();
 
-    sdf1->Refresh();
-
-    // while(!updateQueue.IsEmpty()) {
-    //     EmptyTextureResourcePtr t = updateQueue.Get();
-    //     t->RebindTexture();
-    // }
+    while(!updateQueue.IsEmpty()) {
+        EmptyTextureResourcePtr t = updateQueue.Get();
+        t->RebindTexture();
+    }
 
     //phiT.ToTexture(phiTTex);
     //SDFToTexture(phiT, phiTTex);
@@ -140,45 +146,55 @@ void LevelSetMethod::Run() {
 
 
 
-
-Tex<float> LevelSetMethod::Union(Tex<float> sdf1, Tex<float> sdf2) {
-	unsigned int height = sdf1.GetHeight();
-	unsigned int width = sdf1.GetWidth();
+SDF* LevelSetMethod::Union(SDF* s1, SDF* s2) {
+	unsigned int height = s1->GetHeight();
+	unsigned int width = s1->GetWidth();
 	
-	Tex<float> res(width,height);
+    SDF* ns = new SDF(width,height);
+    
+	Tex<float> res = ns->GetPhi();
 	
 	for (unsigned int y=0; y<height; y++) {
-		for (unsigned int x=0; x<width; x++) {
-			res(x,y) = min(sdf1(x,y),sdf2(x,y));
+		for (unsigned int x=0; x<width; x++) {            
+			res(x,y) = min((*s1)(x,y),(*s2)(x,y));
 		}
 	}
-	return res;
+	ns->SetPhi(res);
+    return ns;    
 }
 
-Tex<float> LevelSetMethod::Intersection(Tex<float> sdf1, Tex<float> sdf2) {
-	unsigned int height = sdf1.GetHeight();
-	unsigned int width = sdf1.GetWidth();
+
+SDF* LevelSetMethod::Intersection(SDF* s1, SDF* s2) {
+	unsigned int height = s1->GetHeight();
+	unsigned int width = s1->GetWidth();
 	
-	Tex<float> res(width,height);
+    SDF* ns = new SDF(width,height);
+    
+	Tex<float> res = ns->GetPhi();
 	
 	for (unsigned int y=0; y<height; y++) {
-		for (unsigned int x=0; x<width; x++) {
-			res(x,y) = max(sdf1(x,y),sdf2(x,y));
+		for (unsigned int x=0; x<width; x++) {            
+			res(x,y) = max((*s1)(x,y),(*s2)(x,y));
 		}
 	}
-	return res;
+	ns->SetPhi(res);
+    return ns;    
 }
 
-Tex<float> LevelSetMethod::Subtract(Tex<float> sdf1, Tex<float> sdf2) {
-	unsigned int height = sdf1.GetHeight();
-	unsigned int width = sdf1.GetWidth();
+
+SDF* LevelSetMethod::Subtract(SDF* s1, SDF* s2) {
+	unsigned int height = s1->GetHeight();
+	unsigned int width = s1->GetWidth();
 	
-	Tex<float> res(width,height);
+    SDF* ns = new SDF(width,height);
+    
+	Tex<float> res = ns->GetPhi();
 	
 	for (unsigned int y=0; y<height; y++) {
 		for (unsigned int x=0; x<width; x++) {
-			res(x,y) = max(sdf1(x,y),-sdf2(x,y));
+			res(x,y) = max((*s1)(x,y),-(*s2)(x,y));
 		}
 	}
-	return res;
+	ns->SetPhi(res);
+    return ns;    
 }

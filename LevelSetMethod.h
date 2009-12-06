@@ -19,6 +19,8 @@ using namespace std;
 class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     SDF* sdf1;
+    SDF* sdf2;
+    SDF* testSDF;
 
     ITextureResourcePtr inputTex;
     ITextureResourcePtr inputTex2;
@@ -31,7 +33,6 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     LockedQueue<EmptyTextureResourcePtr> updateQueue;
 
-    EmptyTextureResourcePtr testTex;
 
 
     void ProcessImage();
@@ -42,6 +43,8 @@ public:
                    ITextureResourcePtr inputTex2);
 
     SDF* GetSDF1() {return sdf1;}
+    SDF* GetSDF2() {return sdf2;}
+    SDF* GetTestSDF() {return testSDF;}
 
     void Handle(ProcessEventArg arg);
 
@@ -49,15 +52,14 @@ public:
 
     virtual void Run();
 
-    EmptyTextureResourcePtr GetTestTexture() {return testTex;}
 
     
     float GetValue(unsigned int i, unsigned int j);        
     Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);
 
-    Tex<float> Union(Tex<float> sdf1, Tex<float> sdf2);
-	Tex<float> Intersection(Tex<float> sdf1, Tex<float> sdf2);
-	Tex<float> Subtract(Tex<float> sdf1, Tex<float> sdf2);
+    SDF* Union(SDF* sdf1, SDF* sdf2);
+	SDF* Intersection(SDF* sdf1, SDF* sdf2);
+	SDF* Subtract(SDF* sdf1, SDF* sdf2);
 
 
 };

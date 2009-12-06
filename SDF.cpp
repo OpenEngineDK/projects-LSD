@@ -97,27 +97,48 @@ void GenerateSDF( Grid &g, int width, int height ) {
 
 
 // ^- This will go away soon
+SDF::SDF(unsigned int w, unsigned int h) 
+    : width(w)
+    , height(h)
+    , phiTexture(EmptyTextureResource::Create(width,height,8))
+    , phi0Texture(EmptyTextureResource::Create(width,height,8))
+    , outputTexture(EmptyTextureResource::Create(width,height,8))
+    , gradientTexture(EmptyTextureResource::Create(width,height,24))
+    , phi(width,height)
+    , phi0(width,height)
+    , gradient(width,height)    
+{
+    phiTexture->Load();
+    phi0Texture->Load();
+    outputTexture->Load();
+    gradientTexture->Load();
+     
+    // BuildSDF();
+    // BuildGradient();
+
+}
+
 
 
 SDF::SDF(ITextureResourcePtr input) 
-  : inputTexture(input)
-  , width(inputTexture->GetWidth())
-  , height(inputTexture->GetHeight())
-  , phiTexture(EmptyTextureResource::Create(width,height,8))
-  , phi0Texture(EmptyTextureResource::Create(width,height,8))
-  , outputTexture(EmptyTextureResource::Create(width,height,8))
-  , gradientTexture(EmptyTextureResource::Create(width,height,24))
-  , phi(width,height)
-  , phi0(width,height)
-  , gradient(width,height)
- {
-     phiTexture->Load();
-     phi0Texture->Load();
-     outputTexture->Load();
-     gradientTexture->Load();
+    : inputTexture(input)
+    , width(inputTexture->GetWidth())
+    , height(inputTexture->GetHeight())
+    , phiTexture(EmptyTextureResource::Create(width,height,8))
+    , phi0Texture(EmptyTextureResource::Create(width,height,8))
+    , outputTexture(EmptyTextureResource::Create(width,height,8))
+    , gradientTexture(EmptyTextureResource::Create(width,height,24))
+    , phi(width,height)
+    , phi0(width,height)
+    , gradient(width,height)
+{
+    phiTexture->Load();
+    phi0Texture->Load();
+    outputTexture->Load();
+    gradientTexture->Load();
      
-     BuildSDF();
-     BuildGradient();
+    BuildSDF();
+    BuildGradient();
 }
 
 void SDF::BuildSDF() {
@@ -192,8 +213,8 @@ void SDF::BuildSDF() {
 
 
 void SDF::BuildGradient() {   
-    const unsigned int Y = inputTexture->GetHeight();
-    const unsigned int X = inputTexture->GetWidth();
+    const unsigned int Y = height;
+    const unsigned int X = width;
 
     float dx = 1;
     float dy = 1;
@@ -209,15 +230,8 @@ void SDF::BuildGradient() {
             } 
             //lower right corner
             else if (x == X - 1 && y == 0) {
-                logger.info << "[lr] phi(x-1,y) " << phi(x-1, y)
-                            << " phi(x,y+1) " << phi(x, y+1)
-                            << " phi(x,y) " << phi(x,y) 
-                            << logger.end;
-
                 cdX = (phi(x, y) - phi(x-1, y)) / dx;
                 cdY = (phi(x, y) - phi(x, y+1)) / dy;
-                logger.info << cdX << " " << cdY << logger.end;
-
             }
             //upper left corner
             else if (x == 0 && y == Y - 1) {

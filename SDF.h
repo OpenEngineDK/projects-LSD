@@ -40,6 +40,7 @@ private:
 
 public:
     SDF(ITextureResourcePtr);
+    SDF(unsigned int,unsigned int);
     
     void Reinitialize(unsigned int);
 
@@ -52,8 +53,10 @@ public:
     Tex<float> GetPhi();
     void SetPhi(Tex<float>);
     
+    unsigned int GetWidth() {return width;}
+    unsigned int GetHeight() {return height;}
 
-    float operator()(unsigned int, unsigned int);
+    float operator()(unsigned int x, unsigned int y) {return phi(x,y);}
 
     Vector<2,float> Gradient(unsigned int, unsigned int);
 

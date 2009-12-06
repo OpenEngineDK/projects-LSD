@@ -215,7 +215,12 @@ int main(int argc, char** argv) {
     wall(1,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
 
     wall(2,1) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
-    // wall(1,2) = make_pair<>(method.GetGradientTexture(),"Gradient");
+    
+    SDF* test = method.GetTestSDF();
+
+    wall(1,2) = make_pair<>(test->GetPhiTexture(),"Subtract");
+    wall(0,2) = make_pair<>(test->GetOutputTexture(),"Subtract");
+    wall(2,2) = make_pair<>(test->GetGradientTexture(),"Subtract");
 
     // wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");
 
