@@ -22,7 +22,7 @@ private:
 public:
     Tex(const Tex<T> & copyFromMe) : width(copyFromMe.width),
                                      height(copyFromMe.height),
-                                     data(new T[width*height]) {    
+                                     data(new T[width*height]) {
          std::copy(copyFromMe.data, 
                    copyFromMe.data + (width*height), 
                    data);    
@@ -77,34 +77,34 @@ public:
 
 
   // look up pixel by interpolation
-  T operator()(const float fx, const float fy) {
-#if OE_SAFE
-    if (fx < 0) throw Math::IndexOutOfBounds(floor(fx),0,(unsigned int)-1);
-    if (fy < 0) throw Math::IndexOutOfBounds(floor(fy),0,(unsigned int)-1);
-#endif
+//   T operator()(const float fx, const float fy) {
+// #if OE_SAFE
+//     if (fx < 0) throw Math::IndexOutOfBounds(floor(fx),0,(unsigned int)-1);
+//     if (fy < 0) throw Math::IndexOutOfBounds(floor(fy),0,(unsigned int)-1);
+// #endif
 
-    unsigned int ix_below = floor(fx);
-    unsigned int ix_above = ceil(fx);
-    unsigned int iy_below = floor(fy);
-    unsigned int iy_above = ceil(fy);
+//     unsigned int ix_below = floor(fx);
+//     unsigned int ix_above = ceil(fx);
+//     unsigned int iy_below = floor(fy);
+//     unsigned int iy_above = ceil(fy);
 
-    float wx_below =  fx - ix_below;
-    float wx_above =  1 - wx_below;
+//     float wx_below =  fx - ix_below;
+//     float wx_above =  1 - wx_below;
 
-    float wy_below =  fy - iy_below;
-    float wy_above =  1 - wy_below;
+//     float wy_below =  fy - iy_below;
+//     float wy_above =  1 - wy_below;
 
-    float dy_above = 
-      (*this)(ix_above,iy_above) * wx_above +
-      (*this)(ix_below,iy_above) * wx_below;
+//     float dy_above = 
+//       (*this)(ix_above,iy_above) * wx_above +
+//       (*this)(ix_below,iy_above) * wx_below;
 
-    float dy_below = 
-      (*this)(ix_above,iy_below) * wx_above +
-      (*this)(ix_below,iy_below) * wx_below;
+//     float dy_below = 
+//       (*this)(ix_above,iy_below) * wx_above +
+//       (*this)(ix_below,iy_below) * wx_below;
 
-    T v = dy_above * wy_above + dy_below * wy_below;
-    return v;
-  }
+//     T v = dy_above * wy_above + dy_below * wy_below;
+//     return v;
+//   }
 };
 
 
