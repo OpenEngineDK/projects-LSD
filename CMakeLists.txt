@@ -14,6 +14,9 @@ SET( PROJECT_SOURCES
 
   Tex.cpp
   Tex.h
+
+  SDF.h
+  SDF.cpp
 )
 
 # Include needed to use SDL under Mac OS X

@@ -38,6 +38,7 @@
 #include "LockedQueue.h"
 #include "EmptyTextureResource.h"
 #include "LevelSetMethod.h"
+#include "SDF.h"
 
 #include "Producer.h"
 #include "Consumer.h"
@@ -183,7 +184,7 @@ int main(int argc, char** argv) {
     SimpleSetup* setup = new SimpleSetup("LevelSet Method",NULL,env);
  
 
-    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.0,0.0,0.0,1.0));
+    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.5,0.5,0.5,1.0));
 
     ISceneNode* rootNode = setup->GetScene();
 
@@ -198,18 +199,20 @@ int main(int argc, char** argv) {
     setup->GetEngine().ProcessEvent().Attach(method);
 
 
+    SDF* sdf1 = method.GetSDF1();
+
     Wall wall(setup->GetTextureLoader());
     
     wall(0,0) = make_pair<>(auLogo,"AU Logo");
-    wall(2,0) = make_pair<>(circle,"Circle");
+    wall(1,0) = make_pair<>(circle,"Circle");
 
-    wall(0,1) = make_pair<>(method.GetDFSTexture(),"Phi");
-    wall(1,1) = make_pair<>(method.GetPhiTTexture(),"Phi_0");
+    wall(2,0) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
+    //wall(1,1) = make_pair<>(method.GetPhiTTexture(),"Phi_0");
 
-    wall(0,2) = make_pair<>(method.GetTestTexture(),"Test");
-    wall(1,2) = make_pair<>(method.GetGradientTexture(),"Gradient");
+    // wall(0,2) = make_pair<>(method.GetTestTexture(),"Test");
+    // wall(1,2) = make_pair<>(method.GetGradientTexture(),"Gradient");
 
-    wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");
+    // wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");
 
     setup->SetScene((*wall.MakeScene()));
 

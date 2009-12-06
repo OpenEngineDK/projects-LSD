@@ -8,48 +8,17 @@
 
 #include "Tex.h"
 
+#include "SDF.h"
+
 #include "EmptyTextureResource.h"
 
 using namespace OpenEngine::Core;
 using namespace std;
 
 
-struct Point {
-    int dx, dy;
-
-    int DistSq() const { return dx*dx + dy*dy; }
-};
-
-class Grid {
-    
-    unsigned int width;
-    unsigned int height;
-    
-    Point *grid;//[HEIGHT][WIDTH];
-
-public:
-    Grid(unsigned int w, 
-         unsigned int h) : width(w), height(h) {
-        grid = new Point[width*height];
-    }
-    Point Get(unsigned int x,
-               unsigned int y) {
-        return grid[y*width+x];
-    }
-    void Put(unsigned int x,
-             unsigned int y,
-             Point v) {
-        grid[y*width+x] = v;
-    }
-
-    Point& operator()(unsigned int x,
-                      unsigned int y) {
-        return grid[y*width+x];
-    }
-};
-
-
 class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
+
+    SDF* sdf1;
 
     ITextureResourcePtr inputTex;
     ITextureResourcePtr inputTex2;
@@ -60,12 +29,12 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     int dx, dy;
 
-    Tex<float> phi;
-    Tex<float> phi0;
-    Tex<float> phiT;
+    // Tex<float> phi;
+    // Tex<float> phi0;
+    // Tex<float> phiT;
 
-    Tex<Vector<2,float> > vf;
-    Tex<Vector<2,float> > grad;
+    //Tex<Vector<2,float> > vf;
+    //Tex<Vector<2,float> > grad;
     
     LockedQueue<EmptyTextureResourcePtr> updateQueue;
 
@@ -78,12 +47,12 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
     void ProcessImage();
 
-    void BuildPhi(ITextureResourcePtr in, Tex<float>& pphi);
-
 public:
 
     LevelSetMethod(ITextureResourcePtr inputTex,
                    ITextureResourcePtr inputTex2);
+
+    SDF* GetSDF1() {return sdf1;}
 
     void Handle(ProcessEventArg arg);
 
@@ -102,11 +71,11 @@ public:
     float GetValue(unsigned int i, unsigned int j);        
     Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);
     Vector<2, float> Gradient(unsigned int i, unsigned j);
-    void ReInitialize();
-    int S(Tex<float>& field, unsigned int x, unsigned int y);
+    //void ReInitialize();
 
 
-    Tex<float> GetPhi() {return phi;}
+
+    //Tex<float> GetPhi() {return phi;}
 
     Tex<float> Union(Tex<float> sdf1, Tex<float> sdf2);
 	Tex<float> Intersection(Tex<float> sdf1, Tex<float> sdf2);
