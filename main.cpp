@@ -204,12 +204,12 @@ int main(int argc, char** argv) {
     Wall wall(setup->GetTextureLoader());
     
     wall(0,0) = make_pair<>(auLogo,"AU Logo");
-    wall(1,0) = make_pair<>(circle,"Circle");
+    wall(1,0) = make_pair<>(circle,"Circle"); // input 1
 
     wall(2,0) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
-    //wall(1,1) = make_pair<>(method.GetPhiTTexture(),"Phi_0");
+    wall(1,1) = make_pair<>(sdf1->GetOutputTexture(),"Output");
 
-    // wall(0,2) = make_pair<>(method.GetTestTexture(),"Test");
+     wall(2,1) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
     // wall(1,2) = make_pair<>(method.GetGradientTexture(),"Gradient");
 
     // wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");

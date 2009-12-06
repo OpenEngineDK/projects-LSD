@@ -11,35 +11,10 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
       height(inputTex->GetHeight()),
       dx(1),
       dy(1),
-      // phi(*(new Tex<float>(width,height))),
-      // phi0(*(new Tex<float>(width,height))),
-      // phiT(*(new Tex<float>(width,height))),
-      //phi(width,height),
-      //phi0(width,height),
-      //phiT(width,height),
-      //vf(width,height),
-      //grad(width,height),
-      sdfTex(EmptyTextureResource::Create(width,height,8)),
-      vfTex(EmptyTextureResource::Create(width,height,24)),
-      gradTex(EmptyTextureResource::Create(width,height,24)),
-      phiTTex(EmptyTextureResource::Create(width,height,8)),
       testTex(EmptyTextureResource::Create(width,height,8)),
       run(true)
 {
-    sdfTex->Load();
-    vfTex->Load();
-    gradTex->Load();
-    phiTTex->Load();
     testTex->Load();
-    // Lets generate the SDF    
-    //BuildSDF();
-    //phi.ToTexture(sdfTex);
-
-    //BuildVF();
-    //vf.ToTexture(vfTex);
-    
-    //BuildGradient();
-    //grad.ToTexture(gradTex);
 
     
     // Testing
@@ -59,88 +34,8 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
     //         (*testTex)(x,y,0) = g.GetLength()*100.0;
             
     //     }
-
-
-    
-
+  
 }
-
-
-// void LevelSetMethod::BuildVF() {
-//     // make vector field V
-    
-//     const unsigned int Y = inputTex->GetHeight();
-//     const unsigned int X = inputTex->GetWidth();
-
-//     Vector<2,float> gradient[X][Y];
-//     float dx = 1;
-//     float dy = 1;
-//     float cdX, cdY;
-//     for (unsigned int x=0; x<X; x++)
-//         for (unsigned int y=0; y<Y; y++) {
-      
-//             //lower left corner
-//             if (x == 0 && y == 0) {
-//                 cdX = (phi(x, y) - phi(x+1, y)) / dx;
-//                 cdY = (phi(x, y) - phi(x, y+1)) / dy;
-
-//             } 
-//             //upper right corner
-//             else if (x == X - 1 && y == 0) {
-//                 cdX = (phi(x, y) - phi(x-1, y)) / dx;
-//                 cdY = (phi(x, y) - phi(x, y+1)) / dy;
-
-//             }
-//             //upper left corner
-//             else if (x == 0 && y == Y - 1) {
-//                 cdX = (phi(x, y) - phi(x+1, y)) / dx;
-//                 cdY = (phi(x, y) - phi(x, y-1)) / dy;
-
-//             }      
-//             //lower right corner
-//             else if (x == X - 1 && y == Y - 1) {
-//                 cdX = (phi(x, y) - phi(x-1, y)) / dx;
-//                 cdY = (phi(x, y) - phi(x, y-1)) / dy;
-
-//             }
-
-//             // upper border
-//             else if (y == 0 && (x > 0 && x < X - 1)) {
-//                 cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-//                 cdY = (phi(x, y)   - phi(x, y+1)) / dy;
-
-//             }       
-//             // lower border
-//             else if (y == Y - 1 && (x > 0 && x < X - 1)) {
-//                 cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-//                 cdY = (phi(x, y)   - phi(x, y-1)) / dy;
-
-//             }
-//             // left border
-//             else if (x == 0 && (y > 0 && y < Y - 1)) {
-//                 cdX = (phi(x, y)   - phi(x+1, y)) / dx;
-//                 cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
-
-//             }
-//             // right border
-//             else if (x == X - 1 && (y > 0 && y < Y - 1)) {
-//                 cdX = (phi(x, y)   - phi(x-1, y)) / dx;
-//                 cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
-
-//             }
-//             // Normal case
-//             else {
-	
-//                 // central differences
-//                 cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-//                 cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
-//             }
-
-//             gradient[x][y] = vf(x,y) = Vector<2, float>(cdX, cdY);
-
-//         }
-
-// }
 
 
 void LevelSetMethod::ProcessImage() {
@@ -191,18 +86,6 @@ void LevelSetMethod::ProcessImage() {
     
 }
 
-void LevelSetMethod::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
-    for (unsigned int x=0;x<p.GetWidth();x++) {
-        for (unsigned int y=0;y<p.GetHeight();y++) {
-            //logger.info << p(x,y) << logger.end;
-            if (p(x,y) < 0 )
-                (*t)(x,y,0) = 0;
-            else 
-                (*t)(x,y,0) = -1;
-        }
-    }
-}
-
 void LevelSetMethod::Handle(ProcessEventArg arg) {
 
     while(!updateQueue.IsEmpty()) {
@@ -221,7 +104,7 @@ void LevelSetMethod::Run() {
     while (run) {
 
         ProcessImage();
-        //Thread::Sleep(1000000);
+        Thread::Sleep(1000000);
     }
 }
 

@@ -22,6 +22,8 @@ private:
     unsigned int width,height;
 
     EmptyTextureResourcePtr phiTexture;
+    EmptyTextureResourcePtr outputTexture;
+    EmptyTextureResourcePtr gradientTexture;
 
     Tex<float> phi;
     Tex<float> phi0;
@@ -31,15 +33,19 @@ private:
     void BuildGradient();
     
     int S(Tex<float>& field, unsigned int x, unsigned int y);
+    void SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t);
 
 public:
     SDF(ITextureResourcePtr);
     
     void Reinitialize();
 
-    EmptyTextureResourcePtr GetOutputTexture(); // Returns the isosurface?
+    // Returns the isosurface?
+    EmptyTextureResourcePtr GetOutputTexture() {return outputTexture;} 
     EmptyTextureResourcePtr GetPhiTexture() {return phiTexture;}
-    
+    EmptyTextureResourcePtr GetGradientTexture() {return gradientTexture;}
+
+
     float operator()(unsigned int, unsigned int);
 
     Vector<2,float> Gradient(unsigned int, unsigned int);

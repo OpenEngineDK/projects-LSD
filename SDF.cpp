@@ -103,16 +103,18 @@ SDF::SDF(ITextureResourcePtr input)
   , width(inputTexture->GetWidth())
   , height(inputTexture->GetHeight())
   , phiTexture(EmptyTextureResource::Create(width,height,8))
+  , outputTexture(EmptyTextureResource::Create(width,height,8))
+  , gradientTexture(EmptyTextureResource::Create(width,height,24))
   , phi(width,height)
   , phi0(width,height)
   , gradient(width,height)
  {
      phiTexture->Load();
+     outputTexture->Load();
+     gradientTexture->Load();
      
      BuildSDF();
-
-     
-    
+     BuildGradient();
 }
 
 void SDF::BuildSDF() {
@@ -181,6 +183,7 @@ void SDF::BuildSDF() {
 
 
     phi.ToTexture(phiTexture);
+    SDFToTexture(phi,outputTexture);
 }
 
 
@@ -259,7 +262,7 @@ void SDF::BuildGradient() {
             gradient(x,y)  = Vector<2, float>(cdX, cdY);
 
         }
-
+    gradient.ToTexture(gradientTexture);
 }
 
 
@@ -328,4 +331,17 @@ void SDF::Reinitialize() {
         phi(x,height-1) = phi(x,height-2);
     }
 
+}
+
+
+void SDF::SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t) {
+    for (unsigned int x=0;x<p.GetWidth();x++) {
+        for (unsigned int y=0;y<p.GetHeight();y++) {
+            //logger.info << p(x,y) << logger.end;
+            if (p(x,y) < 0 )
+                (*t)(x,y,0) = 0;
+            else 
+                (*t)(x,y,0) = -1;
+        }
+    }
 }
