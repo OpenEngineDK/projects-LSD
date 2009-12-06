@@ -120,7 +120,7 @@ void LevelSetMethod::Run() {
 //     float diffXNegative = (phi(i, j)   - phi(i+1, j  )) / dx;
 //     float diffYPositive = (phi(i, j)   - phi(i  , j-1)) / dy;
 //     float diffYNegative = (phi(i, j)   - phi(i  , j+1)) / dy;
-
+    //[Osher153] Eq 6.3 / 6.4 
 //     float dx2,dy2;
 
 //     if (a > 0) {

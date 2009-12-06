@@ -292,36 +292,41 @@ Vector<2, float> SDF::Gradient(unsigned int i, unsigned int j) {
 }
 
 // Fortegns funktion fra bogen.
-int SDF::S(Tex<float>& field, unsigned int x, unsigned int y) {
-    float res = field(x,y);
-    return (res > 0 ? 1 : -1);
+int SDF::S(unsigned int x, unsigned int y) {
+    float phi = phi0(x,y);
+
+    //7.5
+    //return (phi > 0 ? 1 : -1);
+
+    Vector<2,float> grad = gradient(x,y);
+    //7.6
+    return phi / sqrt(phi*phi + grad.GetLengthSquared());
 }
 
 
-void SDF::Reinitialize() {
-        // Equation 7.4
-    
-    for (unsigned int y=1; y<height-1 ; y++) {
-        for (unsigned int x=1; x<width-1; x++) { 
+void SDF::Reinitialize(unsigned int iterations) {
+    // Equation 7.4
+    while (iterations--) {
+        for (unsigned int y=1; y<height-1 ; y++) {
+            for (unsigned int x=1; x<width-1; x++) { 
              
-            //Vector<2,float> g = vf(x,y);
-            Vector<2,float> g = gradient(x,y);
-            phi(x,y) = phi0(x,y) +  S(phi0, x, y) * (g.GetLength() - 1.0);
+                Vector<2,float> g = gradient(x,y);
+                phi(x,y) = phi0(x,y) +  S(x, y) * (g.GetLength() - 1.0);
             
-            
-            if (isnan(g.GetLength()))
-                logger.info << g << logger.end;
-            //phi(x,y) = (phi0(x,y) > 0)*100;
+                if (isnan(g.GetLength()))
+                    logger.info << g << logger.end;
+            }
         }
-    }
-    
-    for (unsigned int y=0; y<height ; y++) {
-        phi(0,y) = phi(1,y);
-        phi(width-1,y) = phi(width-2,y);
-    }
-    for (unsigned int x=0; x<width; x++) { 
-        phi(x,0) = phi(x,1);
-        phi(x,height-1) = phi(x,height-2);
+
+#warning Edge cases fixed here too
+        for (unsigned int y=0; y<height ; y++) {
+            phi(0,y) = phi(1,y);
+            phi(width-1,y) = phi(width-2,y);
+        }
+        for (unsigned int x=0; x<width; x++) { 
+            phi(x,0) = phi(x,1);
+            phi(x,height-1) = phi(x,height-2);
+        }
     }
 }
 

@@ -33,15 +33,15 @@ private:
     void BuildSDF();
     void BuildGradient();
     
-    int S(Tex<float>& field, unsigned int x, unsigned int y);
     void SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t);
+    int S(unsigned int x, unsigned int y);
 
     LockedQueue<EmptyTextureResourcePtr> updateQueue;
 
 public:
     SDF(ITextureResourcePtr);
     
-    void Reinitialize();
+    void Reinitialize(unsigned int);
 
     // Returns the isosurface?
     EmptyTextureResourcePtr GetOutputTexture() {return outputTexture;} 
