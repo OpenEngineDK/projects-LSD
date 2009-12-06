@@ -163,9 +163,6 @@ void SDF::BuildSDF() {
     GenerateSDF(*gridInner,X,Y);
 	GenerateSDF(*gridOuter,X,Y);
 
-	int min = X*Y+1;
-	int max = -(X*Y+1);
-
 	int dist1 = 0, dist2 = 0, dist = 0;
 	for (unsigned int y=0; y<Y; y++) {
 		for (unsigned int x=0; x<X; x++) {
@@ -178,11 +175,6 @@ void SDF::BuildSDF() {
 
             if (dist == 0.0f)
                 logger.info << "WTF" << logger.end;
-
-			if(min > dist)
-				min = dist;
-			if(max < dist)
-				max = dist;
 		}
 	}
 
@@ -324,11 +316,12 @@ void SDF::Reinitialize(unsigned int iterations) {
     // Equation 7.4
     while (iterations--) {
         BuildGradient();
+
         for (unsigned int y=1; y<height-1 ; y++) {
             for (unsigned int x=1; x<width-1; x++) { 
              
                 Vector<2,float> g = gradient(x,y);
-                phi(x,y) = phi0(x,y) +  S(x, y) * (g.GetLength() - 1.0);
+                phi(x,y) = phi(x,y) +  S(x, y) * (g.GetLength() - 1.0);
             
                 if (isnan(g.GetLength()))
                     logger.info << g << logger.end;

@@ -45,16 +45,15 @@ void LevelSetMethod::ProcessImage() {
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
     
-    //sdf1->Reinitialize(10);
+    sdf1->Reinitialize(2);
 
-    Tex<float> phiT = sdf1->GetPhi();
+    Tex<float> phi = sdf1->GetPhi();
 
     for(unsigned int x=1; x<width-1;x++) {
         for(unsigned int y=1; y<height-1;y++) {
             
             // //Vector<2,float> godunov = Godunov(x,y,a);
             Vector<2,float> g = sdf1->Gradient(x,y);
-            // Vector<2,float> g = vf(x,y);
  
             // //float phiX = sqrt(godunov[0]);
             // //float phiY = sqrt(godunov[1]);
@@ -63,12 +62,13 @@ void LevelSetMethod::ProcessImage() {
             v[0] = g[0] / g.GetLength();
             v[1] = g[1] / g.GetLength();
 
-            phiT(x,y) += a*(v*g);
-            //phiT(x,y) += -1.1;
+            //phi(x,y) += -1.1;
+
+            phi(x,y) += a*(v*g);
         }
     }
 
-    sdf1->SetPhi(phiT);
+    sdf1->SetPhi(phi);
 
     
 
@@ -112,9 +112,9 @@ void LevelSetMethod::Handle(ProcessEventArg arg) {
 void LevelSetMethod::Run() {
 
     while (run) {
-
+        //sdf1->Reinitialize(10);
         ProcessImage();
-        Thread::Sleep(100000);
+        //Thread::Sleep(1000000);
     }
 }
 
