@@ -51,7 +51,7 @@ void LevelSetMethod::ProcessImage() {
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
     
-    //sdf->Reinitialize(2);
+    sdf->Reinitialize(20);
 
     Tex<float> phi = sdf->GetPhi();
 
