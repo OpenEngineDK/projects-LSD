@@ -43,7 +43,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
 
 void LevelSetMethod::ProcessImage() {
 
-    SDF* sdf = testSDF;
+    SDF* sdf = sdf1;
 
     logger.info << "Process" << logger.end;
        
@@ -51,7 +51,7 @@ void LevelSetMethod::ProcessImage() {
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
     
-    sdf->Reinitialize(2);
+    //sdf->Reinitialize(2);
 
     Tex<float> phi = sdf->GetPhi();
 
@@ -68,9 +68,9 @@ void LevelSetMethod::ProcessImage() {
             v[0] = g[0] / g.GetLength();
             v[1] = g[1] / g.GetLength();
 
-            //phi(x,y) += -1.1;
+            phi(x,y) += -2.0;
 
-            phi(x,y) += a*(v*g);
+            //phi(x,y) += a*(v*g);
         }
     }
 
@@ -103,6 +103,8 @@ void LevelSetMethod::ProcessImage() {
 void LevelSetMethod::Handle(ProcessEventArg arg) {
     
     testSDF->Refresh();
+    sdf1->Refresh();
+    sdf2->Refresh();
 
     while(!updateQueue.IsEmpty()) {
         EmptyTextureResourcePtr t = updateQueue.Get();

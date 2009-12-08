@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
     circle->Load();
     auLogo->Load();
 
-    LevelSetMethod& method = *(new LevelSetMethod(auLogo,circle));
+    LevelSetMethod& method = *(new LevelSetMethod(circle,auLogo));
     setup->GetEngine().ProcessEvent().Attach(method);
 
 
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
     wall(1,0) = make_pair<>(circle,"Circle"); // input 1
     wall(2,0) = make_pair<>(sdf1->GetOutputTexture(),"Output");
 
-    wall(0,1) = make_pair<>(sdf1->GetPhi0Texture(),"Phi0");
+    //wall(0,1) = make_pair<>(sdf1->GetPhi0Texture(),"Phi0");
     wall(1,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
 
     wall(2,1) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
@@ -238,7 +238,6 @@ int main(int argc, char** argv) {
     setup->GetEngine().Start();
 
     method.run  = false;
-    
     method.Wait();
 
     // Return when the engine stops.

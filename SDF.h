@@ -21,20 +21,18 @@ private:
 
     unsigned int width,height;
 
-    EmptyTextureResourcePtr phiTexture;
-    EmptyTextureResourcePtr phi0Texture;
+    EmptyTextureResourcePtr phiTexture;   
     EmptyTextureResourcePtr outputTexture;
     EmptyTextureResourcePtr gradientTexture;
 
     Tex<float> phi;
-    Tex<float> phi0;
     Tex<Vector<2,float> > gradient;
 
     void BuildSDF();
     void BuildGradient();
     
     void SDFToTexture(Tex<float> p, EmptyTextureResourcePtr t);
-    int S(unsigned int x, unsigned int y);
+    //int S(unsigned int x, unsigned int y);
 
     LockedQueue<EmptyTextureResourcePtr> updateQueue;
 
@@ -47,7 +45,6 @@ public:
     // Returns the isosurface?
     EmptyTextureResourcePtr GetOutputTexture() {return outputTexture;} 
     EmptyTextureResourcePtr GetPhiTexture() {return phiTexture;}
-    EmptyTextureResourcePtr GetPhi0Texture() {return phi0Texture;}
     EmptyTextureResourcePtr GetGradientTexture() {return gradientTexture;}
 
     Tex<float> GetPhi();

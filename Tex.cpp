@@ -91,7 +91,7 @@ template<> void Tex<Vector<2,float> >::ToTexture(EmptyTextureResourcePtr texture
                     (*texture)(x,y,1) = (unsigned char)(pix[1]/_max * 255);
 
                 
-                (*texture)(x,y,2) = pix.GetLength()*255;
+                //(*texture)(x,y,2) = pix.GetLength()*255;
 
                 //if (dbg)
                     //logger.info << x << " " << y <<" " << int((*texture)(x,y,1)) << logger.end;

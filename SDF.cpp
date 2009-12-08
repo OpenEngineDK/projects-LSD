@@ -68,15 +68,12 @@ SDF::SDF(unsigned int w, unsigned int h)
     : width(w)
     , height(h)
     , phiTexture(EmptyTextureResource::Create(width,height,8))
-    , phi0Texture(EmptyTextureResource::Create(width,height,8))
     , outputTexture(EmptyTextureResource::Create(width,height,8))
     , gradientTexture(EmptyTextureResource::Create(width,height,24))
     , phi(width,height)
-    , phi0(width,height)
     , gradient(width,height)    
 {
     phiTexture->Load();
-    phi0Texture->Load();
     outputTexture->Load();
     gradientTexture->Load();
      
@@ -92,15 +89,12 @@ SDF::SDF(ITextureResourcePtr input)
     , width(inputTexture->GetWidth())
     , height(inputTexture->GetHeight())
     , phiTexture(EmptyTextureResource::Create(width,height,8))
-    , phi0Texture(EmptyTextureResource::Create(width,height,8))
     , outputTexture(EmptyTextureResource::Create(width,height,8))
     , gradientTexture(EmptyTextureResource::Create(width,height,24))
     , phi(width,height)
-    , phi0(width,height)
     , gradient(width,height)
 {
     phiTexture->Load();
-    phi0Texture->Load();
     outputTexture->Load();
     gradientTexture->Load();
      
@@ -172,10 +166,6 @@ void SDF::BuildSDF() {
     phi.ToTexture(phiTexture);
     updateQueue.Put(phiTexture);
 
-    phi0 = phi;
-    phi0.ToTexture(phi0Texture);
-    updateQueue.Put(phi0Texture);
-
 
     SDFToTexture(phi,outputTexture);
     updateQueue.Put(outputTexture);
@@ -194,18 +184,18 @@ void SDF::BuildGradient() {
       
             //lower left corner
             if (x == 0 && y == 0) {
-                cdX = (phi(x, y) - phi(x+1, y)) / dx;
-                cdY = (phi(x, y) - phi(x, y+1)) / dy;
+                cdX = -(phi(x, y) - phi(x+1, y)) / dx;
+                cdY = -(phi(x, y) - phi(x, y+1)) / dy;
 
             } 
             //lower right corner
             else if (x == X - 1 && y == 0) {
                 cdX = (phi(x, y) - phi(x-1, y)) / dx;
-                cdY = (phi(x, y) - phi(x, y+1)) / dy;
+                cdY = -(phi(x, y) - phi(x, y+1)) / dy;
             }
             //upper left corner
             else if (x == 0 && y == Y - 1) {
-                cdX = (phi(x, y) - phi(x+1, y)) / dx;
+                cdX = -(phi(x, y) - phi(x+1, y)) / dx;
                 cdY = (phi(x, y) - phi(x, y-1)) / dy;
 
             }      
@@ -218,42 +208,42 @@ void SDF::BuildGradient() {
 
             // upper border
             else if (y == 0 && (x > 0 && x < X - 1)) {
-                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y)   - phi(x, y+1)) / dy;
+                cdX = -(phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = -(phi(x, y)   - phi(x, y+1)) / dy;
 
             }       
             // lower border
             else if (y == Y - 1 && (x > 0 && x < X - 1)) {
-                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdX = -(phi(x-1, y) - phi(x+1, y)) / 2 * dx;
                 cdY = (phi(x, y)   - phi(x, y-1)) / dy;
 
             }
             // left border
             else if (x == 0 && (y > 0 && y < Y - 1)) {
-                cdX = (phi(x, y)   - phi(x+1, y)) / dx;
-                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
+                cdX = -(phi(x, y)   - phi(x+1, y)) / dx;
+                cdY = -(phi(x, y-1) - phi(x, y+1)) / 2 * dy;
 
             }
             // right border
             else if (x == X - 1 && (y > 0 && y < Y - 1)) {
                 cdX = (phi(x, y)   - phi(x-1, y)) / dx;
-                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
+                cdY = -(phi(x, y-1) - phi(x, y+1)) / 2 * dy;
 
             }
             // Normal case
             else {
 	
                 // central differences
-                cdX = (phi(x-1, y) - phi(x+1, y)) / 2 * dx;
-                cdY = (phi(x, y-1) - phi(x, y+1)) / 2 * dy;
+                cdX = -(phi(x-1, y) - phi(x+1, y)) / 2 * dx;
+                cdY = -(phi(x, y-1) - phi(x, y+1)) / 2 * dy;
             }
 
             
             Vector<2, float> g(cdX, cdY);
-            if (g.IsZero()) 
-                g = Vector<2,float>(0,1);
+            // if (g.IsZero()) 
+            //     g = Vector<2,float>(0,1);
                 
-            g.Normalize();
+            // g.Normalize();
             gradient(x,y) = g;
 
         }
@@ -265,64 +255,49 @@ void SDF::BuildGradient() {
 
 Vector<2, float> SDF::Gradient(unsigned int i, unsigned int j) {
     
-    return gradient(i,j);
-    
-    // Upwind
-    // float ddx, ddy;
-    
-    // Vector<2,float> v = vf(i,j);
-
-    // ddx = ( v[0] < 0.0f ) 
-    //     ? (phi(i, j)   - phi(i-1, j    )) / dx
-    //     : (phi(i, j)   - phi(i+1, j    )) / dx;
-    // ddy = ( v[1] < 0.0f ) 
-    //     ? (phi(i, j)   - phi(i  , j-1  )) / dx 
-    //     : (phi(i, j)   - phi(i  , j+1  )) / dy;
-
-    // return Vector<2, float>(ddx, ddy);
-        
+    return gradient(i,j);       
 }
 
-// Fortegns funktion fra bogen.
-int SDF::S(unsigned int x, unsigned int y) {
-    float phi = phi0(x,y);
+// // Fortegns funktion fra bogen.
+// int SDF::S(unsigned int x, unsigned int y) {
+//     float phi = phi0(x,y);
 
-    //7.5
-    //return (phi > 0 ? 1 : -1);
+//     //7.5
+//     //return (phi > 0 ? 1 : -1);
 
-    Vector<2,float> grad = gradient(x,y);
-    //7.6
-    return phi / sqrt(phi*phi + grad.GetLengthSquared());
-}
+//     Vector<2,float> grad = gradient(x,y);
+//     //7.6
+//     return phi / sqrt(phi*phi + grad.GetLengthSquared());
+// }
 
 
 void SDF::Reinitialize(unsigned int iterations) {
     // Equation 7.4
-    while (iterations--) {
-        BuildGradient();
+//     while (iterations--) {
+//         BuildGradient();
 
-        for (unsigned int y=1; y<height-1 ; y++) {
-            for (unsigned int x=1; x<width-1; x++) { 
+//         for (unsigned int y=1; y<height-1 ; y++) {
+//             for (unsigned int x=1; x<width-1; x++) { 
              
-                Vector<2,float> g = gradient(x,y);
-                phi(x,y) = phi(x,y) +  S(x, y) * (g.GetLength() - 1.0);
+//                 Vector<2,float> g = gradient(x,y);
+//                 phi(x,y) = phi(x,y) +  S(x, y) * (g.GetLength() - 1.0);
             
-                if (isnan(g.GetLength()))
-                    logger.info << g << logger.end;
-            }
-        }
+//                 if (isnan(g.GetLength()))
+//                     logger.info << g << logger.end;
+//             }
+//         }
 
-#warning Edge cases fixed here too
-        for (unsigned int y=0; y<height ; y++) {
-            phi(0,y) = phi(1,y);
-            phi(width-1,y) = phi(width-2,y);
-        }
-        for (unsigned int x=0; x<width; x++) { 
-            phi(x,0) = phi(x,1);
-            phi(x,height-1) = phi(x,height-2);
-        }
+// #warning Edge cases fixed here too
+//         for (unsigned int y=0; y<height ; y++) {
+//             phi(0,y) = phi(1,y);
+//             phi(width-1,y) = phi(width-2,y);
+//         }
+//         for (unsigned int x=0; x<width; x++) { 
+//             phi(x,0) = phi(x,1);
+//             phi(x,height-1) = phi(x,height-2);
+//         }
 
-    }
+//     }
 
     
 }
@@ -349,14 +324,10 @@ Tex<float> SDF::GetPhi() {
 }
 
 void SDF::SetPhi(Tex<float> phiT) {
-    phi0 = phi;
     phi = phiT;
 
     phi.ToTexture(phiTexture);
     updateQueue.Put(phiTexture);
-
-    phi0.ToTexture(phi0Texture);
-    updateQueue.Put(phi0Texture);
 }
 
 
