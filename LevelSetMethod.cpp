@@ -17,7 +17,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
     testSDF = Subtract(sdf2,sdf1);
     
     testSDF->Refresh();
-    testSDF->Reinitialize(1);
+    testSDF->Reinitialize(20);
     // Testing
     //Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
     
@@ -43,11 +43,11 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
 
 void LevelSetMethod::ProcessImage() {
 
-    SDF* sdf = sdf1;
+    SDF* sdf = testSDF;
 
     logger.info << "Process" << logger.end;
        
-    float a = 1.0;
+    float a = -0.1;
 
 #warning Oh fail, flere kant tilfælde...!!shift-en
     
@@ -68,7 +68,7 @@ void LevelSetMethod::ProcessImage() {
             v[0] = g[0] / g.GetLength();
             v[1] = g[1] / g.GetLength();
 
-            phi(x,y) += -2.0;
+            phi(x,y) += -a;
 
             //phi(x,y) += a*(v*g);
         }

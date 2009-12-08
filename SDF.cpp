@@ -100,6 +100,7 @@ SDF::SDF(ITextureResourcePtr input)
      
     BuildSDF();
     BuildGradient();
+    Reinitialize(width/2);
 }
 
 void SDF::BuildSDF() {
@@ -272,33 +273,6 @@ Vector<2, float> SDF::Gradient(unsigned int i, unsigned int j) {
 
 
 void SDF::Reinitialize(unsigned int iterations) {
-    // Equation 7.4
-//     while (iterations--) {
-//         BuildGradient();
-
-//         for (unsigned int y=1; y<height-1 ; y++) {
-//             for (unsigned int x=1; x<width-1; x++) { 
-             
-//                 Vector<2,float> g = gradient(x,y);
-//                 phi(x,y) = phi(x,y) +  S(x, y) * (g.GetLength() - 1.0);
-            
-//                 if (isnan(g.GetLength()))
-//                     logger.info << g << logger.end;
-//             }
-//         }
-
-// #warning Edge cases fixed here too
-//         for (unsigned int y=0; y<height ; y++) {
-//             phi(0,y) = phi(1,y);
-//             phi(width-1,y) = phi(width-2,y);
-//         }
-//         for (unsigned int x=0; x<width; x++) { 
-//             phi(x,0) = phi(x,1);
-//             phi(x,height-1) = phi(x,height-2);
-//         }
-
-//     }
-
 
 //----------------------------
     Tex<float> phi0 = GetPhi();
@@ -359,38 +333,38 @@ void SDF::Reinitialize(unsigned int iterations) {
     }
     BuildGradient();
 
-    // debug pring to console
-    unsigned int multip = 15;
-    unsigned int xras = 2*multip, yras = multip;
-    float lengthSum = 0.0, maxGL = 1.0, minGL = 1.0;
-    for (unsigned int y=0; y<height; y++)
-        for (unsigned int x=0; x<width; x++) {
-            if (x > width/2-xras && x < width/2+xras) continue;
-            if (y > height/2-yras && y < height/2-yras) continue;
+    // // debug pring to console
+    // unsigned int multip = 15;
+    // unsigned int xras = 2*multip, yras = multip;
+    // float lengthSum = 0.0, maxGL = 1.0, minGL = 1.0;
+    // for (unsigned int y=0; y<height; y++)
+    //     for (unsigned int x=0; x<width; x++) {
+    //         if (x > width/2-xras && x < width/2+xras) continue;
+    //         if (y > height/2-yras && y < height/2-yras) continue;
 
-            Vector<2,float> g = gradient(x,y);
-            float gL = g.GetLength();
-                if (gL > maxGL) {
-                    maxGL = gL;
-                    /*
-                      logger.info << "max hit on x,y=" << x << "," << y
-                                << " value=" << gL << logger.end;
-                    */
-                }
-                else if (gL < minGL) {
-                    minGL = gL;
-                    /*
-                    logger.info << "min hit on x,y=" << x << "," << y
-                                << " value=" << gL << logger.end;
-                    */
-                }
-            lengthSum += gradient(x,y).GetLength() - 1;
-            if (isnan(g.GetLength()))
-                logger.info << g << logger.end;
-        }
-    logger.info << "gradient length sum:" << lengthSum << logger.end;
-    logger.info << "gradient length min:" << minGL << logger.end;
-    logger.info << "gradient length max:" << maxGL << logger.end;
+    //         Vector<2,float> g = gradient(x,y);
+    //         float gL = g.GetLength();
+    //             if (gL > maxGL) {
+    //                 maxGL = gL;
+    //                 /*
+    //                   logger.info << "max hit on x,y=" << x << "," << y
+    //                             << " value=" << gL << logger.end;
+    //                 */
+    //             }
+    //             else if (gL < minGL) {
+    //                 minGL = gL;
+    //                 /*
+    //                 logger.info << "min hit on x,y=" << x << "," << y
+    //                             << " value=" << gL << logger.end;
+    //                 */
+    //             }
+    //         lengthSum += gradient(x,y).GetLength() - 1;
+    //         if (isnan(g.GetLength()))
+    //             logger.info << g << logger.end;
+    //     }
+    // // logger.info << "gradient length sum:" << lengthSum << logger.end;
+    // // logger.info << "gradient length min:" << minGL << logger.end;
+    // // logger.info << "gradient length max:" << maxGL << logger.end;
 }
 
 

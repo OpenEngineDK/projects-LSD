@@ -118,7 +118,7 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
 
 
 struct Wall {
-    pair<ITextureResourcePtr,string> tex[9];
+    pair<ITextureResourcePtr,string> tex[12];
     TextureLoader& loader;
 
     Wall(TextureLoader& l) : loader(l) {        
@@ -131,7 +131,7 @@ struct Wall {
         SceneNode *sn = new SceneNode();
         CairoTextTool textTool;
         
-        for (int x=0;x<3;x++) {
+        for (int x=0;x<4;x++) {
             for (int y=0;y<3;y++) {
                 pair<ITextureResourcePtr,string> itm = (*this)(x,y);
                 ITextureResourcePtr t = itm.first;
@@ -139,7 +139,7 @@ struct Wall {
                     loader.Load(t,TextureLoader::RELOAD_QUEUED);
                     TransformationNode* node = CreateTextureBillboard(t,0.05);
                     node->SetScale(Vector<3,float>(1.0,-1.0,1.0));
-                    node->Move(x*35-35,y*25-25,0);
+                    node->Move(x*35-52,y*25-25,0);
 
                     CairoResourcePtr textRes = CairoResource::Create(128,32);
                     textRes->Load();
@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
     // Create simple setup
     
 
-    SDLEnvironment* env = new SDLEnvironment(1024,768);
+    SDLEnvironment* env = new SDLEnvironment(1150,768);
     
 
     SimpleSetup* setup = new SimpleSetup("LevelSet Method",NULL,env);
@@ -195,32 +195,43 @@ int main(int argc, char** argv) {
     circle->Load();
     auLogo->Load();
 
-    LevelSetMethod& method = *(new LevelSetMethod(circle,auLogo));
+    LevelSetMethod& method = *(new LevelSetMethod(auLogo,circle));
     setup->GetEngine().ProcessEvent().Attach(method);
 
 
     SDF* sdf1 = method.GetSDF1();
-
+    SDF* sdf2 = method.GetSDF2();
+    SDF* test = method.GetTestSDF();
     int x=5,y=5;
     
     logger.info << "g(" << x << "," << y << ") = " << sdf1->Gradient(x,y).GetLength() << logger.end;
 
     Wall wall(setup->GetTextureLoader());
     
-    wall(0,0) = make_pair<>(auLogo,"AU Logo");
-    wall(1,0) = make_pair<>(circle,"Circle"); // input 1
-    wall(2,0) = make_pair<>(sdf1->GetOutputTexture(),"Output");
+    wall(0,2) = make_pair<>(auLogo,"AU Logo");
+    wall(0,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
+    wall(0,0) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
+    
+
+
+    wall(1,2) = make_pair<>(circle,"Circle"); // input 1
+    wall(1,1) = make_pair<>(sdf2->GetPhiTexture(),"Phi");
+    wall(1,0) = make_pair<>(sdf2->GetGradientTexture(),"Gradient");
+
+    
+    wall(2,1) = make_pair<>(test->GetPhiTexture(),"Subtract");    
+    wall(2,0) = make_pair<>(test->GetGradientTexture(),"Subtract");
+    
+
+    wall(3,2) = make_pair<>(test->GetOutputTexture(),"Subtract");
+    wall(3,0) = make_pair<>(sdf1->GetOutputTexture(),"Output");
 
     //wall(0,1) = make_pair<>(sdf1->GetPhi0Texture(),"Phi0");
-    wall(1,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
-
-    wall(2,1) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
     
-    SDF* test = method.GetTestSDF();
+    
 
-    wall(1,2) = make_pair<>(test->GetPhiTexture(),"Subtract");
-    wall(0,2) = make_pair<>(test->GetOutputTexture(),"Subtract");
-    wall(2,2) = make_pair<>(test->GetGradientTexture(),"Subtract");
+
+    
 
     // wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");
 
@@ -228,7 +239,7 @@ int main(int argc, char** argv) {
 
     float h = -25/2;
 
-    setup->GetCamera()->SetPosition(Vector<3,float>(0.0,h,100));
+    setup->GetCamera()->SetPosition(Vector<3,float>(0.0,h,130));
     setup->GetCamera()->LookAt(Vector<3,float>(0.0,h,0.0));
 
 

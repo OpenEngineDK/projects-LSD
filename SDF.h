@@ -43,6 +43,7 @@ public:
     void Reinitialize(unsigned int);
 
     // Returns the isosurface?
+    //ITextureResourcePtr GetInputTexture() {return inputTexture;}
     EmptyTextureResourcePtr GetOutputTexture() {return outputTexture;} 
     EmptyTextureResourcePtr GetPhiTexture() {return phiTexture;}
     EmptyTextureResourcePtr GetGradientTexture() {return gradientTexture;}
