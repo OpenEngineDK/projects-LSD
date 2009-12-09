@@ -51,12 +51,81 @@ void LevelSetMethod::ProcessImage() {
        
     sdf->Reinitialize(30);
 
-    Tex<float> phi = sdf->GetPhi();
-    Tex<float> phi2 = sdf2->GetPhi();
+    //Tex<float> phi = sdf->GetPhi();
+    //Tex<float> phi2 = sdf2->GetPhi();
     //unsigned char* u0 = inputTex->GetData();
     //EmptyTextureResourcePtr ut_tex = EmptyTextureResource::Clone(inputTex);
     //unsigned char* ut = ut_tex->GetData();
 
+    
+    // vf:
+
+    /*
+     * (1) VFExpand
+     * (2) VFShrink
+     * (3) VFMorph
+     * (4) VFMeanCurvature
+     */
+    
+    VFMorph(0.01, sdf, sdf2);
+
+    //sdf->SetPhi(phi);
+
+    
+
+    // int iterations = 4; //width/2;
+
+    // while(iterations--) {
+    //     //logger.info << "Reinitialize - iteration: " << x << logger.end;
+    //     ReInitialize();
+    // }
+    
+    
+    //phi0 = phiT;
+
+    //phi0.SetTex(phi);
+    //phi.SetTex(phiT);
+    
+    // phi.ToTexture(sdfTex,true);
+    // phi0.ToTexture(phiTTex);
+
+    // updateQueue.Put(sdfTex);
+    // updateQueue.Put(phiTTex);
+
+    
+}
+
+void LevelSetMethod::VFExpand(float a, SDF* sdf) {
+
+
+    Tex<float> phi = sdf->GetPhi();
+
+    for(unsigned int x=0; x<width; x++) {
+        for(unsigned int y=0; y<height; y++) {
+            phi(x,y) += -a;
+        }
+    }
+
+    sdf->SetPhi(phi);
+}
+
+void LevelSetMethod::VFShrink(float a, SDF* sdf) {
+
+    Tex<float> phi = sdf->GetPhi();
+
+    for(unsigned int x=0; x<width; x++) {
+        for(unsigned int y=0; y<height; y++) {
+            phi(x,y) += a;
+        }
+    }
+
+    sdf->SetPhi(phi);
+}
+
+void LevelSetMethod::VFMeanCurvature(float a, SDF* sdf) {
+
+    Tex<float> phi = sdf->GetPhi();
+    
     for(unsigned int x=1; x<width-1; x++) {
         for(unsigned int y=1; y<height-1; y++) {
             // //Vector<2,float> godunov = Godunov(x,y,a);
@@ -102,31 +171,22 @@ void LevelSetMethod::ProcessImage() {
             */
         }
     }
+    
+    sdf->SetPhi(phi);
+}
+
+void LevelSetMethod::VFMorph(float a, SDF* sdf, SDF* sdf2) {
+    
+    Tex<float> phi = sdf->GetPhi();
+    Tex<float> phi2 = sdf2->GetPhi();
+    
+    for(unsigned int x=0; x<width; x++) {
+        for(unsigned int y=0; y<height; y++) {
+            phi(x,y) += (phi(x,y) - phi2(x,y)) * -a; //morph
+        }
+    }
 
     sdf->SetPhi(phi);
-
-    
-
-    // int iterations = 4; //width/2;
-
-    // while(iterations--) {
-    //     //logger.info << "Reinitialize - iteration: " << x << logger.end;
-    //     ReInitialize();
-    // }
-    
-    
-    //phi0 = phiT;
-
-    //phi0.SetTex(phi);
-    //phi.SetTex(phiT);
-    
-    // phi.ToTexture(sdfTex,true);
-    // phi0.ToTexture(phiTTex);
-
-    // updateQueue.Put(sdfTex);
-    // updateQueue.Put(phiTTex);
-
-    
 }
 
 void LevelSetMethod::Handle(ProcessEventArg arg) {

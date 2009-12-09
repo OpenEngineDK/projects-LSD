@@ -36,6 +36,12 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 
 
     void ProcessImage();
+    
+    void VFExpand(float a, SDF* sdf);
+    void VFShrink(float a, SDF* sdf);
+    void VFMeanCurvature(float a, SDF* sdf);
+    void VFMorph(float a, SDF* sdf, SDF* sdf2);
+    
 
 public:
 
