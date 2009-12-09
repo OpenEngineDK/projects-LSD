@@ -14,10 +14,12 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
       dy(1),      
       run(true)
 {
+    //testSDF = sdf1;//Subtract(sdf2,sdf1);
     testSDF = Subtract(sdf2,sdf1);
     
     testSDF->Refresh();
-    testSDF->Reinitialize(20);
+    testSDF->Reinitialize(width/2);
+
     // Testing
     //Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
     
@@ -40,27 +42,27 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
  
 }
 
-
 void LevelSetMethod::ProcessImage() {
 
     SDF* sdf = testSDF;
 
-    logger.info << "Process" << logger.end;
+    static unsigned int count = 0;
+    logger.info << "Process (iteration " << count++ << ")" << logger.end;
        
-    float a = -0.1;
-
-#warning Oh fail, flere kant tilfælde...!!shift-en
-    
-    sdf->Reinitialize(20);
+    sdf->Reinitialize(30);
 
     Tex<float> phi = sdf->GetPhi();
+    Tex<float> phi2 = sdf2->GetPhi();
+    //unsigned char* u0 = inputTex->GetData();
+    //EmptyTextureResourcePtr ut_tex = EmptyTextureResource::Clone(inputTex);
+    //unsigned char* ut = ut_tex->GetData();
 
-    for(unsigned int x=1; x<width-1;x++) {
-        for(unsigned int y=1; y<height-1;y++) {
-            
+    for(unsigned int x=1; x<width-1; x++) {
+        for(unsigned int y=1; y<height-1; y++) {
             // //Vector<2,float> godunov = Godunov(x,y,a);
             Vector<2,float> g = sdf->Gradient(x,y);
  
+            /*          
             // //float phiX = sqrt(godunov[0]);
             // //float phiY = sqrt(godunov[1]);
             
@@ -68,9 +70,36 @@ void LevelSetMethod::ProcessImage() {
             v[0] = g[0] / g.GetLength();
             v[1] = g[1] / g.GetLength();
 
-            phi(x,y) += -a;
-
             //phi(x,y) += a*(v*g);
+            */
+
+
+            // formula 6.1 page 55
+            //float a = -0.7, dt = 0.48;
+            //phi(x,y) += -a * g.GetLength() * dt; //shrink
+
+            //phi(x,y) += (phi(x,y) - phi2(x,y)) * -0.1; //morph
+
+
+            // using formula 1.9 on page 12 and
+            const float dx = 1.0;
+            float phi_xx = (phi(x+1,y) - 2*phi(x,y) + phi(x-1,y))/(dx*dx);
+            float phi_yy = (phi(x,y+1) - 2*phi(x,y) + phi(x,y-1))/(dx*dx);
+            // using formula 2.7 on page 21.
+            float kappa = phi_xx + phi_yy;
+            // using formula 4.11 on page 45
+            const float b = 1.0, dt = 0.48;
+            phi(x,y) += kappa * g.GetLength() * b * dt; //mean curvature
+
+            /*
+            float u0_xx = u0[(x+1)+y*width] - 2*u0[x+y*width] +
+                u0[(x-1)+y*width];
+            float u0_yy = u0[x+(y+1)*width] - 2*u0[x+y*width] + 
+                u0[x+(y-1)*width];
+            float Lu0 = u0_xx + u0_yy;
+            float dt = 0.2;
+            u0[x+y*width] = u0[x+y*width] + Lu0*dt;
+            */
         }
     }
 

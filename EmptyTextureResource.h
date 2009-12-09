@@ -51,6 +51,20 @@ typedef boost::shared_ptr<EmptyTextureResource> EmptyTextureResourcePtr;
                 return ptr;
             }
             
+            static EmptyTextureResourcePtr Clone(ITextureResourcePtr tex) {
+                unsigned int w = tex->GetWidth();
+                unsigned int h = tex->GetHeight();
+                unsigned int d = tex->GetDepth();
+                EmptyTextureResourcePtr ptr = Create(w,h,d);
+
+                unsigned char* from = tex->GetData();
+                unsigned char* to = ptr->GetData();
+                for (unsigned int x=0; x<w; x++)
+                    for (unsigned int y=0; y<h; y++)
+                        to[x+y*w] = from[x+y*w];
+
+                return ptr;
+            }
             ~EmptyTextureResource() { exit(-1);  delete data; }
             void Load() {}
             void Unload() {} //delete data; }

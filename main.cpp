@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.5,0.5,0.5,1.0));
 
-    ISceneNode* rootNode = setup->GetScene();
+    //ISceneNode* rootNode = setup->GetScene();
 
     DirectoryManager::AppendPath("./projects/LSD/data/");
     ITextureResourcePtr auLogo = ResourceManager<ITextureResource>::Create("au-logo.png");
