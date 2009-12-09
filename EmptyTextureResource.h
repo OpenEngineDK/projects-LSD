@@ -59,13 +59,16 @@ typedef boost::shared_ptr<EmptyTextureResource> EmptyTextureResourcePtr;
 
                 unsigned char* from = tex->GetData();
                 unsigned char* to = ptr->GetData();
-                for (unsigned int x=0; x<w; x++)
-                    for (unsigned int y=0; y<h; y++)
-                        to[x+y*w] = from[x+y*w];
+
+                std::copy(from, from+w*h*d/8, to);
+
+                // for (unsigned int x=0; x<w; x++)
+                //     for (unsigned int y=0; y<h; y++)
+                //         to[x+y*w] = from[x+y*w];
 
                 return ptr;
             }
-            ~EmptyTextureResource() { exit(-1);  delete data; }
+            ~EmptyTextureResource() { delete data; }
             void Load() {}
             void Unload() {} //delete data; }
             int GetID() { return id; }
