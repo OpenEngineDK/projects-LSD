@@ -1,5 +1,21 @@
-\documentclass[a4paper]{memoir}
+\documentclass[a4paper, oneside]{memoir}
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+
+% \image{image, scale, caption, label}
+\newcommand{\image}[4]{
+  \begin{figure*}[!htb]
+    \centering
+    \includegraphics[scale=#2]{imgs/#1}
+    \caption{#3}
+    \label{#4}
+  \end{figure*}
+}
 
 
 \title{Level Sets!!}
@@ -30,18 +46,16 @@ Her er et billede af et morph ting
 \tableofcontents{}
 
 \chapter{Introduction}
-
-\section{Hvad er et LevelSet}
-\section{Og hvad kan det bruges til}
-
-\section{Morph af to overflader}
-\section{Lysbereginger (måske)}
+\label{chap:introduction}
+  \input{text/introduction}
 
 \chapter{SDF}
+\label{chap:sdf}
 
 \section{Mikkel-Sean Algorithm TM}
 
 \section{Reinitialize}
+\label{sec:reinitialize}
 
 \section{CSG (Union, Intersetion, Minus)}
 \subsection{Union}
@@ -55,14 +69,28 @@ Her er et billede af et morph ting
 \subsection{CFG condition (Stability)}
 
 \chapter{Extensions}
+\label{chap:extensions}
 
 \section{3D}
+\label{sec:3d}
+
 \section{CUDA}
+\label{sec:cuda}
 
 \section{Segmentation}
+\label{sec:segmentation}
   \input{text/segmentation}
+
 \section{Fluid / Smoke}
+\label{sec:fluid}
+
 \section{Image Vision}
+\label{sec:imagevision}
+
+\appendix
+\bibliographystyle{alpha}
+\bibliography{master}
+
 
 \end{document}
 

@@ -1,0 +1,38 @@
+In this report, we will explain what a Level Set method is and what its applications are. Furthermore, we will provide code examples of how to implement the mathematical formulas needed to create a Level Set framework. 
+
+A Level Set method is a numerical technique used to track or transform surfaces. The surfaces are tracked by solving a partial differential equation dependant on a time factor. 
+
+We use an implicit representation of the objects. A Level Set method uses implicit functions which means that the function is defined in the entire plane and not only on the object. The function $\phi(x,y)$ is a signed distance function in all of $\mathbb{R}^{n}$, in our case $\mathbb{R}^{2}$. A signed distance function $\phi$ is a function that given a point on the plane, returns the distance to the surface. We have that $\phi(x,y) < 0$ if we are outside the object and $\phi(x,y) > 0$ when we are inside the object. And last, when $\phi(x,y) = 0$ we are on the interface or iso-surface separates the inside and outside. Besides indicating whether we are inside or outside an object, it also indicates how far we are from the closest point on the iso-surface which is quite handy. For a picture of the above, see figure \ref{introduction:fig:implicitfunction}.
+
+\image{phi.png}{0.3}{The figure is borrowed from the level set book. A implicit function, defined in all of $\mathbb{R}^{2}$. We see that when we are outside the object then $\phi$ is less than zero, larger when we are inside and zero on the interface.}{introduction:fig:implicitfunction}
+
+%% formulas
+
+When solving our level set, for each iteration we solve a partial differential equation in all points $x$ and $y$. If we want to move the interface in the normal direction we solve the following equation:
+
+\begin{equation}
+\label{introduction:eq:levelsetndirection}
+  \phi_{t} + a|\nabla \phi| = 0
+\end{equation}
+
+where $\nabla \phi = (\dfrac{\partial \phi}{\partial x}, \dfrac{\partial \phi}{\partial y})$  and $a$ can be of either sign. 
+
+When $a > 0$ the interface moves in the normal direction and when $a < 0$ it moves in the opposite direction of the normal.
+
+The advantages are that since we discretize the surface into a cartesian grid, we can do numerical computations without having to parameterize the objects. Another advantage is that the level set method makes it easy to work on geometry that change topology over time.
+
+
+%% applications.
+So why do we want to use a level set method? A simple example is to consider an object that splits in two or two objects merging into one. If we did not use the level set method, we would have to explicitely represent the two new objects, where in the level set case we get this for free do to the implicit representation.
+
+% lidt flere anvendelsesmuligheder (lysberegninger her!)
+
+
+In chapter \ref{chap:sdf}, we give an in depth look on the signed distance function, describe what kinds of mathematical operations we have in our toolbox and describe the important reinitialize function, section \ref{sec:reinitialize}.
+
+In chapter \ref{chap:extensions}, we look at extension that can be made to the basic level set implementation that we have done. In section \ref{sec:segmentation}, we look at how to implement segmentation algorithms which can be used in mediacal imaging. In section \ref{sec:fluid}, we implement a fluid solver for computer graphics using the level set method. And finally, in section \ref{sec:imagevision} we use the level set to do computations on images.
+
+
+
+
+
