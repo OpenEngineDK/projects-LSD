@@ -5,6 +5,12 @@
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{amsmath}
+\usepackage{varioref}
+
+% replaces cite. Use \cit instead!
+\newcommand{\cit}[1] {
+  \cite{#1}
+}
 
 % \image{image, scale, caption, label}
 \newcommand{\image}[4]{
@@ -87,8 +93,9 @@ Her er et billede af et morph ting
 \label{sec:imagevision}
 
 \appendix
+
 \bibliographystyle{alpha}
-\bibliography{master}
+\bibliography{text/levelset}
 
 
 \end{document}
