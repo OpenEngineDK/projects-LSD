@@ -6,17 +6,9 @@ SET( PROJECT_NAME "LSD")
 SET( PROJECT_SOURCES
   # Add all the cpp source files here
   main.cpp
-  EmptyTextureResource.h
-  LockedQueue.h
-  LockedQueue.cpp  
+
   LevelSetMethod.h
   LevelSetMethod.cpp
-
-  Tex.cpp
-  Tex.h
-
-  SDF.h
-  SDF.cpp
 )
 
 # Include needed to use SDL under Mac OS X
@@ -40,4 +32,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   # Extension dependencies
   Extensions_SDL
   Extensions_SetupHelpers  
+  Extensions_TexUtils
+  Extensions_LevelSet
+  Extensions_LevelSetCUDA
 )

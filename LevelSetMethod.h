@@ -1,22 +1,24 @@
 #ifndef _LSD_LEVEL_SET_METHOD_H_
 #define _LSD_LEVEL_SET_METHOD_H_
 
-#include "LockedQueue.h"
+#include <Core/LockedQueue.h>
 #include <Core/Thread.h>
 #include <Math/Vector.h>
 #include <Core/EngineEvents.h>
 
-#include "Tex.h"
+#include <Resources/Tex.h>
 
-#include "SDF.h"
+#include <LevelSet/SDF.h>
 
-#include "EmptyTextureResource.h"
+#include <Resources/EmptyTextureResource.h>
 
 using namespace OpenEngine::Core;
 using namespace std;
-
+using namespace OpenEngine::LevelSet;
 
 class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
+
+    Strategy* strategy;
 
     SDF* sdf1;
     SDF* sdf2;
@@ -46,7 +48,8 @@ class LevelSetMethod : public Thread, public IListener<ProcessEventArg> {
 public:
 
     LevelSetMethod(ITextureResourcePtr inputTex,
-                   ITextureResourcePtr inputTex2);
+                   ITextureResourcePtr inputTex2,
+                   Strategy* s = NULL);
 
     SDF* GetSDF1() {return sdf1;}
     SDF* GetSDF2() {return sdf2;}
@@ -57,8 +60,13 @@ public:
     bool run;
 
     virtual void Run();
+    
+    /**
+     * Set run to false, and wait for thread to end.
+     */    
 
-
+    void Stop(); 
+    
     
     float GetValue(unsigned int i, unsigned int j);        
     Vector<2, float> Godunov(unsigned int i, unsigned int j, float a);

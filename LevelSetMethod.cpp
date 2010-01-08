@@ -1,11 +1,16 @@
 #include "LevelSetMethod.h"
 #include <Logging/Logger.h>
+#include <Utils/Timer.h>
+#include <LevelSet/CPUStrategy.h>
 
+using namespace OpenEngine::Utils;
 
-
-LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr inputTex2)
-    : sdf1(new SDF(inputTex)),
-      sdf2(new SDF(inputTex2)),
+LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, 
+                               ITextureResourcePtr inputTex2, 
+                               Strategy* s)
+    : strategy(s?s:new CPUStrategy()),
+      sdf1(new SDF(inputTex,strategy)),
+      sdf2(new SDF(inputTex2,strategy)),
       inputTex(inputTex),
       inputTex2(inputTex2),
       width(inputTex->GetWidth()),
@@ -14,11 +19,14 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
       dy(1),      
       run(true)
 {
-    //testSDF = sdf1;//Subtract(sdf2,sdf1);
-    testSDF = Subtract(sdf2,sdf1);
+    testSDF = sdf1;//Subtract(sdf2,sdf1);
+    //testSDF = Subtract(sdf2,sdf1);
     
     testSDF->Refresh();
     testSDF->Reinitialize(width/2);
+
+
+    EmptyTextureResourcePtr ut_tex = EmptyTextureResource::Clone(inputTex);
 
     // Testing
     //Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
@@ -44,17 +52,13 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex, ITextureResourcePtr
 
 void LevelSetMethod::ProcessImage() {
 
-    SDF* sdf = testSDF;
-
-    static unsigned int count = 0;
-    logger.info << "Process (iteration " << count++ << ")" << logger.end;
-       
+    SDF* sdf = testSDF;       
     sdf->Reinitialize(30);
 
     //Tex<float> phi = sdf->GetPhi();
     //Tex<float> phi2 = sdf2->GetPhi();
     //unsigned char* u0 = inputTex->GetData();
-    //EmptyTextureResourcePtr ut_tex = EmptyTextureResource::Clone(inputTex);
+    
     //unsigned char* ut = ut_tex->GetData();
 
     
@@ -207,10 +211,15 @@ void LevelSetMethod::Handle(ProcessEventArg arg) {
 }
 
 void LevelSetMethod::Run() {
-
+    unsigned int count = 0;
+    Timer timer;
+    timer.Start();
     while (run) {
-        //sdf1->Reinitialize(10);
+        
+        
         ProcessImage();
+        Time t = timer.GetElapsedTimeAndReset();
+        logger.info << "Process (iteration " << count++ << ") " << t << logger.end;
         //Thread::Sleep(1000000);
     }
 }
@@ -241,7 +250,7 @@ SDF* LevelSetMethod::Union(SDF* s1, SDF* s2) {
 	unsigned int height = s1->GetHeight();
 	unsigned int width = s1->GetWidth();
 	
-    SDF* ns = new SDF(width,height);
+    SDF* ns = new SDF(width,height,strategy);
     
 	Tex<float> res = ns->GetPhi();
 	
@@ -259,7 +268,7 @@ SDF* LevelSetMethod::Intersection(SDF* s1, SDF* s2) {
 	unsigned int height = s1->GetHeight();
 	unsigned int width = s1->GetWidth();
 	
-    SDF* ns = new SDF(width,height);
+    SDF* ns = new SDF(width,height,strategy);
     
 	Tex<float> res = ns->GetPhi();
 	
@@ -277,7 +286,7 @@ SDF* LevelSetMethod::Subtract(SDF* s1, SDF* s2) {
 	unsigned int height = s1->GetHeight();
 	unsigned int width = s1->GetWidth();
 	
-    SDF* ns = new SDF(width,height);
+    SDF* ns = new SDF(width,height,strategy);
     
 	Tex<float> res = ns->GetPhi();
 	
@@ -288,4 +297,9 @@ SDF* LevelSetMethod::Subtract(SDF* s1, SDF* s2) {
 	}
 	ns->SetPhi(res);
     return ns;    
+}
+
+void LevelSetMethod::Stop() {
+    run = false;
+    Wait();
 }

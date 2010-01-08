@@ -35,13 +35,9 @@
 #include <Utils/CairoTextTool.h>
 #include <Display/SDLEnvironment.h>
 
-#include "LockedQueue.h"
-#include "EmptyTextureResource.h"
+#include <Resources/EmptyTextureResource.h>
 #include "LevelSetMethod.h"
-#include "SDF.h"
-
-#include "Producer.h"
-#include "Consumer.h"
+#include <LevelSet/CUDAStrategy.h>
 
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
@@ -150,9 +146,9 @@ struct Wall {
                     textTool.DrawText(out.str(), textRes);
 
                     loader.Load(textRes);
-                    TransformationNode* textNode = CreateTextureBillboard(textRes,0.1);
+                    TransformationNode* textNode = CreateTextureBillboard(textRes,0.15);
                     textNode->SetScale(Vector<3,float>(1.0,-1.0,1.0));                    
-                    textNode->Move(0,22.0,0);
+                    textNode->Move(0,23.0,0);
 
 
                     node->AddNode(textNode);
@@ -176,15 +172,10 @@ struct Wall {
 
 int main(int argc, char** argv) {
     // Create simple setup
-    
-
     SDLEnvironment* env = new SDLEnvironment(1150,768);
-    
-
     SimpleSetup* setup = new SimpleSetup("LevelSet Method",NULL,env);
- 
 
-    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.5,0.5,0.5,1.0));
+    setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.0));
 
     //ISceneNode* rootNode = setup->GetScene();
 
@@ -195,44 +186,58 @@ int main(int argc, char** argv) {
     circle->Load();
     auLogo->Load();
 
-    LevelSetMethod& method = *(new LevelSetMethod(auLogo,circle));
+    LevelSetMethod& method = *(new LevelSetMethod(auLogo,circle,new CUDAStrategy()));
     setup->GetEngine().ProcessEvent().Attach(method);
 
+    LevelSetMethod& methodCPU = *(new LevelSetMethod(auLogo,circle));
+    setup->GetEngine().ProcessEvent().Attach(methodCPU);
 
     SDF* sdf1 = method.GetSDF1();
     SDF* sdf2 = method.GetSDF2();
+
+    SDF* sdf1CPU = methodCPU.GetSDF1();
+    SDF* sdf2CPU = methodCPU.GetSDF2();
+
     SDF* test = method.GetTestSDF();
     int x=5,y=5;
     
     logger.info << "g(" << x << "," << y << ") = " << sdf1->Gradient(x,y).GetLength() << logger.end;
 
     Wall wall(setup->GetTextureLoader());
+
+
     
+    // CUDA
+
     wall(0,2) = make_pair<>(auLogo,"AU Logo");
+    wall(1,2) = make_pair<>(circle,"Circle"); // input 1
+
     wall(0,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
     wall(0,0) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
     
-
-
-    wall(1,2) = make_pair<>(circle,"Circle"); // input 1
     wall(1,1) = make_pair<>(sdf2->GetPhiTexture(),"Phi");
     wall(1,0) = make_pair<>(sdf2->GetGradientTexture(),"Gradient");
 
+    // CPU
+
+    wall(2,2) = make_pair<>(auLogo,"AU Logo");
+    wall(3,2) = make_pair<>(circle,"Circle"); // input 1
+
+    wall(2,1) = make_pair<>(sdf1CPU->GetPhiTexture(),"Phi");
+    wall(2,0) = make_pair<>(sdf1CPU->GetGradientTexture(),"Gradient");
     
-    wall(2,1) = make_pair<>(test->GetPhiTexture(),"Subtract");    
-    wall(2,0) = make_pair<>(test->GetGradientTexture(),"Subtract");
+    wall(3,1) = make_pair<>(sdf2CPU->GetPhiTexture(),"Phi");
+    wall(3,0) = make_pair<>(sdf2CPU->GetGradientTexture(),"Gradient");
     
 
-    wall(3,2) = make_pair<>(test->GetOutputTexture(),"Subtract");
-    wall(3,0) = make_pair<>(sdf1->GetOutputTexture(),"Output");
+    // wall(2,1) = make_pair<>(test->GetPhiTexture(),"Subtract");    
+    // wall(2,0) = make_pair<>(test->GetGradientTexture(),"Subtract");
+    
+
+    // wall(3,2) = make_pair<>(test->GetOutputTexture(),"Subtract");
+    // wall(3,0) = make_pair<>(sdf1->GetOutputTexture(),"Output");
 
     //wall(0,1) = make_pair<>(sdf1->GetPhi0Texture(),"Phi0");
-    
-    
-
-
-    
-
     // wall(2,2) = make_pair<>(method.GetVFTexture(),"VF");
 
     setup->SetScene((*wall.MakeScene()));
@@ -244,12 +249,13 @@ int main(int argc, char** argv) {
 
 
     method.Start();
+    methodCPU.Start();
 
     // Start the engine.
     setup->GetEngine().Start();
 
-    method.run  = false;
-    method.Wait();
+    method.Stop();
+    methodCPU.Stop();
 
     // Return when the engine stops.
     return EXIT_SUCCESS;
