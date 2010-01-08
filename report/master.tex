@@ -6,6 +6,23 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{varioref}
+\usepackage{color}
+\usepackage[colorinlistoftodos]{todonotes}
+
+%Individual todos
+\newcommand{\todoPtx}[2][]{\todo[color=red,    #1]{Ptx: #2}}
+\newcommand{\todoCpvc}[2][]{\todo[color=yellow, #1]{Cpvc: #2}}
+\newcommand{\todoSean}[2][]{\todo[color=pink,   #1]{Sean: #2}}
+\newcommand{\todoHave}[2][]{\todo[color=green,  #1]{Have: #2}}
+\newcommand{\todoVester}[2][]{\todo[color=blue,  #1]{Vester: #2}}
+
+%Dokumantation:
+%http://www.tex.ac.uk/tex-archive/macros/latex/contrib/todonotes/todonotes.pdf
+%Vigtigste kommandoer:
+%\todoVester[inline]{text}
+%\missingfigure{A illustration of how peers are placed on the ring}
+%\todo{Introduction to this section}
+%\todo[inline]{Someone write this}
 
 % replaces cite. Use \cit instead!
 \newcommand{\cit}[1] {
@@ -30,7 +47,8 @@
 
 \maketitle{}
 
-Her er et billede af et morph ting
+
+\missingfigure{Her er et billede af et morph ting}
 
 % Hvem laver hvad.
 \begin{comment}
@@ -49,15 +67,17 @@ Her er et billede af et morph ting
 \newpage
 
 \tableofcontents{}
-
+\listoftodos
 \chapter{Introduction}
 \label{chap:introduction}
   \input{text/introduction}
 
 \chapter{SDF}
 \label{chap:sdf}
+\todoVester{tekst her}
 
 \section{Mikkel-Sean Algorithm TM}
+\todo{Dette er et eksempel på en todo for alle}
 
 \section{Reinitialize}
 \label{sec:reinitialize}
@@ -76,6 +96,10 @@ Her er et billede af et morph ting
 \chapter{Extensions}
 \label{chap:extensions}
 
+\section{Narrow-band}
+\label{sec:narrowband}
+\todoVester{skriv om narrow band}
+
 \section{3D}
 \label{sec:3d}
 
@@ -93,6 +117,9 @@ Her er et billede af et morph ting
 \label{sec:imagevision}
 
 \appendix
+
+\newpage
+
 
 \bibliographystyle{alpha}
 \bibliography{text/levelset}
