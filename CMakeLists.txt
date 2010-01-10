@@ -34,5 +34,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_SetupHelpers  
   Extensions_TexUtils
   Extensions_LevelSet
-  Extensions_LevelSetCUDA
+#  Extensions_LevelSetCUDA
 )

@@ -170,6 +170,8 @@ struct Wall {
  * method in Java.
  */
 
+#define USE_CUDA 0
+
 int main(int argc, char** argv) {
     // Create simple setup
     SDLEnvironment* env = new SDLEnvironment(1150,768);
@@ -186,38 +188,40 @@ int main(int argc, char** argv) {
     circle->Load();
     auLogo->Load();
 
-    LevelSetMethod& method = *(new LevelSetMethod(auLogo,circle,new CUDAStrategy()));
-    setup->GetEngine().ProcessEvent().Attach(method);
-
+#if USE_CUDA
+    LevelSetMethod& methodCUDA = *(new LevelSetMethod(auLogo,circle,new CUDAStrategy()));
+    setup->GetEngine().ProcessEvent().Attach(methodCUDA);
+#endif
     LevelSetMethod& methodCPU = *(new LevelSetMethod(auLogo,circle));
     setup->GetEngine().ProcessEvent().Attach(methodCPU);
 
-    SDF* sdf1 = method.GetSDF1();
-    SDF* sdf2 = method.GetSDF2();
-
+#if USE_CUDA
+    SDF* sdf1 = methodCUDA.GetSDF1();
+    SDF* sdf2 = methodCUDA.GetSDF2();
+#endif
     SDF* sdf1CPU = methodCPU.GetSDF1();
     SDF* sdf2CPU = methodCPU.GetSDF2();
 
-    SDF* test = method.GetTestSDF();
+    SDF* test = methodCPU.GetTestSDF();
     int x=5,y=5;
     
-    logger.info << "g(" << x << "," << y << ") = " << sdf1->Gradient(x,y).GetLength() << logger.end;
+
 
     Wall wall(setup->GetTextureLoader());
 
 
     
     // CUDA
+#if USE_CUDA
+        wall(0,2) = make_pair<>(auLogo,"AU Logo");
+        wall(1,2) = make_pair<>(circle,"Circle"); // input 1
 
-    wall(0,2) = make_pair<>(auLogo,"AU Logo");
-    wall(1,2) = make_pair<>(circle,"Circle"); // input 1
-
-    wall(0,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
-    wall(0,0) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
+        wall(0,1) = make_pair<>(sdf1->GetPhiTexture(),"Phi");
+        wall(0,0) = make_pair<>(sdf1->GetGradientTexture(),"Gradient");
     
-    wall(1,1) = make_pair<>(sdf2->GetPhiTexture(),"Phi");
-    wall(1,0) = make_pair<>(sdf2->GetGradientTexture(),"Gradient");
-
+        wall(1,1) = make_pair<>(sdf2->GetPhiTexture(),"Phi");
+        wall(1,0) = make_pair<>(sdf2->GetGradientTexture(),"Gradient");
+#endif
     // CPU
 
     wall(2,2) = make_pair<>(auLogo,"AU Logo");
@@ -247,14 +251,17 @@ int main(int argc, char** argv) {
     setup->GetCamera()->SetPosition(Vector<3,float>(0.0,h,130));
     setup->GetCamera()->LookAt(Vector<3,float>(0.0,h,0.0));
 
-
-    method.Start();
+#if USE_CUDA
+    methodCUDA.Start();
+#endif
     methodCPU.Start();
 
     // Start the engine.
     setup->GetEngine().Start();
 
-    method.Stop();
+#if USE_CUDA
+    methodCUDA.Stop();
+#endif
     methodCPU.Stop();
 
     // Return when the engine stops.

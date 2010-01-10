@@ -12,7 +12,7 @@ darcs-dev /projects/LSD fh.daimi.au.dk:/users/cgd/code/projects/LSD
 
 # dist files
 dist /extensions/LevelSet                http://openengine.dk/code/extensions/LevelSet/LevelSet.dist
-dist /extensions/LevelSetCUDA                http://openengine.dk/code/extensions/LevelSetCUDA/LevelSetCUDA.dist
+# dist /extensions/LevelSetCUDA            http://openengine.dk/code/extensions/LevelSetCUDA/LevelSetCUDA.dist
 
 # required extensions
 darcs /extensions/SetupHelpers           http://openengine.dk/code/extensions/SetupHelpers
