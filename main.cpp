@@ -37,8 +37,11 @@
 
 #include <Resources/EmptyTextureResource.h>
 #include "LevelSetMethod.h"
-#include <LevelSet/CUDAStrategy.h>
 
+#define USE_CUDA 0
+#if USE_CUDA
+#include <LevelSet/CUDAStrategy.h>
+#endif
 // name spaces that we will be using.
 // this combined with the above imports is almost the same as
 // fx. import OpenEngine.Logging.*; in Java.
@@ -170,7 +173,6 @@ struct Wall {
  * method in Java.
  */
 
-#define USE_CUDA 0
 
 int main(int argc, char** argv) {
     // Create simple setup
