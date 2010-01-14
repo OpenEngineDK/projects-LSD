@@ -28,7 +28,7 @@ is not a source of error.
 The two most used algoritmic approched to reinitialization are:
 geometricly methods that calculations distances to the contour or surface,
 and PDE based methods that numerical approximates solutions to the Eikonal
-equation: $||\nabla \phi|| = 1$ \citbook{book:fluids}{page~89}.
+equation: $||\nabla \phi|| = 1$ \citbook{bridson2008fluid}{page~89}.
 
 When initializing the implicit contour in section \vref{sec:initialization}
 we used an algorithm that geometricly calculated the distance to the
@@ -47,7 +47,7 @@ ways, which we will describe in the next subsections.
 
 \subsection{The PDE way of reinintalizing}
 When using the PDE way of reinitialing the level set, we solve the
-following PDE \citbook{book:levelset}{page~65-66}:
+following PDE \citbook{osher2002level}{page~65-66}:
 
 \begin{equation}
 \label{eq:reinit}
@@ -58,7 +58,7 @@ Where $\phi$ is the SDF being evolved as a PDE, and $\phi_0$, is the
 initial SDF giving as input to the reinitialization algorithm, which
 has not been altered by the process of solving the PDE. The function
 $S(\phi_0)$ gives the sign of the SDF, like the following function,
-described in \citbook{book:LS}{page~66}:
+described in \citbook{osher2002level}{page~66}:
 %\citbook{article:FLLSM}{page~419}:
 
 \begin{equation}
@@ -87,7 +87,7 @@ has reinitialized the whole domain.
 But because the algorithm has the property of reinitializing the SDF
 in layers it is of special interest in reguards to performance when
 using a narrow band level set as described in section
-\vref{sec:band}. Here only three or four layers around the SDF needs
+\vref{sec:narrowband}. Here only three or four layers around the SDF needs
 to be reinitialized, making the algorithm ideal for the narrow band
 approach.
 
@@ -125,10 +125,10 @@ two functions, as depicted in figure \ref{fig:s-graph}.
 
 \pagebreak
 \subsection{Implementation}
-The implementation of how to solve the PDE from equation \eqref{},
-uses the describtion Godunov's scheme from \citbook{book:LS}{page~58}
+The implementation of how to solve the PDE from equation \eqref{eq:reinit},
+uses the describtion Godunov's scheme from \citbook{osher2002level}{page~58}
 in the spatial dimensions, and a forward Euler in time, described in
-formular (1.3) in \citbook{book:LS}{page~10}.
+formular (1.3) in \citbook{osher2002level}{page~10}.
 
 \begin{lstlisting}[language=c++]
     Tex<float> phi0 = GetPhi(); Tex<float> phin = GetPhi();
