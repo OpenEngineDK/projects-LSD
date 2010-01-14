@@ -8,6 +8,7 @@
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{amsmath}
+\usepackage{subfig}
 \usepackage{varioref}
 \usepackage{color}
 \usepackage{pgf}
@@ -16,7 +17,10 @@
 \usepackage{hyperref}
 % ^- farver gør det meget nederen at udskrive en s/h kopi, da alle "se
 % fig 1.1 på side xx" bliver grå! (ptx)
-% Individual todos
+
+\usepackage{natbib}
+
+%Individual todos
 \newcommand{\todoPtx}[2][]{\todo[color=red,    #1]{Ptx: #2}}
 \newcommand{\todoCpvc}[2][]{\todo[color=yellow, #1]{Cpvc: #2}}
 \newcommand{\todoSean}[2][]{\todo[color=pink,   #1]{Sean: #2}}
@@ -60,9 +64,13 @@
 % \todo[inline]{Someone write this}
 
 % replaces cite. Use \cit instead!
-\newcommand{\cit}[1] {
-  \cite{#1}
-}
+\newcommand{\cit}[1] {\cite{#1}}
+
+% cite with page or section ref
+\newcommand{\citbook}[2] {\citep[#2]{#1}}
+
+% when defining a new term
+\newcommand{\dit}[1] {\textit{#1}}
 
 % \image{image, scale, caption, label}
 \newcommand{\image}[4]{
@@ -132,8 +140,10 @@
 \section{Mikkel-Sean Algorithm TM}
 \todo{Dette er et eksempel på en todo for alle}
 
-\section{Reinitialize}
+\pagebreak
+\section{Reinitialization}
 \label{sec:reinitialize}
+\input{text/reinitialization}
 
 \section{CSG (Union, Intersetion, Minus)}
 \subsection{Union}
@@ -166,7 +176,7 @@
 
 \section{Segmentation}
 \label{sec:segmentation}
-  \input{text/segmentation}
+\input{text/segmentation}
 
 \section{Fluid / Smoke}
 \label{sec:fluid}
