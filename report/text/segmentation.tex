@@ -49,8 +49,8 @@ Basically we solve the following equation:
 
 which is easily achieved using the code below: 
 
+\begin{listing}
 \begin{lstlisting}[language=c++]
-\label{segmentation:code}
 for(unsigned int x=0; x<width; x++) {
     for(unsigned int y=0; y<height; y++) {
         [...]
@@ -69,7 +69,8 @@ if (growth / ``number of pixels moving'' < tTreshold) {
     done = true;
 }
 \end{lstlisting}
-
+\label{segmentation:code}
+\end{listing}
 
 
 We want to be able to terminate the segmentation when we have found the correct area. We do this by looking at the zero iso-surface and check how much the surface is moving. When it slows down we know that we have found the area we want to segment.
@@ -130,3 +131,7 @@ The second algorithm is more advanced and makes good use of the information from
 
 Do to time constraints I have only tested the algorithms on grayscale pictures and also not on real medical data, but none the less I still get results that should scale to real data.
 
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master.tex"
+%%% End: 
