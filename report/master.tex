@@ -1,7 +1,10 @@
-\documentclass[a4paper, oneside]{memoir}
+\documentclass[a4paper, oneside]{article}
 \usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{listings}
+\usepackage{listing}
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{amsmath}
@@ -20,7 +23,32 @@
 \newcommand{\todoHave}[2][]{\todo[color=green,  #1]{Have: #2}}
 \newcommand{\todoVester}[2][]{\todo[color=blue,  #1]{Vester: #2}}
 
-\synctex=1
+\renewcommand{\ttdefault}{pcr}
+
+
+\lstset{language=C}
+%\lstset{backgroundcolor=listinggray}
+%\lstset{backgroundcolor=\color{listinggray}}
+%\lstset{linewidth=90mm}
+%\lstset{frameround=tttt}
+%\lstset{frameround=trbl}
+%\lstset{labelstep=1}
+%\lstset{keywordstyle=\color{blue}\textbf}
+\lstset{keywordstyle=\textbf}
+%\lstset{moredelim=[is][\ttfamily]{|}{|}}
+\lstset{basicstyle=\ttfamily \footnotesize}
+%\lstset{basicstyle=\ttfamily \small}
+\lstset{commentstyle=\ttfamily}
+\lstset{stringstyle=\bfseries}
+\lstset{showstringspaces=false}
+%\lstset{numbers=left,numberstyle=\ttfamily \small}
+%\lstset{breaklines=true}
+
+
+% \lstset{
+%   basicstyle=\ttfamily \footnotesize,
+%   keywordstyle=\color{red}
+% }
 
 
 % Dokumantation:
