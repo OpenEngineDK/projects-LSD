@@ -125,10 +125,11 @@ two functions, as depicted in figure \ref{fig:s-graph}.
 
 \pagebreak
 \subsection{Implementation}
-The implementation of how to solve the PDE from equation \eqref{eq:reinit},
-uses the describtion Godunov's scheme from \citbook{osher2002level}{page~58}
-in the spatial dimensions, and a forward Euler in time, described in
-formular (1.3) in \citbook{osher2002level}{page~10}.
+The implementation of how to solve the PDE in equation \eqref{eq:reinit},
+uses the describtion of Godunov's scheme from
+\citbook{osher2002level}{page~58} in the spatial dimensions, and a
+forward Euler in the temporal dimension, as described in formular
+(1.3) in \citbook{osher2002level}{page~10}.
 
 \begin{lstlisting}[language=c++]
     Tex<float> phi0 = GetPhi(); Tex<float> phin = GetPhi();
