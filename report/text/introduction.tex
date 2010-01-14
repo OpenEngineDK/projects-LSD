@@ -62,14 +62,14 @@ It is defined in all points in $\mathbb{R}^{2}$ and is an example of an implicit
 
 % indsæt tekst omkring hvis man nu vil bevæge level settet eller lave en effekt. Så kan man løse forskellige ligninger. Navier stokes/euler i fluids eller tilsvarende inden for andre områer.
 
-\subsection{Solving the Level Set}
+\subsection{Solving the Level Set}\label{sec:intro:solve}
 
 When solving our level set, for each iteration we solve a partial differential equation in all points $(x,y) | x,y \in \mathbb{R}^{2}$. If we want to move the interface in the normal direction we solve the following equation:
 
 \begin{equation}
 \label{introduction:eq:levelsetndirection}
   \phi_{t} + a|\nabla \phi| = 0
-\end{equation}
+\end{equation}\label{eq:normMove}
 
 where $\nabla \phi = (\dfrac{\partial \phi}{\partial x}, \dfrac{\partial \phi}{\partial y})$  and $a$ can be of either sign. 
 
@@ -85,7 +85,9 @@ So why do we want to use the level set method? A simple example is to consider a
 
 % lidt flere anvendelsesmuligheder (lysberegninger her!)
 
-\subsection{Outline of the report}
+\newpage
+
+\subsection{Outline of the report}\todoPtx{Denne er på en side for sige selv, så vref ikke crasher}
 
 In chapter \vref{chap:sdf}, we give an in depth look on the signed distance function, describe what kinds of mathematical operations we have in our toolbox and describe the important reinitialize function, section \vref{sec:reinitialize}.
 
