@@ -7,14 +7,21 @@
 \usepackage{amsmath}
 \usepackage{varioref}
 \usepackage{color}
+\usepackage{pgf}
 \usepackage[colorinlistoftodos]{todonotes}
-\usepackage[colorlinks, linkcolor=blue, citecolor=red, urlcolor=brown]{hyperref}
-%Individual todos
+%\usepackage[colorlinks, linkcolor=blue, citecolor=red, urlcolor=brown]{hyperref}
+\usepackage{hyperref}
+% ^- farver gør det meget nederen at udskrive en s/h kopi, da alle "se
+% fig 1.1 på side xx" bliver grå! (ptx)
+% Individual todos
 \newcommand{\todoPtx}[2][]{\todo[color=red,    #1]{Ptx: #2}}
 \newcommand{\todoCpvc}[2][]{\todo[color=yellow, #1]{Cpvc: #2}}
 \newcommand{\todoSean}[2][]{\todo[color=pink,   #1]{Sean: #2}}
 \newcommand{\todoHave}[2][]{\todo[color=green,  #1]{Have: #2}}
 \newcommand{\todoVester}[2][]{\todo[color=blue,  #1]{Vester: #2}}
+
+\synctex=1
+
 
 % Dokumantation:
 % http://www.tex.ac.uk/tex-archive/macros/latex/contrib/todonotes/todonotes.pdf
@@ -36,9 +43,9 @@
     \includegraphics[scale=#2]{imgs/#1}
     \caption{#3}
     \label{#4}
-  \end{figure*}
-}
-
+  \end{figure*}}
+% ^- Det her går aldrig godt, man har aldrig brug for at ændre flere
+% ting end der er muligt med denne slags makroer. (ptx)
 
 \title{Level Sets!!}
 \author{
@@ -107,9 +114,13 @@
 
 \section{Motion (grow/shrink, mean-curvature, morph, CFG condition)}
 \subsection{Grow/Shrink}
+\input{text/motion/grow}
 \subsection{Mean-Curvature}
+\input{text/motion/curv}
 \subsection{Morph}
+\input{text/motion/morph}
 \subsection{CFG condition (Stability)}
+\input{text/motion/CFG}
 
 \chapter{Extensions}
 \label{chap:extensions}
@@ -123,6 +134,7 @@
 
 \section{CUDA}
 \label{sec:cuda}
+\input{text/cuda}
 
 \section{Segmentation}
 \label{sec:segmentation}

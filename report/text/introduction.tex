@@ -14,7 +14,16 @@ The level set at its most simple representation is a static datastructure. It ca
 
 Since a compute has a finite memory we need to come up with a way to store our representation. A simple way to do this that scale in the number of dimensions is to partition the region into a grid where each square is of equal size.
 
-\image{cartesiangrid.png}{0.3}{Borrowed from \cit{JLTGK}. We can see that $\cdots$}{introduction:fig:cartesiangrid}
+%\image{cartesiangrid.png}{0.3}{Borrowed from \cit{JLTGK}. We can see that $\cdots$}{introduction:fig:cartesiangrid}
+
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=0.3]{imgs/cartesiangrid.png}
+  \todoPtx[inline]{Lav vector version hvor der står $\sqrt{2}-1$}
+  \caption{Borrowed from \cit{JLTGK}. We can see that $\cdots$}
+  \label{introduction:fig:cartesiangrid}
+\end{figure}
 
 In figure \vref{introduction:fig:cartesiangrid}, we see that ... .
 
@@ -24,7 +33,17 @@ In figure \vref{introduction:fig:cartesiangrid}, we see that ... .
 
 We use an implicit representation of the surface. The Level Set method can use implicit functions which means that the function is defined in the entire plane and not only on the object.
 
-The function $\phi(x,y)$ is a signed distance function in all of $\mathbb{R}^{n}$, in our case $\mathbb{R}^{2}$. A signed distance function $\phi$ is a function that given a point on the plane, returns the distance to the surface. We have that $\phi(x,y) > 0$ if we are outside the object and $\phi(x,y) < 0$ when we are inside the object. And last, when $\phi(x,y) = 0$ we are on the interface or iso-surface separates the inside and outside. Besides indicating whether we are inside or outside an object, it also indicates how far we are from the closest point on the iso-surface which is quite handy. For a picture of the above, see figure \vref{introduction:fig:implicitfunction}.
+The function $\phi(x,y)$ is a signed distance function in all of
+$\mathbb{R}^{n}$, in our case $\mathbb{R}^{2}$. A signed distance
+function $\phi$ is a function that given a point on the plane, returns
+the distance to the surface. We have that $\phi(x,y) > 0$ if we are
+outside the object and $\phi(x,y) < 0$ when we are inside the object.
+And last, when $\phi(x,y) = 0$ we are on the interface or \todoHave{Denne sætning er defekt (ptx)}
+iso-surface separates the inside and outside.  Besides indicating
+whether we are inside or outside an object, it also indicates how far
+we are from the closest point on the iso-surface which is quite
+handy. For a picture of the above, see figure
+\vref{introduction:fig:implicitfunction}.
 
 \image{phi.png}{0.3}{The figure is borrowed from \cit{osher2002level}. A implicit function, defined in all of $\mathbb{R}^{2}$. We see that when we are inside the object then $\phi$ is less than zero, larger when we are outside and zero on the interface.}{introduction:fig:implicitfunction}
 
