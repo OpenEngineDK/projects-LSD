@@ -7,7 +7,7 @@ The level set at its most simple representation is a static datastructure. It ca
 \image{hoejdekort.png}{0.25}{A topographic map indicating heights in the vermont region.}{introduction:fig:hoejdekort}
 
 
-\subsection{Cartesian grid}
+\section*{Cartesian grid}
 \begin{comment}
   Finite memory -> descritization of plane -> cartesian grid is used.
 \end{comment}
@@ -24,7 +24,7 @@ Since a computer has finite memory we need to come up with a way to store our re
 
 In figure \vref{introduction:fig:cartesiangrid}, we see how a plane has been descritized into a cartesian grid, showing a circle and the values of $\phi$.
 
-\subsection{Signed distance function -  $\phi$}
+\section*{Signed distance function -  $\phi$}
 
 We use an implicit representation of the surface. The Level Set method can use implicit functions which means that the function is defined in the entire plane and not only on the object.
 
@@ -44,7 +44,7 @@ handy. For a picture of the above, see figure
 
 %% Example - Circle
 
-\subsubsection{Example}
+\subsection*{Example}
 
 A simple example is to consider a circle and its equation:
 \begin{equation*}
@@ -55,9 +55,8 @@ It is defined in all points in $\mathbb{R}^{2}$ and is an example of an implicit
 
 %% formulas
 
-\begin{comment}
-
-\subsection{Solving the Level Set}\label{sec:intro:solve}
+\section*{Solving the Level Set}\label{sec:intro:solve} 
+\todoPtx{I own this!!}
 
 When solving our level set, for each iteration we solve a partial differential equation in all points $(x,y) | x,y \in \mathbb{R}^{2}$. If we want to move the interface in the normal direction we solve the following equation:
 
@@ -70,9 +69,8 @@ where $\nabla \phi = (\dfrac{\partial \phi}{\partial x}, \dfrac{\partial \phi}{\
 
 When $a > 0$ the interface moves in the normal direction and when $a < 0$ it moves in the opposite direction of the normal.
 
-\end{comment}
 
-\subsection{Applications}
+\section*{Applications}
 
 The advantages are that since we discretize the surface into a cartesian grid, we can do numerical computations without having to parameterize the objects. Another advantage is that the level set method makes it easy to work on geometry that change topology over time.
 
@@ -80,11 +78,11 @@ The advantages are that since we discretize the surface into a cartesian grid, w
 %% applications.
 So why do we want to use the level set method? A simple example is to consider an object that splits in two or two objects merging into one. If we did not use the level set method, we would have to explicitely represent the two new objects, where in the level set case we get this for free do to the implicit representation.
 
-% lidt flere anvendelsesmuligheder (lysberegninger her!)
+\todoPtx{måske lidt flere anvendelsesmuligheder (lysberegninger her!)}
 
 \newpage
 
-\subsection{Outline of the report}\todoPtx{Denne er på en side for sige selv, så vref ikke crasher}
+\section*{Outline of the report}\todoPtx{Denne er på en side for sige selv, så vref ikke crasher}
 
 In chapter \vref{chap:sdf}, we give an in depth look on the signed distance function, describe what kinds of mathematical operations we have in our toolbox and describe the important reinitialize function, section \vref{sec:reinitialize}.
 
@@ -94,6 +92,8 @@ In chapter \vref{chap:extensions}, we look at extension that can be made to the 
 
 %%% Local Variables: 
 %%% mode: latex
+%%% mode: auto-fill
+%%% TeX-PDF-mode: t
 %%% TeX-master: "../master.tex"
 %%% End: 
 
