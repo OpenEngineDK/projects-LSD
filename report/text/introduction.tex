@@ -1,3 +1,36 @@
+When simulating physical phenomena one must chose a model which fits
+the phenomena being modeled. The level set method (LSM), is a method
+for modelling phenomena that can be described in terms of moving
+level sets.
+%
+A level set in it self is only a mathematical function that groups
+variables which have the same function value. It describes a
+parametric function in one dimension higher than its original domain,
+gaining the ability to describe more than one not colocated level set
+in the same structure.
+%
+A two dimensional level set is known as a level curve or
+isocontour, which uses two dimensions to describe curves. A three
+dimensional level set is known as a level surface or isosurface, and
+is used, as suggested be it's name, to describe surfaces.
+A general a level set in n dimensions is used to describe n-1
+dimensional objects. Mathematically a level set is define as follows:
+
+\begin{equation}
+\{ (x_1,...,x_n) \} | f(x_1,...,x_n) = c
+\end{equation}
+
+In words this means that all vaules of $v_i$ leding to a function
+value of $c$ defines the level set $c$.
+%
+The level set in it's own right does not make a simulation. Unless it
+is evolved over times it stays the same. To evolve the level set over
+time partiel differential equations (PDEs) describing the physical
+phenomena needs to be solved to move the level sets.
+%
+Typical phenomena modeled by the LSM includes: computational fluid
+dynamics (CFG), and fire and explosion simulation. \todo{more examples}
+
 In this report, we will explain what the Level Set method is and what
 its applications are. Furthermore, we will provide code examples of
 how to implement the mathematical formulas needed to create a Level
