@@ -1,6 +1,52 @@
 The process of moving an implicit surface given by a signed distance function is known as \emph{level set methods}. Level set methods are ways of influencing signed distance fields to move the implicit surfaces contained therein. This is done by solving certain equations of motion that we will describe in this section.
 
-As discussed previously\todoSean{Has it been mentioned before?}, using implicit surfaces rather than an explicit representation such as a polygon mesh provides certain benifits. Nowhere is this more clear than when implementing moving surfaces. Moving a surface built from triangles presents a number of problems. First and foremost, it becomes necessary to determine whether the surface starts to overlap itself and what to do if it does. Clearly this is problematic when dealing with polygons, since there is no obvious or "natural" way of merging two polygons which have overlapped.
+First we distinguish between Lagrangian and Eulerian representations of the surface.
+To understand the difference between the two viewpoints we
+imagine how we could measure the movement of ex. a fluid. In the Eulerian
+viewpoint we would place measuring devices at fixed points in the
+fluid, and continues sample the velocity of the fluid, the measured
+value is taken as a avarage for an area. For convenience the
+measuring devices are almost always placed in a uniform grid, with
+square areas as illustrated in figure \ref{fig:eulerian}.
+
+\begin{figure}[h]
+  \centering
+  \subfloat[Eulerian]{
+    \includegraphics[width=0.5\textwidth]{imgs/eulerian.png}
+    \label{fig:eulerian}
+  }
+  \subfloat[Lagrangian]{
+    \includegraphics[width=0.5\textwidth]{imgs/lagrangian.png}
+    \label{fig:lagrangian}
+  }
+  \caption{The eulerian and the lagrangian viewpoints.}
+  \label{fig:eulerian-lagrangian}
+\end{figure}
+
+In the lagrangian viewpoint we let the measuring devices move along
+the current in the fluid and take measurements at different locations
+in the fluid. Here we imagine that the measuring device is part of the
+fluid or a particle that the fluid moves around. Figure
+\ref{fig:lagrangian} shows how the current has moved the devices as
+time has progressed.
+
+These two viewpoints are tightly coupled to the way the simulation data
+is represented and visuliazed. Lets say that we are interested in
+visualizing the surface of the substance.
+%
+The Lagrangian data is keept as points in space and moved around by
+updating the position of the points. This can be visualized by
+imposing that the points define a surface and rendered as geometry
+ex. triangles between the points.
+%
+The eulerian viewpoint is seen as a 3D grid. Each cell in the grid has
+a density that describes how much substance the cell contains (0-100\%).
+
+In the Lagrangian representation, movement by a velocity field can be accomplished by solving the ordinary differential equation:
+\begin{eqnarray}
+\frac{d\vec{x}}{dt} = \vec{V}\left(\vec{x}\right)
+\end{eqnarray}
+As discussed previously, however, using implicit surfaces by an Eulerian representation rather than an explicit Lagrangian representation, such as a polygon mesh, provides certain benifits. Nowhere is this more clear than when implementing moving surfaces. Moving a surface built from triangles presents a number of problems. First and foremost, it becomes necessary to determine whether the surface starts to overlap itself and what to do if it does. Clearly this is problematic when dealing with polygons, since there is no obvious or "natural" way of merging two polygons which have overlapped.
 
 \image{movingsurfaces.png}{0.4}{Two moving surface representations.
 Top: Explicit representation, merging is a problem.
@@ -9,12 +55,12 @@ Bottom: Implicit surface by signed distance field, merging is automatic.}{veloci
 With implicit surfaces, this problem disappears, since an implicit surface is just that: implicit. If two "interior" areas of the implicit function "overlaps", it simply means that that area of the domain is in the interior of the function, and the interface will wrap around it as appropriate. See figure \vref{velocity:movingsurfaces} for an illustration of the advantage of implicit surfaces.
 
 \subsection{The level set equation}
-We examine now how to evolve an implicit surface, or interface, by affecting the underlying implicit function with an externally generated velocity field. This process of convection/advection \todoSean{One of these? Both?}is defined by equation \vref{velocity:levelseteq}
+We examine now how to evolve an implicit surface, or interface, by affecting the underlying implicit function with an externally generated velocity field. This process of convection in an Eulerian representation is defined by equation \vref{velocity:levelseteq}
 \begin{eqnarray}
 \label{velocity:levelseteq}
 \phi_t + \vec{V}\cdot \nabla \phi = 0
 \end{eqnarray}
-This simple convection equation is referred to as the \emph{level set equation} due to its central importance to level set methods. It describes the evolution of an implicit function $\phi$ by a velocity field $\vec{V}$. $\nabla \phi$, of course, is the gradient of the function. From this, we have
+This partial differential equation is referred to as the \emph{level set equation} due to its central importance to level set methods. It describes the evolution of an implicit function $\phi$ by a velocity field $\vec{V}$. $\nabla \phi$, of course, is the gradient of the function. From this, we have
 \begin{eqnarray}
 \label{velocity:gradient}
 \vec{V}\cdot\nabla\phi = u\phi_x + v\phi_y
@@ -74,6 +120,7 @@ By enforcing this, we increase the guarantee that small errors are not amplified
 
 Finally, \cit{osher2002level} recommends methods such as an essentially nonoscillatory (ENO) way of computing more accurate spatial differences and total variation diminishing (TVD) Runge-Kutta for further accuracy in temporal difference. In short, ENO is a polynomial forward or backward difference function and Runge-Kutta is essentially a multiple-step version of the simpler forward Euler method we use.
 
+The above method, then, is the general solution to the problem of convecting an implicit surface by an externally generated velocity field. Using it, we may arbitrarily define our field of motion to produce motion in any way we wish.
 
 %%% Local Variables: 
 %%% mode: latex
