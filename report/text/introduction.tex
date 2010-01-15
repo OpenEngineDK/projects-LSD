@@ -90,9 +90,9 @@ number of dimensions is to partition the region into a grid where each
 square is of equal size.
 
 \begin{figure}[htb] \centering
-    \begin{tikzpicture}[font=\LARGE]
+    \begin{tikzpicture}[font=\Large]
     \draw (0,0) rectangle +(2,2)
-    +(1,1) node {$-1$};
+    +(1,0.5) node {$-1$};    
     \draw (0,2) rectangle +(2,2)
     +(1,1.5) node {$0$};
     \draw (2,0) rectangle +(2,2)
@@ -102,14 +102,25 @@ square is of equal size.
     \draw (-2,0) rectangle +(2,2)
     +(0.5,1) node {$0$};
     \draw (2,2) rectangle +(2,2)
-    +(1,1) node {$\sqrt{2}-1$};
+    +(1,1.5) node {$\sqrt{2}-1$};
     \draw (2,-2) rectangle +(2,2)
-    +(1,1) node {$\sqrt{2}-1$};
+    +(1,0.5) node {$\sqrt{2}-1$};
     \draw (-2,2) rectangle +(2,2)
-    +(1,1) node {$\sqrt{2}-1$};
+    +(1,1.5) node {$\sqrt{2}-1$};
     \draw (-2,-2) rectangle +(2,2)
-    +(1,1) node {$\sqrt{2}-1$};
+    +(1,.5) node {$\sqrt{2}-1$};
     \draw[line width=2pt] (1,1) circle (2);
+    \fill[shift={(1,1)},red]
+    (0,0) circle (3pt)
+    (2,0) circle (3pt)
+    (0,2) circle (3pt)
+    (-2,0) circle (3pt)
+    (0,-2) circle (3pt)
+    (-2,-2) circle (3pt)
+    (2,-2) circle (3pt)
+    (-2,2) circle (3pt)
+    (2,2) circle (3pt)    
+    ;
   \end{tikzpicture}
   \caption{Borrowed from \cit{JLTGK}. A circle, descritized into a
 cartesian grid. The value in each cell is the $\phi$ value described
