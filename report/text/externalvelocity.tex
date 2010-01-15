@@ -57,8 +57,8 @@ With implicit surfaces, this problem disappears, since an implicit surface is ju
 \subsection{The level set equation}
 We examine now how to evolve an implicit surface, or interface, by affecting the underlying implicit function with an externally generated velocity field. This process of convection in an Eulerian representation is defined by equation \vref{velocity:levelseteq}
 \begin{eqnarray}
-\label{velocity:levelseteq}
-\phi_t + \vec{V}\cdot \nabla \phi = 0
+  \label{velocity:levelseteq}
+  \phi_t + \vec{V}\cdot \nabla \phi = 0
 \end{eqnarray}
 This partial differential equation is referred to as the \emph{level set equation} due to its central importance to level set methods. It describes the evolution of an implicit function $\phi$ by a velocity field $\vec{V}$. $\nabla \phi$, of course, is the gradient of the function. From this, we have
 \begin{eqnarray}
@@ -74,7 +74,14 @@ Since we are essentially only interested in moving the implicit surface or inter
 For concrete implementation purposes, to evolve an implicit surface in an n-dimensional domain, the velocity field is an n-dimensional cartesian grid of n-dimensional vectors. In our two-dimensional case, that means all velocity fields are double arrays of two-value vectors.
 
 \subsection{Upwind differencing}
-How then, do we numerically solve equation \ref{velocity:levelseteq}? As we know, the implicit function is discretized into a cartesian grid of cells with $\Delta x$ representing the width and height of these cells in the theoretical continuous field. In our case this is a discretized signed distance field, each cell in the grid being of course a number representing the distance from the zero-isocountour. So too is the velocity field represented discretely with vectors, as mentioned previously.
+How then, do we numerically solve equation \ref{velocity:levelseteq}?
+As we know, the implicit function is discretized into a cartesian grid
+of cells with $\Delta x$ representing the width and height of these
+cells in the theoretical continuous field. In our case this is a
+discretized signed distance field, each cell in the grid being of
+course a number representing the distance from the
+zero-isocountour. So too is the velocity field represented discretely
+with vectors, as mentioned previously.
 
 Now, since motion takes place across time, we will need discretize our
 motion across time as well. We discretize time into steps of $\Delta
@@ -94,7 +101,10 @@ Expanding the gradient as in \vref{velocity:gradient} we get
 \label{velocity:forwardeuler}
 \frac{\phi^{n+1}-\phi^n}{\Delta t}+u\phi_{x}^n + v\phi_{y}^n = 0
 \end{eqnarray}
-To calculate this equation, then, we must find the spatial derivatives in the x and y directions. For this we can again use a first-order difference method. However, we need to pick a direction in which to calculate the derivative. That is, do we use
+To calculate this equation, then, we must find the spatial derivatives
+in the $x$ and $y$ directions. For this we can again use a first-order
+difference method. However, we need to pick a direction in which to
+calculate the derivative. That is, do we use
 \begin{eqnarray}
 D^+\phi &\approx & \frac{\phi_{i+1} - \phi_i}{\Delta x} \texttt{ or}\\
 D^-\phi &\approx & \frac{\phi_i - \phi_{i-1}}{\Delta x}

@@ -1,20 +1,36 @@
 
-We can move and stuff!\todoPtx{Generelt om motion}
 
-One of the things we can do using a SDF, is to move the interface by
-solving a differential equation.
+In contract to section \vref{sec:extVel}, this section describes
+motion using a internally generated velocity field.
 
+\newpage
 
 \subsection{Grow/Shrink}
 \input{text/motion/grow}
 % Copy this code to grow.tex later?
 
-As written in section \vref{sec:intro:solve}, we can move the
-interface in the normal direction using the following equation:
+One of the most simple things we can do, is to move the interface in
+the normal direction $\vec{N}$ using a constant $a$, efficiently
+scaling the iso-surface.
+
+From equation \vref{velocity:levelseteq} we have:
+\begin{equation}
+  \phi_t + \vec{V}\cdot \nabla \phi = 0
+\end{equation}
+Since $a\vec{N}$ have the same direction as $\nabla{\phi}$, we have the following:
+\begin{align*}
+  a\vec{N}\cdot\nabla\phi &=
+  a\frac{\nabla\phi}{|\nabla\phi|}\cdot\nabla\phi \\
+  &= a\frac{|\nabla\phi|^2}{|\nabla\phi|} 
+  = a|\nabla\phi|
+\end{align*}
+
+With corresponds to this level set equation:
 
 \begin{equation}
-  \phi_t + a|\nabla\phi| = 0
+  \phi_t + a |\nabla \phi| = 0
 \end{equation}
+
 
 
 \subsection{Mean-Curvature}
