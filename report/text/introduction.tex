@@ -35,13 +35,31 @@ In figure \vref{fig:heightmap} we see two figures describing a 2-d and 3-d view 
 
 %\image{hoejdekort.png}{0.25}{A topographic map indicating heights in the vermont region.}{introduction:fig:hoejdekort}
 
+For a level set representation there is an underlying function
+describing the topology. Each contour corresponds to a set of points
+in this function with the same value, thus we need a function which
+produces a field of values. In heightmaps, it would be a function from
+$(x,y)$ coordinates to a height. In general, any function producing a
+field of values is sufficient.  
+
+One function that has the desired characteristics is a function known
+as the signed distance function, $\phi$.
+
 \section*{Signed distance function - $\phi$}
 
-We would like a suitable way to indicate whether we are inside or outside the isocontour. 
+In a level set context, the signed distance function is essentially a
+measure of, for each point in the domain how far that point is from
+the zero isocontour.
 
-We use an implicit representation of the surface. The Level Set method
-can use implicit functions which means that the function is defined in
-the entire plane and not only on the object.
+Since this function produces the straightforward euclidian distance,
+it increases linearly. 
+
+In order to use an implicit representation of the surface we use a
+signed distance field as the underlying function to the level set. We
+define the zero isocontour of this function to be the surface.
+
+The Level Set method can use implicit functions which means that the
+function is defined in the entire plane and not only on the surface.
 
 The function $\phi(x,y)$ is a signed distance function in all of
 $\mathbb{R}^{n}$, in our case $\mathbb{R}^{2}$. A signed distance
@@ -122,7 +140,7 @@ square is of equal size.
     (2,2) circle (3pt)    
     ;
   \end{tikzpicture}
-  \caption{Borrowed from \cit{JLTGK}. A circle, descritized into a
+  \caption{A circle, descritized into a
 cartesian grid. The value in each cell is the $\phi$ value described
 in this chapter.}
   \label{introduction:fig:cartesiangrid}
