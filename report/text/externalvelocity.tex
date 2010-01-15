@@ -19,7 +19,9 @@ This simple convection equation is referred to as the \emph{level set equation} 
 \label{velocity:gradient}
 \vec{V}\cdot\nabla\phi = u\phi_x + v\phi_y
 \end{eqnarray}
-Where $phi_x$ and $phi_y$ are the spacial derivatives in the first two dimensions respectively and $u$ and $v$ are the two components of the velocity vector.
+Where $\phi_x$ and $\phi_y$ are the spacial derivatives in the first two
+dimensions respectively and $u$ and $v$ are the two components of the
+velocity vector.
 
 Since we are essentially only interested in moving the implicit surface or interface with the velocity field, it is sufficient for the field to contain values only in a band around the interface. For simplicity of implementation, however, we assume that the field is defined across the entire domain.
 
@@ -28,7 +30,12 @@ For concrete implementation purposes, to evolve an implicit surface in an n-dime
 \subsection{Upwind differencing}
 How then, do we numerically solve equation \ref{velocity:levelseteq}? As we know, the implicit function is discretized into a cartesian grid of cells with $\Delta x$ representing the width and height of these cells in the theoretical continuous field. In our case this is a discretized signed distance field, each cell in the grid being of course a number representing the distance from the zero-isocountour. So too is the velocity field represented discretely with vectors, as mentioned previously.
 
-Now, since motion takes place across time, we will need discretize our motion across time as well. We discretize time into steps of $\Delta t$. The n'th time step we denote $t^n$ and the state of the cartesian grid of our signed distance field at that time as $\phi^n$. Since the velocity also may change over time, this too is separated into discrete steps $\vec{V}$.
+Now, since motion takes place across time, we will need discretize our
+motion across time as well. We discretize time into steps of $\Delta
+t$. The n'th time step we denote $t^n$ and the state of the cartesian
+grid of our signed distance field at that time as $\phi^n$. Since the
+velocity also may change over time, this too is separated into
+discrete steps $\vec{V}^n$.
 
 One way of discretizing equation \ref{velocity:levelseteq} is the simple \emph{forward Euler} method. Equation \vref{velocity:forwardeuler} shows how the time-dependant term $\phi_t$ of equation \ref{velocity:levelseteq} is discretized by forward Euler. 
 \begin{eqnarray}
