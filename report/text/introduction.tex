@@ -1,7 +1,7 @@
-When simulating physical phenomena one must chose a model which fits
+When simulating physical phenomena one must choose a model which fits
 the phenomena being modeled. The level set method (LSM), is a method
-for modelling phenomena that can be described in terms of moving
-level sets.
+for modelling phenomena that can be described in terms of moving level
+sets.
 %
 A level set in it self is only a mathematical function that groups
 variables which have the same function value. It describes a
@@ -9,18 +9,22 @@ parametric function in one dimension higher than its original domain,
 gaining the ability to describe more than one not colocated level set
 in the same structure.
 %
-A two dimensional level set is known as a level curve or
-isocontour, which uses two dimensions to describe curves. A three
-dimensional level set is known as a level surface or isosurface, and
-is used, as suggested be it's name, to describe surfaces.
-A general a level set in n dimensions is used to describe n-1
-dimensional objects. Mathematically a level set is define as follows:
+A two dimensional level set is known as a level curve or isocontour,
+which uses two dimensions to describe curves. We encounter isocontours
+in everyday life as pressure information in the weather cast and
+terrain elevation on maps.
+%
+A three dimensional level set is
+known as a level surface or isosurface, and is used, as suggested be
+it's name, to describe surfaces.  A general a level set in n
+dimensions is used to describe n-1 dimensional objects. Mathematically
+a level set is define as follows:
 
 \begin{equation}
 \{ (x_1,...,x_n) \} | f(x_1,...,x_n) = c
 \end{equation}
 
-In words this means that all vaules of $v_i$ leding to a function
+In words this means that all values of $v_i$ leading to a function
 value of $c$ defines the level set $c$.
 %
 The level set in it's own right does not make a simulation. Unless it
@@ -29,23 +33,23 @@ time partiel differential equations (PDEs) describing the physical
 phenomena needs to be solved to move the level sets.
 %
 Typical phenomena modeled by the LSM includes: computational fluid
-dynamics (CFG), and fire and explosion simulation. \todo{more examples}
+dynamics (CFG), and fire and explosion simulation. \todo{more examples
+please}
 
 In this report, we will explain what the Level Set method is and what
 its applications are. Furthermore, we will provide code examples of
 how to implement the mathematical formulas needed to create a Level
 Set framework.
 
-The Level Set method is a numerical technique used to transform
-surfaces in $d$ dimensions. Transform means that we move the surface. The surfaces are transformed by solving a
-partial differential equation(PDE) dependant on a time factor.
+The Level Set method is a numerical technique used to move
+surfaces. The surfaces are moved by solving a partial differential
+equation(PDE) dependant on a time factor.
 
-The level set at its most simple representation is a static
-datastructure. It can be represented as a topographic map indicating
-heights in a region, displayed in figure \vref{fig:isocontour-2d} or
-it can be seen as a meteorological map, displaying weather data like
-pressure. 
-In figure \vref{fig:heightmap} we see two figures describing a 2-d and 3-d view of an island. Figure \vref{fig:isocontour-2d} describes an isocontour map of heights where the color indicates the height of each point. The brighter the color the higher the point. Figure \vref{fig:isocontour-3d} shows the corresponding 3d view.  
+In figure \vref{fig:heightmap} we see two figures describing a 2-d and
+3-d view of an island. Figure \vref{fig:isocontour-2d} describes an
+isocontour map of heights where the color indicates the height of each
+point. The brighter the color the higher the point. Figure
+\vref{fig:isocontour-3d} shows the corresponding 3d view.
 
 \begin{figure}[h]
 \begin{center}
@@ -136,9 +140,8 @@ grid is used.
 \end{comment}
 
 Since a computer has finite memory we need to come up with a way to
-store our representation. A simple way to do this that scale in the
-number of dimensions is to partition the region into a grid where each
-square is of equal size.
+store our representation. A simple way to do this is to partition the region into a grid where each
+square is of equal size. Normally
 
 \begin{figure}[htb] \centering
     \begin{tikzpicture}[font=\Large]
@@ -173,9 +176,8 @@ square is of equal size.
     (2,2) circle (3pt)    
     ;
   \end{tikzpicture}
-  \caption{A circle, descritized into a
-cartesian grid. The value in each cell is the $\phi$ value described
-in this chapter.}
+  \caption{A circle, descritized into a cartesian grid. The value in
+    each cell is the $\phi$ value described in this chapter.}
   \label{introduction:fig:cartesiangrid}
 \end{figure}
 
@@ -189,9 +191,9 @@ values of $\phi$.
 
 \todoPtx{I own this!!}
 
-If we want to move the level set, we have to iteratively solve a Partial
-differential equation to make the surface move. We solve a partial
-differential equation in all points $(x,y) | x,y \in
+If we want to move the level set, we have to iteratively solve a
+Partial differential equation to make the surface move. We solve a
+partial differential equation in all points $(x,y) | x,y \in
 \mathbb{R}^{2}$. If we want to move the interface in the normal
 direction we solve the following equation:
 
