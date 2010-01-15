@@ -3,15 +3,16 @@ its applications are. Furthermore, we will provide code examples of
 how to implement the mathematical formulas needed to create a Level
 Set framework.
 
-The Level Set method is a numerical technique used to track or
-transform surfaces in $d$ dimensions. The surfaces are tracked by
-solving a partial differential equation(PDE) dependant on a time factor.
+The Level Set method is a numerical technique used to transform
+surfaces in $d$ dimensions. Transform means that we move the surface. The surfaces are transformed by solving a
+partial differential equation(PDE) dependant on a time factor.
 
 The level set at its most simple representation is a static
 datastructure. It can be represented as a topographic map indicating
-heights in a region, displayed in figure
-\vref{fig:heightmap} or it can be seen as a
-meteorological map, displaying weather data like pressure.
+heights in a region, displayed in figure \vref{fig:isocontour-2d} or
+it can be seen as a meteorological map, displaying weather data like
+pressure. 
+In figure \vref{fig:heightmap} we see two figures describing a 2-d and 3-d view of an island. Figure \vref{fig:isocontour-2d} describes an isocontour map of heights where the color indicates the height of each point. The brighter the color the higher the point. Figure \vref{fig:isocontour-3d} shows the corresponding 3d view.  
 
 \begin{figure}[h]
 \begin{center}
@@ -28,9 +29,54 @@ meteorological map, displaying weather data like pressure.
 \label{fig:heightmap}
 \end{figure}
 
-Intel Array Visualizer Gallery website\footnote{\url{http://www.intel.com/cd/software/products/apac/zho/perflib/226296.htm}}
+%Intel Array Visualizer Gallery
+%website\footnote{\url{http://www.intel.com/cd/software/products/apac/zho/perflib/226296.htm}}
+\todoHave{husk reference}
 
 %\image{hoejdekort.png}{0.25}{A topographic map indicating heights in the vermont region.}{introduction:fig:hoejdekort}
+
+\section*{Signed distance function - $\phi$}
+
+We would like a suitable way to indicate whether we are inside or outside the isocontour. 
+
+We use an implicit representation of the surface. The Level Set method
+can use implicit functions which means that the function is defined in
+the entire plane and not only on the object.
+
+The function $\phi(x,y)$ is a signed distance function in all of
+$\mathbb{R}^{n}$, in our case $\mathbb{R}^{2}$. A signed distance
+function $\phi$ is a function that given a point on the plane, returns
+the distance to the surface. We have that $\phi(x,y) > 0$ if we are
+outside the object and $\phi(x,y) < 0$ when we are inside the object.
+And last, when $\phi(x,y) = 0$ we are on the interface or iso-surface.
+The iso-surface separates the inside and outside.  Besides indicating
+whether we are inside or outside an object, it also indicates how far
+we are from the closest point on the iso-surface which is quite
+handy. For a picture of the above, see figure
+\vref{introduction:fig:implicitfunction}.
+
+\image{phi.png}{0.3}{The figure is borrowed from
+\cit{osher2002level}. A implicit function, defined in all of
+$\mathbb{R}^{2}$. We see that when we are inside the object then
+$\phi$ is less than zero, larger when we are outside and zero on the
+interface.}{introduction:fig:implicitfunction}
+
+%% Example - Circle
+
+\subsection*{Example}
+
+A simple example is to consider a circle and its equation:
+\begin{equation*} 
+  x^{2} + y^{2} = r^{2}
+\end{equation*}
+
+It is defined in all points in $\mathbb{R}^{2}$ and is an example of
+an implicit function. Given a specific radius $r$, the equation of a
+circle defines an isocontour. If $r = 5$, then the isovalue is $c =
+5^{2} = 25$. For all the points $(x,y)$ that evaluate to 25 gives us
+the isosurface. If the value is smaller then it is inside the surface,
+and outside when the value is greater. See figure
+\vref{introduction:fig:cartesiangrid}.
 
 
 \section*{Cartesian grid}
@@ -75,50 +121,11 @@ In figure \vref{introduction:fig:cartesiangrid}, we see how a plane
 has been descritized into a cartesian grid, showing a circle and the
 values of $\phi$.
 
-\section*{Signed distance function - $\phi$}
-
-We use an implicit representation of the surface. The Level Set method
-can use implicit functions which means that the function is defined in
-the entire plane and not only on the object.
-
-The function $\phi(x,y)$ is a signed distance function in all of
-$\mathbb{R}^{n}$, in our case $\mathbb{R}^{2}$. A signed distance
-function $\phi$ is a function that given a point on the plane, returns
-the distance to the surface. We have that $\phi(x,y) > 0$ if we are
-outside the object and $\phi(x,y) < 0$ when we are inside the object.
-And last, when $\phi(x,y) = 0$ we are on the interface or iso-surface.
-The iso-surface separates the inside and outside.  Besides indicating
-whether we are inside or outside an object, it also indicates how far
-we are from the closest point on the iso-surface which is quite
-handy. For a picture of the above, see figure
-\vref{introduction:fig:implicitfunction}.
-
-\image{phi.png}{0.3}{The figure is borrowed from
-\cit{osher2002level}. A implicit function, defined in all of
-$\mathbb{R}^{2}$. We see that when we are inside the object then
-$\phi$ is less than zero, larger when we are outside and zero on the
-interface.}{introduction:fig:implicitfunction}
-
-%% Example - Circle
-
-\subsection*{Example}
-
-A simple example is to consider a circle and its equation:
-\begin{equation*} x^{2} + y^{2} = r^{2}
-\end{equation*}
-
-It is defined in all points in $\mathbb{R}^{2}$ and is an example of
-an implicit function. Given a specific radius $r$, the equation of a
-circle defines an isocontour. If $r = 5$, then the isovalue is $c =
-5^{2} = 25$. For all the points $(x,y)$ that evaluate to 25 gives us
-the isosurface. If the value is smaller then it is inside the surface,
-and outside when the value is greater. See figure
-\vref{introduction:fig:cartesiangrid}.
-
 %% formulas
 
-\section*{Solving the Level Set}\label{sec:intro:solve} \todoPtx{I own
-this!!}
+\section*{Solving the Level Set}\label{sec:intro:solve} 
+
+\todoPtx{I own this!!}
 
 If we want to move the level set, we have to iteratively solve a Partial
 differential equation to make the surface move. We solve a partial
