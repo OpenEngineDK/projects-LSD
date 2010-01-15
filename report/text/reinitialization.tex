@@ -1,8 +1,8 @@
 % -*- mode: latex; mode: auto-fill; coding: utf-8; -*-
 
-The main advantage of representing an implicit contour or surface as
-a signed distance field (SDF), is that the length of the gradient is
-1. This is also exactly what defines a signed distance field.
+The main advantage of representing an implicit counture or surface as
+a signed distance field, is that the length of the gradient is
+one. This is also exactly what defines a signed distance field.
 
 When constructing or manipulating a SDF defined on a Cartesian grid,
 the result is not always a SDF. So to enable further calculations or
@@ -32,7 +32,7 @@ Eikonal equation: $||\nabla \phi|| = 1$
 
 When initializing the implicit contour in section \vref{sec:initialization}
 we used an algorithm that geometrically calculated the distance to the
-contour. So the natural choice would have been also to use this algorithm for
+contour. So the natural choice should be to also use this algorithm for
 reinitializing, but because the algorithm does not calculate the
 SDF precise enough, we cannot use the algorithm
 when reinitializing. Furthermore if we had used this type of
