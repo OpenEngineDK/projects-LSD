@@ -49,9 +49,10 @@ a density that describes how much substance the cell contains (0-100\%).
 
 In the Lagrangian representation, movement by a velocity field can be
 accomplished by solving the ordinary differential equation:
-\begin{eqnarray}
+\begin{align} % eqnarray is deprecated, please use align, see
+                 % http://texblog.net/latex-archive/maths/eqnarray-align-environment/
 \frac{d\vec{x}}{dt} = \vec{V}\left(\vec{x}\right)
-\end{eqnarray}
+\end{align}
 As discussed previously, however, using implicit surfaces by an
 Eulerian representation rather than an explicit Lagrangian
 representation, such as a polygon mesh, provides certain
@@ -80,19 +81,19 @@ We examine now how to evolve an implicit surface, or interface, by
 affecting the underlying implicit function with an externally
 generated velocity field. This process of convection in an Eulerian
 representation is defined by equation \vref{velocity:levelseteq}
-\begin{eqnarray}
+\begin{align}
   \label{velocity:levelseteq}
   \phi_t + \vec{V}\cdot \nabla \phi = 0
-\end{eqnarray}
+\end{align}
 This partial differential equation is referred to as the \emph{level
   set equation} due to its central importance to level set methods. It
 describes the evolution of an implicit function $\phi$ by a velocity
 field $\vec{V}$. $\nabla \phi$, of course, is the gradient of the
 function. From this, we have
-\begin{eqnarray}
-\label{velocity:gradient}
-\vec{V}\cdot\nabla\phi = u\phi_x + v\phi_y
-\end{eqnarray}
+\begin{align}
+  \label{velocity:gradient}
+  \vec{V}\cdot\nabla\phi = u\phi_x + v\phi_y
+\end{align}
 Where $\phi_x$ and $\phi_y$ are the spacial derivatives in the first two
 dimensions respectively and $u$ and $v$ are the two components of the
 velocity vector.
@@ -130,26 +131,26 @@ simple \emph{forward Euler} method. Equation
 \vref{velocity:forwardeuler} shows how the time-dependant term
 $\phi_t$ of equation \ref{velocity:levelseteq} is discretized by
 forward Euler.
-\begin{eqnarray}
-\label{velocity:forwardeuler}
-\frac{\phi^{n+1}-\phi^n}{\Delta t}+\vec{V}^n\cdot\nabla\phi^n = 0
-\end{eqnarray}
+\begin{align}
+  \label{velocity:forwardeuler}
+  \frac{\phi^{n+1}-\phi^n}{\Delta t}+\vec{V}^n\cdot\nabla\phi^n = 0
+\end{align}
 This is a first-order accurate method for time discretization, which
 \cit{osher2002level} suggests is adequate, based on practical
 experience.  Expanding the gradient as in \vref{velocity:gradient} we
 get
-\begin{eqnarray}
-\label{velocity:forwardeuler}
-\frac{\phi^{n+1}-\phi^n}{\Delta t}+u\phi_{x}^n + v\phi_{y}^n = 0
-\end{eqnarray}
+\begin{align}
+  \label{velocity:forwardeuler}
+  \frac{\phi^{n+1}-\phi^n}{\Delta t}+u\phi_{x}^n + v\phi_{y}^n = 0
+\end{align}
 To calculate this equation, then, we must find the spatial derivatives
 in the $x$ and $y$ directions. For this we can again use a first-order
 difference method. However, we need to pick a direction in which to
 calculate the derivative. That is, do we use
-\begin{eqnarray}
-D^+\phi &\approx & \frac{\phi_{i+1} - \phi_i}{\Delta x} \texttt{ or}\\
-D^-\phi &\approx & \frac{\phi_i - \phi_{i-1}}{\Delta x}
-\end{eqnarray}
+\begin{align}\label{eq:fweuler}
+  D^+\phi &\approx  \frac{\phi_{i+1} - \phi_i}{\Delta x} \texttt{ or}\\
+  D^-\phi &\approx  \frac{\phi_i - \phi_{i-1}}{\Delta x}
+\end{align}
 These being forward and backwards difference, respectively. Naturally,
 we choose by examining the velocities given for the cell in question
 in the velocity field and take the difference in the direction of
@@ -176,9 +177,9 @@ from via the velocity grid.
 To ensure stability of this method, \cit{osher2002level} recommends
 limiting the time-step according to the \emph{Courant-Friedrich-Lewy}
 condition (CFL for short) which can be written as
-\begin{eqnarray}
+\begin{align}
   \Delta t < \frac{\Delta x}{\max \left\lbrace \left| u \right| \right\rbrace}
-\end{eqnarray}
+\end{align}
 By enforcing this, we increase the guarantee that small errors are not
 amplified over time. The effects of an unstable method are commonly
 referred to as ``exploding'', for obvious reasons.
