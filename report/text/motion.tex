@@ -31,7 +31,16 @@ With corresponds to this level set equation:
   \phi_t + a |\nabla \phi| = 0
 \end{equation}
 
+\todoPtx{When $\phi$ is a signed distance function, something, something....}
 
+\todoPtx{Write about this code}
+\begin{lstlisting}
+for(unsigned int x=0; x<width; x++) {
+    for(unsigned int y=0; y<height; y++) {
+        phi(x,y) += -a;
+    }
+}
+\end{lstlisting}
 
 \subsection{Mean-Curvature}
 \input{text/motion/curv}
