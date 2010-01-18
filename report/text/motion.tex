@@ -6,8 +6,6 @@ motion using a internally generated velocity field.
 \newpage
 
 \subsection{Grow/Shrink}
-\input{text/motion/grow}
-% Copy this code to grow.tex later?
 
 One of the most simple things we can do, is to move the interface in
 the normal direction $\vec{N}$ using a constant $a$, efficiently
@@ -29,11 +27,15 @@ With corresponds to this level set equation:
 
 \begin{equation}
   \phi_t + a |\nabla \phi| = 0
-\end{equation}
+\end{equation}\label{eq:lsgrow}
 
-\todoPtx{When $\phi$ is a signed distance function, something, something....}
+At this point, the point of the signed distances field is clear, if
+$\phi$ is a SDF, then $|\nabla\phi| = 1$. This means that we can solve
+(\ref{eq:lsgrow}) very simply using the forward euler method (see
+equation \ref{eq:fweuler}).
 
-\todoPtx{Write about this code}
+This corresponds to the following code:
+
 \begin{lstlisting}
 for(unsigned int x=0; x<width; x++) {
     for(unsigned int y=0; y<height; y++) {
@@ -42,12 +44,14 @@ for(unsigned int x=0; x<width; x++) {
 }
 \end{lstlisting}
 
+\todoPtx{Billede?}
+
 \subsection{Mean-Curvature}
-\input{text/motion/curv}
+
 \subsection{Morph}
-\input{text/motion/morph}
+
 \subsection{CFG condition (Stability)}
-\input{text/motion/CFG}
+
 
 
 %%% Local Variables: 
