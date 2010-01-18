@@ -161,9 +161,14 @@ void LevelSetMethod::VFMeanCurvature(float a, SDF* sdf) {
             // using formula 2.7 on page 21.
             float kappa = phi_xx + phi_yy;
             // using formula 4.11 on page 45
-            const float b = 1.0, dt = 0.48;
-            phi(x,y) += kappa * g.GetLength() * b * dt; //mean curvature
+            const float
+                //b = 1.0, 
+                dt = 1.0;
+            //phi(x,y) += kappa * g.GetLength() * a * dt; //mean curvature
+            //phi(x,y) += kappa * a * dt; //mean curvature
 
+            // this is formula 4.5 (|\nabla\phi| is always 1 in a SDF!
+            phi(x,y) += kappa * a; //mean curvature
             /*
             float u0_xx = u0[(x+1)+y*width] - 2*u0[x+y*width] +
                 u0[(x-1)+y*width];
