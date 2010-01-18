@@ -1,4 +1,21 @@
 
+Improving the performance of our algorithms can be done in many ways,
+but one of the more obvious ones are using parallel computing!
+
+Currently, the most accessible way to run programs in parallel is
+using the graphics computation unit (GPU). Modern GPUs are very
+powerful, and major manufactures have released software development
+kits (SDK) for utilise the GPU for general purpose computation.
+
+One of these SDKs is nVidias CUDA\cit{cuda}. The only thing needed to
+use CUDA is a nvidia graphics card that is relatively new (a few years
+tops), and the free SDK found at the CUDA website.
+
+As GPUs were developed to render graphics, they are optimized to work
+on spatially coherent data. This makes many of our algorithms a
+natural target, as we often only need information about neighbouring
+data points.
+
 \todoPtx{CUDA}
 
 %%% Local Variables: 
