@@ -48,11 +48,96 @@ for(unsigned int x=0; x<width; x++) {
 
 \subsection{Mean-Curvature}
 
+Another interesting thing we can do with a level set, is to move the
+interface in the normal direction with a velocity proportional to its
+curvature (this is called mean-curvature). The effect of this is to
+soften or sharpen the interface.
+
+To do this we need the following velocity field:
+\begin{equation}
+  \vec{V} = -b\kappa\vec{N}
+\end{equation}
+
+Where $\kappa$ is the curvature, and $b>0$ is a constant describing the
+speed of the motion. \todoPtx{Explain why $b>0$?}
+
+This corresponds to the level set equation: 
+\begin{equation}
+  \phi_t -b\kappa|\nabla\phi| = 0
+\end{equation}
+
+This is a parabolic equation, so to discretize it we need to use a new
+approach. 
+
+We start by exploring the curvature $\kappa$. It is defined as:
+\begin{equation}
+  \kappa = \nabla\cdot\left(\frac{\nabla\phi}{|\nabla\phi|}\right)
+\end{equation}
+
+When $\phi$ is a SDF, then $|\phi|=1$, which simplifies our equation
+to: $\kappa = \nabla^2\phi$. Which is the laplacian operator: $\kappa =
+\Delta\phi$. In this context, $\Delta\phi$ is defined as:
+\begin{equation}
+  \Delta\phi = \phi_{xx} + \phi_{yy}
+\end{equation}
+
+$\phi_{xx}$ and $\phi_{yy}$ can be solved using central difference:
+\begin{equation}
+  D^+_xD^-_x\phi 
+  % \frac{\partial^2\phi}{\partial x^2} % Should we use \partial or D?
+  \approx
+  \frac{\phi_{i+1}-2\phi_i+\phi_{i-1}}{\Delta x^2}
+\end{equation} % eq 1.9 s. 12
+
+Again the forward Euler method can be used, but we have to use a small
+time step according to \citbook{osher2002level}{page~44}:
+\begin{equation}
+   \Delta t \left(
+     \frac{2b}{(\Delta x)^2} +
+     \frac{2b}{(\Delta y)^2}
+   \right) < 1
+\end{equation}
+
+If we respect these, then the  implementation is straight forward:
+
+% using formula 1.9 on page 12 and
+% using formula 2.7 on page 21.
+% using formula 4.11 on page 45
+
+\begin{lstlisting}
+for(unsigned int x=1; x<width-1; x++) {
+    for(unsigned int y=1; y<height-1; y++) {
+        Vector<2,float> g = sdf->Gradient(x,y);
+
+        const float dx = 1.0;
+        float phi_xx = (phi(x+1,y) - 2*phi(x,y) + phi(x-1,y))/(dx*dx);
+        float phi_yy = (phi(x,y+1) - 2*phi(x,y) + phi(x,y-1))/(dx*dx);
+
+        float kappa = phi_xx + phi_yy;
+ 
+        phi(x,y) += kappa * a; //mean curvature
+    }
+}
+\end{lstlisting}
+
+\todoPtx{pics!}
+
 \subsection{Morph}
 
-\subsection{CFG condition (Stability)}
+$\phi_t = \phi + (\phi - \phi_b \cdot -a)$
 
+\begin{lstlisting}
+for(unsigned int x=0; x<width; x++) {
+    for(unsigned int y=0; y<height; y++) {
+        phi(x,y) += (phi(x,y) - phi2(x,y)) * -a; //morph
+    }
+}
+\end{lstlisting}
 
+\todoPtx{picture here!}
+
+% \subsection{CFG condition (Stability)}
+% WTF is this?
 
 %%% Local Variables: 
 %%% mode: latex
