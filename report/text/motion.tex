@@ -5,7 +5,7 @@ motion using a internally generated velocity field.
 
 \newpage
 
-\subsection{Grow/Shrink}
+\subsection{Expand/Shrink}
 
 One of the most simple things we can do, is to move the interface in
 the normal direction $\vec{N}$ using a constant $a$, efficiently
@@ -44,7 +44,24 @@ for(unsigned int x=0; x<width; x++) {
 }
 \end{lstlisting}
 
-\todoPtx{Billede?}
+A sample is shown in figure \ref{fig:auGrow} where the AU logo is
+expanded with $a=1.0$ for 6 and 20 iterations.
+
+
+\begin{figure}[h]
+  \centering
+  \subfloat[The original logo]{
+    \includegraphics[width=0.3\textwidth]{imgs/au-logo}
+    \label{fig:au}
+  }
+  \subfloat[After 6 iterations]{
+    \includegraphics[width=0.3\textwidth]{imgs/auGrow6}}
+  \subfloat[After 20 iterations]{
+    \includegraphics[width=0.3\textwidth]{imgs/auGrow20}}
+  \caption{The AU logo after expanding with $a=1.0$ for 6 and 20 iterations}
+  \label{fig:auGrow}
+\end{figure}
+
 
 \subsection{Mean-Curvature}
 
@@ -59,7 +76,7 @@ To do this we need the following velocity field:
 \end{equation}
 
 Where $\kappa$ is the curvature, and $b>0$ is a constant describing the
-speed of the motion. \todoPtx{Explain why $b>0$?}
+speed of the motion. % \todoPtx{Explain why $b>0$?}
 
 This corresponds to the level set equation: 
 \begin{equation}
@@ -74,7 +91,8 @@ We start by exploring the curvature $\kappa$. It is defined as:
   \kappa = \nabla\cdot\left(\frac{\nabla\phi}{|\nabla\phi|}\right)
 \end{equation}
 
-When $\phi$ is a SDF, then $|\phi|=1$, which simplifies our equation
+When $\phi$ is a SDF, then $|\phi|=1$,\todoPtx{O'Rly? er $|\nabla\phi|
+  =1$ altid?} which simplifies our equation
 to: $\kappa = \nabla^2\phi$. Which is the laplacian operator: $\kappa =
 \Delta\phi$. In this context, $\Delta\phi$ is defined as:
 \begin{equation}
