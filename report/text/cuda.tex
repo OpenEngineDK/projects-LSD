@@ -16,11 +16,62 @@ on spatially coherent data. This makes many of our algorithms a
 natural target, as we often only need information about neighbouring
 data points.
 
-\todoPtx{CUDA}
+% section?
+\subsection{Memory?}
+
+When a algorithm have been implemented using CUDA, there are many ways
+to optimize it. Often memory access is the biggest problem.
+
+
+
+% code
+
+\todoPtx{CUDA coda}
+\subsection{Results}
+
+The results in table \ref{tbl:cudaRes} are taken from a system with a
+1.8 Ghz Intel Core 2 Duo CPU, 4 GB RAM and a 512MB nVidia GeForce
+9600M GT.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|r|r|r|}
+    \hline    Algorithm & CPU & GPU & Speedup \\
+    % BEGIN RECEIVE ORGTBL numbers
+\hline
+Reinitialization & 355179 usec & 138011 usec & 2.5735557 \\
+\hline
+    % END RECEIVE ORGTBL numbers
+  \end{tabular}
+  \caption{GPU vs. CPU comparison}
+  \label{tbl:cudaRes}
+\end{table}
+
+The results shows a significant speedup. Using a quite
+naive implementation the speedup is easily doubled on a inexpensive
+consumer graphics card.
+
+\todoPtx{Picture!}
+
+
+% grep Reinit run1.log | grep CUDA | awk '{sum+=$7} END {print "avg=",sum/NR}'
+
+
+\begin{comment}
+#+ORGTBL: SEND numbers orgtbl-to-latex :splice t :skip 2
+|------------------+-------------+-------------+-----------|
+|                  | CPU         | GPU         |   Speedup |
+|------------------+-------------+-------------+-----------|
+| Reinitialization | 355179 usec | 138011 usec | 2.5735557 |
+|------------------+-------------+-------------+-----------|
+#+TBLFM: @2$4=@2$2 / @2$3
+\end{comment}
+
 
 %%% Local Variables: 
 %%% mode: latex
 %%% mode: auto-fill
+%%% mode: orgtbl
 %%% TeX-PDF-mode: t
 %%% TeX-master: "../master.tex"
 %%% End: 
