@@ -1,0 +1,44 @@
+Intro text about what narrow band is, and why to use it
+
+\missingfigure{Billede der viser et narrowband rundt om kanten på en figur}
+
+\todoVester{Skriv om min NarrowBand implementation, der desvære ikke virker endnu}
+
+\subsection{Implementation}
+
+
+\subsection{Building the initial narrow band}
+\begin{lstlisting}
+    for (unsigned int x=0; x<width; x++)
+        for (unsigned int y=0; y<height; y++) {
+            float phiVal = fabs((*phi)(x, y));
+            if (phiVal <= narrowBandWidth) {
+                //Part of the inner band
+                narrowBand[narrowBandSize++] = (Vector<3,int> (x,y));
+                nbType(x,y) = 1;
+            } else if (phiVal <= narrowBandWidth + 1.0f) {
+                //Part of the outer(safety) band
+                narrowBand[narrowBandSize++] = (Vector<3,int> (x,y));
+                nbType(x,y) = 2;
+            } else {
+                nbType(x,y) = 0;
+            }
+        }
+\end{lstlisting}
+
+
+
+\subsection{Rebuilding the narrow band}
+Rebuild Narrow Band
+
+                %% if ((*phi)(x,y) >= 0)
+                %%     (*phi)(x,y) = narrowBandWidth;
+                %% else 
+                %%     (*phi)(x,y) = -narrowBandWidth;
+
+
+
+\missingfigure{Billede der viser et narrowband tæt på, med 3 i bredde og et safetybånd på 1 px.}
+
+\subsection{Conclution}
+\todoVester{Skriv NB Conclution}
