@@ -1,0 +1,100 @@
+We have previously discussed the advantages of using level set methods to evolve interfaces by representing them implicitly rather than explicitly. One area in which this proves particularly useful is in the simulation of physical phenomena. We look at one such example in this section: the simulation of fluids.
+The basic idea is to let the fluid be represented by the zero-level isosurface of a signed distance field. By solving a set of equations we arrive at a velocity field, with which the interface can be evolved as discussed in the section on generating motion by externally generated velocity fields, section \vref{sec:extVel}.
+
+\subsection{Fluid equations}
+The basis of our fluid simulator is the \emph{incompressible Navier-Stokes equations} as presented in \cit{bridson2008fluid}, a common approach to fluid simulation. These are a set of equations which describe the motion of an incompressible fluid. Incompressibility is a central quality of fluids. Simply put, it means that the fluid cannot grow or shrink in size. Naturally this property does not \textit{quite} hold for real-world fluids, especially if we include gases in the definition, as fluids in the real world \textit{do} compress to some degree. For graphical simulation purposes, however, it is adequate to assume complete incompressibility.
+
+Here, then, is how the incompressible Navier-Stokes equations are usually written:
+\begin{eqnarray}
+\label{eq:momentum}
+\frac{\partial\vec{u}}{\partial t}+\vec{u} \cdot \nabla\vec{u} + \frac{1}{\rho}\Delta p &=& \vec{g}+\nu\nabla\cdot\nabla\vec{u},\\
+\label{eq:incomp}
+\nabla\cdot\vec{u}&=&0
+\end{eqnarray}
+We will be breaking these equations down into some simpler parts that can be calculated discretely and numerically without too much hassle. For now, the variables of the equations: $\vec u$ is the field of velocities that affect the fluid, $\rho$ is the density of the fluid, $p$ tracks how much pressure is present across the fluid, $\vec{g}$ is the downwards force of gravity acting upon the fluid and $\nu$ is a term known as viscosity, which basically says something about how easily the fluid deforms.
+
+Equation \vref{eq:momentum} is called the \emph{momentum equation} and deals (not surprisingly) with the momentum of the fluid. That is, how the fluid continues to move once in motion. Naturally, this equation also encompasses motion derived from external forces like gravity.
+
+The incompressibility of the fluid is captured by equation \vref{eq:incomp}. This equation is derived from looking at the normal component of the velocity around the boundary of a given fluid. In basic terms, it says that the amount of fluid flowing out of the fluid region is equal to the amount flowing in. This measure of change is called divergence, and by this restriction we seek to remove it with as much numerical precision as possible. When evolving the interface with the resulting veolocity field, the incompressibility constraint ensures that the interface is never moved in a way that produces a larger or smaller fluid volume (or area, in the case of our two dimensional implementation).
+
+Looking at the equations, solving the entire scheme at once seems daunting. Thankfully, \cit{bridson2008fluid} presents us with a method for breaking them into smaller, more managable parts. By using this technique, called splitting, we arrive at the following parts:
+\begin{eqnarray}
+\label{eq:advection}
+&\frac{Dq}{Dt}=0 \text{    (advection),}\\
+\label{eq:forces}
+&\frac{\partial \vec{u}}{\partial t} = \vec{g} \text{    (body forces),}\\
+\label{eq:pressure}
+&\frac{\partial \vec{u}}{\partial t} + \frac{1}{\rho}\nabla p = 0\\
+\label{eq:divergence}
+&\text{such that } \nabla\cdot\vec{u}=0 \text{    (pressure/incompressibility),}
+\end{eqnarray}
+
+Notice that the momentum equation has been split into three seperate parts. The first, advection, ensures that velocities are passed around the velocity field properly. The second simply applies external forces. The third and fourth adjust the velocity field under the incompressibility constraint, and thus the velocity field is created and maintained across steps. To formalize the preceding into an algorithm:
+\begin{itemize}
+\item Advect velocities around the velocity field
+\item Add external forces
+\item Adjust the velocity field for pressure
+\end{itemize}
+As mentioned, we use a signed distance function to represent the position and layout of the fluid. The zero-level isocontour is the surface of the fluid and naturally divides the domain into two sections: all values above zero represent empty space not currently occupied by the fluid while everything below zero represents the interior of the fluid.
+
+Our natural inclination at this point would be to represent the discrete velocity field as an identically sized double (or triple, depending on dimensionality) array of values. Each cell would hold the velocity of the fluid at that point, which seems the simplest way of storing it. However, to ease certain portions of later sections of the simulation we have chosen instead the "Marker and Cell" (or MAC for short) grid which \cit{bridson2008fluid} credits to Harlow and Welch.
+
+\subsection{Marker and cell grid}
+For a two-dimensional fluid domain, the velocities clearly need to be two-dimensional as well. With the MAC grid we chose not to simply store the complete velocity vector of the fluid at the center of each cell of the fluid. Instead, we store the only the normal components of the velocity at the \textit{edges} of cells.\image{mac.png}{0.3}{The MAC grid stores velocities at the edge of cells, rather than the center}{fig:mac} As figure \vref{fig:mac} illustrates, each edge of cell in the signed distance field has associated with it a value indicating the component of the velocity vector in the corresponding direction. In practical terms, we store two grids in addition to the discretized signed distance field, one for the values aligned with the x-axis and one for the y-values.
+
+The purpose of this initially unintuitive representation becomes apparent when need to calculate central differences in the velocity field. With a "traditional" velocity field, computing the signed distance field we would sample velocities at either side of the cell in question, ignoring the value stored at the cell itself. Since our field may contain very thin feature-variation, this method of central differencing may accidentally ignore "sharp" features of no more than a cell's width.
+
+With the MAC grid, when central differencing we can sample the "half-values" at the edges of cells, thereby efficiently avoiding this problem at no additional cost.
+
+The MAC grid also needs to be able to handle values being taken between grid points. Not only at the cell edges, but at arbitrary locations in the grid, particularly at grid centers. We will see why in this next section.
+
+\subsection{Advection and forces}
+With the grids thus in place, we may begin our algorithm. Referring to the overview, the first step is the advection of the velocity field. In this step we allow motion to carry on, retaining momentum as the fluid moves. The implementation of this step is quite intuitive.
+
+Recall equation \vref{eq:advection} which describes the advection step. With our grid-based representation of the fluid it seems obvious to use an Eulerian solution to the equation. We won't go into that, however, since it proves to be conditionally unstable. Instead we use something called the \textit{semi-Lagrangian} method. We have previously discussed the difference between Eulerian and Lagrangian viewpoints. As the name suggests, this method is a mix of the two, taking primarily from the Lagrangian.
+
+Essentially, we see each cell in the grid as a newly-moved particle in a Lagrangian system. To update a given cell, $\vec{x}_G$, we first look up the velocity at the grid center. Tracing this velocity backwards, we find where the "particle" originated from and take the value from that location to write to the current cell. The method of backtracing can be as simple as a single step of forward Euler, which has been discussed previously. For increased stability we use a second-order Runge-Kutta method, as recommended in section 3.1 of \cit{bridson2008fluid}. With Runge-Kutta we first take a half-step against the direction indicated by the current cell to get an intermediate position: $\vec{x}_{mid} = \vec{x}_G - \frac{1}{2}\Delta t \vec{u}\left(\vec{x}_G\right)$. We then use the velocity there to arrive at the final value.
+
+After advecting, adding a force such as gravity is as simple as modifying both components of the MAC grid in the desired direction. After this is done, we are ready for the pressure calculations.
+
+\subsection{Incompressibility}
+We arrive now at the part of the simulator that most gives rise to fluid-like behavior of the interface.
+
+Recall that we want to solve equation \vref{eq:pressure} while satisfying equation \vref{eq:divergence}. We use u and v as the horizontal and vertical components of velocity in the mac grid, using half-indices to indicate whether we are sampling at the top, bottom, left or right edge of the cell in question. Thus, the horizontal component at cell $(i,j)$ is designated $u_{i-\frac{1}{2},j}$. The formulas for the pressure update are as follows:
+\begin{eqnarray}
+u_{i+\frac{1}{2},j}^{n+1} &=& u_{i+\frac{1}{2},j} - \Delta t\frac{1}{\rho}\frac{p_{i+1,j}-p_{i,j}}{\Delta x},\\
+v_{i,j+\frac{1}{2}}^{n+1} &=& v_{i,j+\frac{1}{2}} - \Delta t\frac{1}{\rho}\frac{p_{i,j+1}-p_{i,j}}{\Delta x}
+\end{eqnarray}
+Notice in particular how the pressure is calculated at cell centers by using the velocity at cell-edges for the central difference. This is the central purpose of the MAC grid.
+
+How, then, do we calculate the pressure? This portion of the simulation is mathematically simple, but quite complex in implementation, since we are interested in solving a large linear system of equations.
+Fortunately, a lot of the groundwork has been done for us already. We leave the actual solving of the system to an imported mathematical library and focus simply on properly formulating the problem.
+
+We may write the problem of finding the pressures in the grid in the following simple matrix-vector form:
+\begin{equation}
+Ap = b
+\end{equation}
+$p$ is what we are interested in finding, the domain-wide grid of pressures. $A$ is a matrix of coefficients to these pressures: A has a row for each fluid-filled cell, with each of these rows containing non-zero values only in the cells corresponding to the cell in question and its six neighbours. In this way, $Ap$ represents the unknown pressure for each cell in the grid. The right hand side of the equation, $b$, is another domain-sized matrix containing the negative divergences of each cell. Recall that we are trying to minimize divergence across the fluid. This is in fact the entire point of the pressure update. The pressures we are trying to find are exactly the pressures that, when added to the velocity field, will keep the field divergence free.
+We won't go into the details of the construction of the $A$-matrix. It is technically straightforward since we know exactly where our fluid currently is. 
+
+The $b$ matrix on the right hand side of the equation is constructed from the component velocities as follows:
+\begin{lstlisting}
+scale = 1 / dx
+loop over i,j where phi(i,j) < 0
+   rhs(i,j) = -scale * (u(i+1,j)-u(i,j)
+                       +v(i,j+1)-v(i,j));
+\end{lstlisting}
+Of course, we are only interested in the cells which contain fluid, which in our representation is everything on the negative side of the zero-level isosurface.
+
+Finally, we relegate the solving of this system to an implementation of the Preconditional Conjugate Gradient method. This is an iterative method, the precise implementation of which lies somewhat outside the scope of this paper. In short, the result of applying this method to our constructed linear system yields the grid of pressures. Applying this to the velocity field should purge it of divergence, thereby completing this step of the algorithm.
+
+Finally, using this divergence free velocity field, we advect the values of the signed distance field. To this end, we use the same Runge-Kutta method as described in the advection of the velocity field. Of course, having done this we need to reinitialize the signed distance field, as it likely no longer lives up the the requirements described in section \vref{chap:sdf}\todoSean{What requirements?!}.
+
+Having done this, we are ready to start a new iteration afresh, and thus we may iteratively evolve our interface in full accordance with the Navier-Stokes equation.
+
+\subsection{Conclusion}
+While there are other methods for the simulation of fluids, the mathematical simplicity of the equations used here should show that the level set method lends itself particularly well to this sort of physical simulation. Other similar methods use particles to track the surface of the fluids, but these can prove expensive and relatively inaccurate.
+
+Care needs to be taken, however, when using level sets. If features arise in the fluid which are smaller than the size of a grid-cell, they may disappear complettely as the grid is unable to represent them. Therefore, to preserve a natural-seeming motion one should make sure that no accuracy smaller than the cell size is required.
+
+An implementation of the level set based fluid simulator has been incorporated into the joint level set project. At the time of writing, however, the implementation is quite unstable. Currently, little regard is being given to the size of the time-step for each iteration. This causes the simulation to "blow up" before any useful simulation has been done! Fixing the time-step to something sensible is the obvious next step for the algorithm. Section 3.3 of \cit{bridson2008fluid} describes a method of limiting it to maximize stability.
