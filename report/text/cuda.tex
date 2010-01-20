@@ -16,24 +16,81 @@ on spatially coherent data. This makes many of our algorithms a
 natural target, as we often only need information about neighbouring
 data points.
 
-% section?
-\subsection{Memory?}
+\subsection{Threads}
 
-When a algorithm have been implemented using CUDA, there are many ways
-to optimize it. Often memory access is the biggest problem.
+The CUDA programming model is centered about data parallel
+programming. This means that you spawn a thread for each element in
+your data, which runs the same program. In our case, this means
+spawning a thread for each pixel. Luckily our algorithms are already
+in this format, just with two \texttt{for} iterating over the pixels.
 
-Because of the architecture of GPUs, CUDA have many different types of
-memory. Each with different properties and uses.
+Most of our algorithms uses this pattern:
 
-\todoPtx{Skriv om threads?}
+\begin{lstlisting}
+for (unsigned int i = 0; i<iterations; i++) {
+    for (unsigned int x = 0; x < width; x++) {
+        processPixel();
+    }
+}
+\end{lstlisting}
 
-% code
+Which is easily translated into:
+\begin{lstlisting}
+    const dim3 blockSize(32,16,1);
+    const dim3 gridSize(width/blockSize.x, height/blockSize.y);
+    processPixel<<gridSize,blockSize>>();
+\end{lstlisting}
+
+The grid and block size are telling CUDA how many threads to
+spawn. A grid contains many blocks, and each block contain many
+threads. In this sample, each block have $32 \times 16$ threads, and
+the grid have $\frac{width}{32} \times \frac{height}{16}$ blocks. If
+width and height are divisible with 32 and 16, this corresponds to
+$width \times height$ threads. 
+
+In CUDA 2.3, a block can contain no more than 512 threads, hence the
+block size of $32\cdot 16 = 512$.
+
+\todoPtx{More about threads?}
+
+\subsection{Memory}
+
+Memory in CUDA is divided in 3 parts. The Per-thread local memory than
+only a single thread can access. Per-block shared memory which is
+accessible to every thread in the same block and the global
+memory that every thread can access. \todoPtx{Nice graphics?}
+
+The difference between the shared and global memory is the speed. The
+shared memory is much faster, but also much smaller (typically 16
+KB). Its also inaccessible from threads in different blocks.
+
+This make it challenging to utilise the whole GPU, as the algorithms
+needs to be rethought.
+
+One way to do this could be letting each thread fetch it's value
+($\phi$ in our case) into the shared memory. Then if the threads are
+organized in block where neighbouring threads are in the same block,
+each thread can fetch the neighbouring pixels from the shared memory.
+
+Such an optimization creates new challenges, as the threads near the
+border cannot cross over to the next blocks shared memory. The
+solution is to pad the area around the edges of the blocks, so if a
+pixel is on the border, its run by both blocks. This makes us run a
+few more threads than we have pixels, but it increases the speed as we
+can exploit the shared memory.
+
+\subsection{Implementation}
+
+After a quick time profiling, we found that \texttt{Reinitialize} is
+where our program spends most of its time, so this was the first to be
+converted into CUDA.
+
+The following is a very naive conversion. The code is almost the same
+as the original in section \ref{sec:reinitialize}, and there are no
+clever usage of shared memory or other optimizing tricks.
 
 \begin{lstlisting}
 #define GetPhi(phi,x,y,w) phi[x+w*(y)]
-
-void cu_Init() {}
-
 
 __global__ void reinit(float *phi,float* phi0, float* phin, 
                        unsigned int width, unsigned int height) {
@@ -94,7 +151,11 @@ __global__ void reinit(float *phi,float* phi0, float* phin,
 
 
 }
+\end{lstlisting}
 
+Coping the data, and starting the threads are done in the following code:
+
+\begin{lstlisting}
 void cu_Reinit(float* data, 
                unsigned int w,
                unsigned int h,
@@ -136,7 +197,7 @@ void cu_Reinit(float* data,
 \end{lstlisting}
 
 \todoPtx{CUDA coda}
-\subsection{Results}
+\subsection{Results \& Conclusion}
 
 The results in table \ref{tbl:cudaRes} are taken from a system with a
 1.8 Ghz Intel Core 2 Duo CPU, 4 GB RAM and a 512MB nVidia GeForce
@@ -149,8 +210,8 @@ algorithm.
     \hline    Algorithm & CPU & GPU & Speedup \\
     % BEGIN RECEIVE ORGTBL numbers
 \hline
-Reinitialization & 417825 usec & 136675 usec & 2.5987123 \\
-- with textures & - & 100006 usec & 3.5515769 \\
+Reinitialization & 417825 usec & 136675 usec & 3.0570697 \\
+- with textures & - & 100006 usec & 4.1779993 \\
 \hline
     % END RECEIVE ORGTBL numbers
   \end{tabular}
@@ -158,15 +219,7 @@ Reinitialization & 417825 usec & 136675 usec & 2.5987123 \\
   \label{tbl:cudaRes}
 \end{table}
 
-The results shows a significant speedup. Using a quite
-naive implementation the speedup is easily more than doubled on a inexpensive
-consumer graphics card.
-
-\todoPtx{Picture!}
-
-
 % grep Reinit run1.log | grep CUDA | awk '{sum+=$7} END {print "avg=",sum/NR}'
-
 
 \begin{comment}
 #+ORGTBL: SEND numbers orgtbl-to-latex :splice t :skip 2
@@ -178,6 +231,20 @@ consumer graphics card.
 |------------------+-------------+-------------+-----------|
 #+TBLFM: @2$4=@2$2 / @2$3::@3$4=@2$2 / @3$3
 \end{comment}
+
+The results shows a significant speedup. Using a quite naive
+implementation the speedup is easily tripled on a inexpensive consumer
+graphics card.
+
+Using textures to cache lookup, we gain even more performance, going
+from 3x to 4x. If we'd had more time more optimization techniques
+could have been applied. E.g. using shared memory which most likely
+would have improved performance even more.
+
+
+\todoPtx{Picture!}
+
+
 
 
 %%% Local Variables: 
