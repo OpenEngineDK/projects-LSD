@@ -140,7 +140,8 @@ void cu_Reinit(float* data,
 
 The results in table \ref{tbl:cudaRes} are taken from a system with a
 1.8 Ghz Intel Core 2 Duo CPU, 4 GB RAM and a 512MB nVidia GeForce
-9600M GT.
+9600M GT. The time is an average of about 100 iterations of the
+algorithm.
 
 \begin{table}[h]
   \centering
@@ -148,7 +149,8 @@ The results in table \ref{tbl:cudaRes} are taken from a system with a
     \hline    Algorithm & CPU & GPU & Speedup \\
     % BEGIN RECEIVE ORGTBL numbers
 \hline
-Reinitialization & 355179 usec & 138011 usec & 2.5735557 \\
+Reinitialization & 417825 usec & 136675 usec & 2.5987123 \\
+- with textures & - & 100006 usec & 3.5515769 \\
 \hline
     % END RECEIVE ORGTBL numbers
   \end{tabular}
@@ -157,7 +159,7 @@ Reinitialization & 355179 usec & 138011 usec & 2.5735557 \\
 \end{table}
 
 The results shows a significant speedup. Using a quite
-naive implementation the speedup is easily doubled on a inexpensive
+naive implementation the speedup is easily more than doubled on a inexpensive
 consumer graphics card.
 
 \todoPtx{Picture!}
@@ -171,9 +173,10 @@ consumer graphics card.
 |------------------+-------------+-------------+-----------|
 |                  | CPU         | GPU         |   Speedup |
 |------------------+-------------+-------------+-----------|
-| Reinitialization | 355179 usec | 138011 usec | 2.5735557 |
+| Reinitialization | 417825 usec | 136675 usec | 3.0570697 |
+| - with textures  | -           | 100006 usec | 4.1779993 |
 |------------------+-------------+-------------+-----------|
-#+TBLFM: @2$4=@2$2 / @2$3
+#+TBLFM: @2$4=@2$2 / @2$3::@3$4=@2$2 / @3$3
 \end{comment}
 
 
