@@ -79,6 +79,8 @@ pixel is on the border, its run by both blocks. This makes us run a
 few more threads than we have pixels, but it increases the speed as we
 can exploit the shared memory.
 
+
+
 \subsection{Implementation}
 
 After a quick time profiling, we found that \texttt{Reinitialize} is
@@ -196,7 +198,6 @@ void cu_Reinit(float* data,
 
 \end{lstlisting}
 
-\todoPtx{CUDA coda}
 \subsection{Results \& Conclusion}
 
 The results in table \ref{tbl:cudaRes} are taken from a system with a
