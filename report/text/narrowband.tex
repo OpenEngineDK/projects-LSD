@@ -82,24 +82,58 @@ green outline around the red band is the outer safe band.
   \label{fig:narrowBand}
 \end{figure}
 
-
+As seen in figure \vref{fig:narrowBand}, the narrow band method is
+powerful. Using the method we have significantly lowered the number of
+pixels needed to visit while working with the SDF, simultaneously we
+have reduced the number of times needed to reinitialize. If we only
+reinitialize once it is clear that the method without narrow band is
+more correct overall, though it contains large amounts of wrong data
+around the interface, making calculations faulty. The narrow band
+version is clearly wrong in the majority of the pixels, but around the
+interface we see that the narrow band is in effect and the one
+reinitialisation per time step almost covers our needs. 
 
 
 \subsection{Implementation}
+To represent our Narrow band we need a data structure to hold the new
+information. Normally we traverse the workspace linearly and know
+which pixels have been updated, and which we are going to visit
+next. In the narrow band approach we have no linearity, the narrow
+band can be divided into many detached objects in the
+workspace. Therefore we need another way to traverse it than run
+through (x,y) in the height and with of the workspace. Our solution is
+to keep every pixel in a vector with (x,y) coordinates, and add the
+vectors of the pixels inside the narrow band to a list. This list will
+then contain the complete narrow band, both inner and outer band. To
+distinct the two bands from each other we are using a 2D matrix
+holding an 1 if the said pixel is in the inner band, and a 2 if it is
+in the outer, 0 means the pixel is in neither. We also maintain an
+integer containing the number of pixels inside the narrow band.
 
+To build the narrow band, the technique is simply to traverse the SDF
+and check the distance to an interface. If we within the $\gamma$
+range of it, we are inside the narrow band, and the pixel is added to
+the set of pixels inside the band. Meanwhile we add the said pixel to
+the matrix telling which of the bands it is contained in. For
+simplicity we can in the same traversal check if it should be in the
+outer band if it isn't inside the inner band. As it does not matter if
+we take too much in the outer band, we here just check if it is in
+$\gamma$ range + 2 pixel. We take more than needed, but we are on the
+safe side. The type of the pixels in the outer band is of course added
+to the type matrix. This is done as shown by this code stump:
 
-\subsection{Building the initial narrow band}
+%\subsection{Building the initial narrow band}
 \begin{lstlisting}
     for (unsigned int x=0; x<width; x++)
         for (unsigned int y=0; y<height; y++) {
             float phiVal = fabs((*phi)(x, y));
             if (phiVal <= narrowBandWidth) {
                 //Part of the inner band
-                narrowBand[narrowBandSize++] = (Vector<3,int> (x,y));
+                narrowBand[narrowBandSize++] = (Vector<2,int> (x,y));
                 nbType(x,y) = 1;
-            } else if (phiVal <= narrowBandWidth + 1.0f) {
+            } else if (phiVal <= narrowBandWidth + 2.0f) {
                 //Part of the outer(safety) band
-                narrowBand[narrowBandSize++] = (Vector<3,int> (x,y));
+                narrowBand[narrowBandSize++] = (Vector<2,int> (x,y));
                 nbType(x,y) = 2;
             } else {
                 nbType(x,y) = 0;
@@ -107,10 +141,25 @@ green outline around the red band is the outer safe band.
         }
 \end{lstlisting}
 
-bbbbbbbbbb \cit{peng1999pde}
 
 \subsection{Rebuilding the narrow band}
-Rebuild Narrow Band
+As we have defined a narrow band to work inside, it seems odd to
+rebuild this every time step by traversing the entire
+workspace. In \cit{peng1999pde} is described a solution where the
+rebuilding time of the narrow band has been optimized. We again use
+the fact we know our interface only can move 1 pixel per time step,
+hence our new inner band must be within the old narrow band. Knowing
+this we only need to traverse the old narrow band to see which pixels
+are within $\gamma$ distance of our new interface position. Whilst
+doing this we also update the type matrix, removing the pixels now no
+more resides inside a band. Now the tricky part comes; finding the
+outer band. This can be done in a separate step, where we traverse the
+new inner band, and for each pixel visits the neighbors. If the
+neighbor is set to 0 in the type matrix, we change it to 2, and add it
+to the end of our narrow band list. Many of the visited pixels will
+already be inside the narrow band, but the time spared not traversing
+the entire workspace is worth it. 
+
 
                 %% if ((*phi)(x,y) >= 0)
                 %%     (*phi)(x,y) = narrowBandWidth;
@@ -119,7 +168,5 @@ Rebuild Narrow Band
 
 
 
-\missingfigure{Billede der viser et narrowband tæt på, med 3 i bredde og et safetybånd på 1 px.}
-
-\subsection{Conclution}
-\todoVester{Skriv NB Conclution}
+\subsection{Conclusion}
+\todoVester[inline]{Skriv NB Conclution}
