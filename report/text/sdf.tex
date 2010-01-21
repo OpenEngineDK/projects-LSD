@@ -24,16 +24,46 @@ we are from the closest point on the iso-surface which is quite
 handy. For a picture of the above, see figure
 \vref{introduction:fig:implicitfunction}.
 
-\image{phi.png}{0.3}{The figure is borrowed from
-\cit{osher2002level}. A implicit function, defined in all of
-$\mathbb{R}^{2}$. We see that when we are inside the object then
-$\phi$ is less than zero, larger when we are outside and zero on the
-interface.}{introduction:fig:implicitfunction}\todoPtx{Man kunne lave
-mere vektor grafik her, fx. med cirklen i stedet.}
+
+\begin{figure*}[!htb]
+  \centering
+%  \includegraphics[scale=0.3]{imgs/phi.png}
+  \begin{tikzpicture}
+    \draw[gray] 
+    (-3,0) -- (3,0)
+    (0,-3) -- (0,3);
+    \draw (0,0) circle (1.5cm);
+    \draw (2,1.7) node {$\phi = \sqrt{x^2+y^2}-r$};
+    \draw (0,0) node {$\Omega^-$}
+    +(0,-0.4) node {$\phi < 0$}
+    +(0,-0.8) node {inside}
+    ;
+    \draw (-2.5,0.6) node {$\Omega^+$}
+    +(0,-0.4) node {$\phi > 0$}
+    +(0,-0.8) node {outside}
+    ;
+    \draw (2.5,0.6) node {$\Omega^+$}
+    +(0,-0.4) node {$\phi > 0$}
+    +(0,-0.8) node {outside}
+    ;
+    \draw [->] (2,-2)  -- (1.1,-1.1);
+    \draw (2.2,-2.2) node {$\partial\Omega$}
+    +(0,-0.4) node {$\phi = 0$}
+    +(0,-0.8) node {interface}
+    ;
+  \end{tikzpicture}  
+%  \todoPtx[inline]{Man kunne lave mere vektor grafik her, fx. med cirklen i stedet.}
+  \caption{The figure is borrowed from \cit{osher2002level}. A
+    implicit function, defined in all of $\mathbb{R}^{2}$. We see that
+    when we are inside the object then $\phi$ is less than zero,
+    larger when we are outside and zero on the interface.}
+  \label{introduction:fig:implicitfunction}
+\end{figure*}
+
 
 %% Example - Circle
 
-\subsection*{Example}
+\subsection{Example}
 
 A simple example is to consider a circle and its equation:
 \begin{equation*} 
@@ -49,7 +79,9 @@ and outside when the value is greater. See figure
 \vref{introduction:fig:cartesiangrid}.
 
 
+
 \section{Cartesian grid}
+
 \begin{comment} Finite memory -> descritization of plane -> cartesian
 grid is used.
 \end{comment}
@@ -104,7 +136,7 @@ values of $\phi$.
 
 %% formulas
 
-\section*{Solving the Level Set}\label{sec:intro:solve} 
+\section{Solving the Level Set}\label{sec:intro:solve} 
 
 \todoPtx{I own this!!}
 
@@ -124,7 +156,7 @@ where $\nabla \phi = \left(\dfrac{\partial \phi}{\partial x},
 When $a > 0$ the interface moves in the normal direction and when $a <
 0$ it moves in the opposite direction of the normal.
 
-\section*{Applications}
+\section{Applications}
 
 The advantages are that since we discretize the surface into a
 cartesian grid, we can do numerical computations without having to
