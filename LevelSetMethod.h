@@ -65,6 +65,7 @@ public:
      * Set run to false, and wait for thread to end.
      */    
 
+    void Start();
     void Stop(); 
     
     

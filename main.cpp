@@ -30,7 +30,7 @@
 #include <Scene/SceneNode.h>
 #include <Math/Vector.h>
 #include <Math/Exceptions.h>
-
+#include <Devices/IKeyboard.h>
 
 #include <Utils/CairoTextTool.h>
 #include <Display/SDLEnvironment.h>
@@ -56,6 +56,27 @@ using namespace OpenEngine::Math;
 using namespace OpenEngine::Renderers;
 using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Display;
+using namespace OpenEngine::Devices;
+
+class PauseToggler : public IListener<KeyboardEventArg> {
+    
+    bool running;
+    LevelSetMethod& m;
+public:
+    PauseToggler(LevelSetMethod& m) : running(true),m(m) {}
+
+    void Handle(KeyboardEventArg arg) {
+        if (arg.type == EVENT_PRESS && arg.sym == KEY_SPACE) {
+            logger.info << "Toggling levelset process: " << !running <<logger.end;
+            if (running)
+                m.Stop();
+            else
+                m.Start();
+            running = !running;
+        }
+    }
+
+};
 
 
 static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
@@ -252,6 +273,11 @@ int main(int argc, char** argv) {
 
     setup->GetCamera()->SetPosition(Vector<3,float>(0.0,h,130));
     setup->GetCamera()->LookAt(Vector<3,float>(0.0,h,0.0));
+
+
+    setup->GetKeyboard().KeyEvent().Attach(*(new PauseToggler(methodCPU)));
+
+
 
 #if USE_CUDA
     methodCUDA.Start();

@@ -304,6 +304,12 @@ SDF* LevelSetMethod::Subtract(SDF* s1, SDF* s2) {
     return ns;    
 }
 
+
+void LevelSetMethod::Start() {
+    run = true;
+    Thread::Start();
+}
+
 void LevelSetMethod::Stop() {
     run = false;
     Wait();
