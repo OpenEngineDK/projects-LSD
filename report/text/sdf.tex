@@ -29,25 +29,26 @@ handy. For a picture of the above, see figure
   \centering
 %  \includegraphics[scale=0.3]{imgs/phi.png}
   \begin{tikzpicture}
-    \draw[gray] 
-    (-3,0) -- (3,0)
+    \draw[gray,<->] 
+    (-3,0) -- (3,0);
+    \draw[gray,<->]
     (0,-3) -- (0,3);
-    \draw (0,0) circle (1.5cm);
-    \draw (2,1.7) node {$\phi = \sqrt{x^2+y^2}-r$};
-    \draw (0,0) node {$\Omega^-$}
+    \draw (0,0) circle (2cm);
+    \draw (2.3,2) node {$\phi = \sqrt{x^2+y^2}-1$};
+    \draw (-.6,-0.3) node {$\Omega^-$}
     +(0,-0.4) node {$\phi < 0$}
     +(0,-0.8) node {inside}
     ;
-    \draw (-2.5,0.6) node {$\Omega^+$}
+    \draw (-2.9,1.8) node {$\Omega^+$}
     +(0,-0.4) node {$\phi > 0$}
     +(0,-0.8) node {outside}
     ;
-    \draw (2.5,0.6) node {$\Omega^+$}
+    \draw (2.9,-1.0) node {$\Omega^+$}
     +(0,-0.4) node {$\phi > 0$}
     +(0,-0.8) node {outside}
     ;
-    \draw [->] (2,-2)  -- (1.1,-1.1);
-    \draw (2.2,-2.2) node {$\partial\Omega$}
+    \draw [->] (-2,-2)  -- (-1.5,-1.5);
+    \draw (-2.2,-2.2) node {$\partial\Omega$}
     +(0,-0.4) node {$\phi = 0$}
     +(0,-0.8) node {interface}
     ;
