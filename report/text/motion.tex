@@ -91,8 +91,7 @@ We start by exploring the curvature $\kappa$. It is defined as:
   \kappa = \nabla\cdot\left(\frac{\nabla\phi}{|\nabla\phi|}\right)
 \end{equation}
 
-When $\phi$ is a SDF, then $|\phi|=1$,\todoPtx{O'Rly? er $|\nabla\phi|
-  =1$ altid?} which simplifies our equation
+When $\phi$ is a SDF, then $|\nabla\phi|=1$, which simplifies our equation
 to: $\kappa = \nabla^2\phi$. Which is the laplacian operator: $\kappa =
 \Delta\phi$. In this context, $\Delta\phi$ is defined as:
 \begin{equation}
@@ -137,7 +136,24 @@ for(unsigned int x=1; x<width-1; x++) {
 }
 \end{lstlisting}
 
-\todoPtx{pics!}
+This is demonstrated in figure \ref{fig:auMean}. The logo becomes less
+sharp, and if continued long enough, it will disappear. 
+
+\begin{figure}[h]
+  \centering
+  \subfloat[The original logo]{
+    \includegraphics[width=0.3\textwidth]{imgs/au-logo}
+  }
+  \subfloat[After 20 iterations]{
+    \includegraphics[width=0.3\textwidth]{imgs/auMean20}}
+  \subfloat[After 100 iterations]{
+    \includegraphics[width=0.3\textwidth]{imgs/auMean100}}
+  \caption{The AU logo after mean-curvature with $a=0.4$ for 20 and 100 iterations}
+  \label{fig:auMean}
+\end{figure}
+
+
+
 
 \subsection{Morph}
 

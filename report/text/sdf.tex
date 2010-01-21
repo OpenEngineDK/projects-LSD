@@ -9,7 +9,7 @@ In order to use an implicit representation of the surface we use a
 signed distance field as the underlying function to the level set. We
 define the zero isocontour of this function to be the surface.
 
-The Level Set method can use implicit functions which means that the
+The level set method can use implicit functions which means that the
 function is defined in the entire plane and not only on the surface.
 
 The function $\phi(x,y)$ is a signed distance function in all of
@@ -136,25 +136,25 @@ values of $\phi$.
 
 %% formulas
 
-\section{Solving the Level Set}\label{sec:intro:solve} 
+% \section{Solving the level set}\label{sec:intro:solve} 
 
-\todoPtx{I own this!!}
+% \todoPtx{I own this!!}
 
-If we want to move the level set, we have to iteratively solve a
-Partial differential equation to make the surface move. We solve a
-partial differential equation in all points $(x,y) | x,y \in
-\mathbb{R}^{2}$. If we want to move the interface in the normal
-direction we solve the following equation:
+% If we want to move the level set, we have to iteratively solve a
+% Partial differential equation to make the surface move. We solve a
+% partial differential equation in all points $(x,y) | x,y \in
+% \mathbb{R}^{2}$. If we want to move the interface in the normal
+% direction we solve the following equation:
 
-\begin{equation}
-\phi_{t} + a|\nabla \phi| = 0
-\end{equation}\label{eq:normMove}
+% \begin{equation}
+% \phi_{t} + a|\nabla \phi| = 0
+% \end{equation}\label{eq:normMove}
 
-where $\nabla \phi = \left(\dfrac{\partial \phi}{\partial x},
-\dfrac{\partial \phi}{\partial y}\right)$ and $a$ can be of either sign.
+% where $\nabla \phi = \left(\dfrac{\partial \phi}{\partial x},
+% \dfrac{\partial \phi}{\partial y}\right)$ and $a$ can be of either sign.
 
-When $a > 0$ the interface moves in the normal direction and when $a <
-0$ it moves in the opposite direction of the normal.
+% When $a > 0$ the interface moves in the normal direction and when $a <
+% 0$ it moves in the opposite direction of the normal.
 
 \section{Applications}
 
@@ -165,13 +165,15 @@ method makes it easy to work on geometry that change topology over
 time.
 
 
-%% applications.  So why do we want to use the level set method? A
-simple example is to consider an object that splits in two or two
-objects merging into one. If we did not use the level set method, we
-would have to explicitely represent the two new objects, where in the
-level set case we get this for free do to the implicit representation.
+%% applications. 
 
-\todoPtx{måske lidt flere anvendelsesmuligheder (lysberegninger her!)}
+So why do we want to use the level set method? A simple example is to
+consider an object that splits in two or two objects merging into
+one. If we did not use the level set method, we would have to
+explicitely represent the two new objects, where in the level set case
+we get this for free do to the implicit representation.
+
+%\todoPtx{måske lidt flere anvendelsesmuligheder (lysberegninger her!)}
 
 
 % snip
