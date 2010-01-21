@@ -88,7 +88,7 @@ Of course, we are only interested in the cells which contain fluid, which in our
 
 Finally, we relegate the solving of this system to an implementation of the Preconditional Conjugate Gradient method. This is an iterative method, the precise implementation of which lies somewhat outside the scope of this paper. In short, the result of applying this method to our constructed linear system yields the grid of pressures. Applying this to the velocity field should purge it of divergence, thereby completing this step of the algorithm.
 
-Finally, using this divergence free velocity field, we advect the values of the signed distance field. To this end, we use the same Runge-Kutta method as described in the advection of the velocity field. Of course, having done this we need to reinitialize the signed distance field, as it likely no longer lives up the the requirements described in section \vref{sdfintro}.
+Finally, using this divergence free velocity field, we advect the values of the signed distance field. To this end, we use the same Runge-Kutta method as described in the advection of the velocity field. Of course, having done this we need to reinitialize the signed distance field, as it likely no longer lives up the the requirements described in chapter \vref{chap:sdf}.
 
 Having done this, we are ready to start a new iteration afresh, and thus we may iteratively evolve our interface in full accordance with the Navier-Stokes equation.
 
