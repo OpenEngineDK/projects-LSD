@@ -72,28 +72,26 @@ field of values is sufficient.
 One function that has the desired characteristics is a function known
 as the signed distance function $\phi$.
 
-
 \section*{Outline of the report}
 
 In chapter \vref{chap:sdf}, we give an in depth look on the signed
 distance function, describe what kinds of mathematical operations we
-have in our toolbox and describe the important reinitialize function,
-section \vref{sec:reinitialize}.
+have in our toolbox and describe the important reinitialize function in \vref{sec:reinitialize}.
+
+Chapter \vref{chap:motion} deals with evolving the interface. In \vref{sec:extVel} we describe how to use an external velocity field, then in \vref{sec:intVel} we discuss using internally generated fields.
 
 We have individually made a number of extensions to the basic level
 set implementation. These extensions should show the versatility of
 the method and show some practical applications.
-
-In chapter \vref{chap:extensions}, we look at these extensions. Each
+In the final part of this paper, we look at these extensions. Each
 section has been written by the person responsible for it.
-In section \vref{sec:narrowband}, for efficiency, we improve the
-signed distance implementation to use the narrow band technique. 
-In section \vref{sec:cuda} we improve the reinitialization step by
-implementing it on the GPU.
-In section \vref{sec:segmentation}, we look at how to implement
-segmentation algorithms which can be used in mediacal imaging. 
-In section \vref{sec:fluid}, we implement a fluid solver for computer
-graphics using the level set method. 
+
+First, in chapter \vref{sec:narrowband} Mikkel Vester presents a technique called "narrow band" which increases efficiency by limiting the area of calculations.
+Then, Peter Kristensen talks in chapter \vref{sec:cuda} about his use of GPU multi-kernel programming to significantly improve performance.
+
+The final two chapters present practical applications of level sets.
+Martin Have has investigated and implemented a way of segmenting image data using level sets. He writes about his results in chapter \vref{sec:segmentation}.
+In chapter \vref{sec:fluid} Sean Geggie presents how to use level set methods for evolving an interface to write a rudimentary simulator of incompressible fluids.
 
 
 

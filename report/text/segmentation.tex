@@ -22,12 +22,12 @@ two different algorithms which are described in sections
 \vref{segmentation:sec:algorithm1} and
 \vref{segmentation:sec:algorithm2}.
 
-\subsection{Implicit vs. Explicit representation}
+\section{Implicit vs. Explicit representation}
 
 Since segmentation techniques normally are used to locate organs in MR
-scans or meassure the volume of tissue, eg. from real people, it is
+scans or measure the volume of tissue, eg. from real people, it is
 very important that the segmentation is correct and that it is
-fast. Therefore, we have to convince our selves that our technique can
+fast. Therefore, we have to convince ourselves that our technique can
 find the contour in images even though they can contain a lot of noise
 and artefacts.
 
@@ -51,7 +51,7 @@ segmentation. Because we use a level set to solve the problem, when
 our algorithm reaches an artefact the solver simply goes around it and
 merge at the other side.
 
-\subsection{Algorithm 1 - Moving in the normal direction}
+\section{Algorithm 1 - Moving in the normal direction}
 \label{segmentation:sec:algorithm1}
 
 \begin{comment}
@@ -136,7 +136,7 @@ other half is going to be decreased the factor should be approximately
 zero. \texttt{tThreshold} is set to 0.03 through experiments.
 
 
-\subsection{Algortihm 2 - Edge detection}
+\section{Algortihm 2 - Edge detection}
 \label{segmentation:sec:algorithm2}
 
 % \image{image, scale, caption, label}
@@ -198,7 +198,7 @@ When solving the level set equation, for every pixel we get a vector
 that goes away from the iso-surface and points at the closest edge in
 the normal direction.
 
-\subsection{Conclusion}
+\section{Conclusion}
 \label{segmentation:conclusion}
 %% Wrap up.
 

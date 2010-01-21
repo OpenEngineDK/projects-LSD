@@ -21,7 +21,7 @@ in \cit{adalsteinsson1995fast}. A Narrow band of the Aarhus University logo can 
   \label{fig:nb-au-logo}
 \end{figure}
 
-\subsection*{Idea of the Narrow Band Method}
+\section{Idea of the Narrow Band Method}
 The basic idea of the method is to narrow down the amount of pixels we
 are working on, to include as few as possible without loosing
 precision. This is done by keeping a band of $\gamma$ pixels around
@@ -65,7 +65,7 @@ then at the end reinitialize it.
 To decide the size of $\gamma$, and thereby the width of the narrow
 band, we have to look at the maximum distance the interface can move
 in a time step. In our implementation this boundary is at one pixel
-per time step, therefor a narrow band of size 3 around the interface
+per time step, therefore a narrow band of size 3 around the interface
 is sufficient. As seen in figure \vref{fig:nb-au-logo} the band
 reaches just outside the interface border as displayed in red. The
 green outline around the red band is the outer safe band.
@@ -94,7 +94,7 @@ interface we see that the narrow band is in effect and the one
 reinitialisation per time step almost covers our needs. 
 
 
-\subsection{Implementation}
+\section{Implementation}
 To represent our Narrow band we need a data structure to hold the new
 information. Normally we traverse the workspace linearly and know
 which pixels have been updated, and which we are going to visit
@@ -105,8 +105,8 @@ through (x,y) in the height and with of the workspace. Our solution is
 to keep every pixel in a vector with (x,y) coordinates, and add the
 vectors of the pixels inside the narrow band to a list. This list will
 then contain the complete narrow band, both inner and outer band. To
-distinct the two bands from each other we are using a 2D matrix
-holding an 1 if the said pixel is in the inner band, and a 2 if it is
+distinguish the two bands from each other we are using a 2D matrix
+holding a 1 if the said pixel is in the inner band, and a 2 if it is
 in the outer, 0 means the pixel is in neither. We also maintain an
 integer containing the number of pixels inside the narrow band.
 
@@ -142,7 +142,7 @@ to the type matrix. This is done as shown by this code stump:
 \end{lstlisting}
 
 
-\subsection{Rebuilding the narrow band}
+\section{Rebuilding the narrow band}
 As we have defined a narrow band to work inside, it seems odd to
 rebuild this every time step by traversing the entire
 workspace. In \cit{peng1999pde} is described a solution where the
@@ -151,8 +151,8 @@ the fact we know our interface only can move 1 pixel per time step,
 hence our new inner band must be within the old narrow band. Knowing
 this we only need to traverse the old narrow band to see which pixels
 are within $\gamma$ distance of our new interface position. Whilst
-doing this we also update the type matrix, removing the pixels now no
-more resides inside a band. Now the tricky part comes; finding the
+doing this we also update the type matrix, removing the pixels which no
+longer reside inside a band. Now the tricky part comes; finding the
 outer band. This can be done in a separate step, where we traverse the
 new inner band, and for each pixel visits the neighbors. If the
 neighbor is set to 0 in the type matrix, we change it to 2, and add it
@@ -168,5 +168,5 @@ the entire workspace is worth it.
 
 
 
-\subsection{Conclusion}
+\section{Conclusion}
 \todoVester[inline]{Skriv NB Conclution}

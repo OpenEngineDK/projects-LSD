@@ -1,11 +1,11 @@
 
 Improving the performance of our algorithms can be done in many ways,
-but one of the more obvious ones are using parallel computing!
+but one of the more obvious ones is using parallel computing!
 
 Currently, the most accessible way to run programs in parallel is
 using the graphics computation unit (GPU). Modern GPUs are very
 powerful, and major manufactures have released software development
-kits (SDK) for utilise the GPU for general purpose computation.
+kits (SDK) for utilising the GPU for general purpose computation.
 
 One of these SDKs is nVidias CUDA\cit{cuda}. The only thing needed to
 use CUDA is a nvidia graphics card that is relatively new (a few years
@@ -16,13 +16,13 @@ on spatially coherent data. This makes many of our algorithms a
 natural target, as we often only need information about neighbouring
 data points.
 
-\subsection{Threads}
+\section{Threads}
 
 The CUDA programming model is centered about data parallel
 programming. This means that you spawn a thread for each element in
 your data, which runs the same program. In our case, this means
 spawning a thread for each pixel. Luckily our algorithms are already
-in this format, just with two \texttt{for} iterating over the pixels.
+in this format, just with two \texttt{for}-loops iterating over the pixels.
 
 Most of our algorithms uses this pattern:
 
@@ -53,7 +53,7 @@ block size of $32\cdot 16 = 512$.
 
 \todoPtx{More about threads?}
 
-\subsection{Memory}
+\section{Memory}
 
 Memory in CUDA is divided in 3 parts. The Per-thread local memory than
 only a single thread can access. Per-block shared memory which is
@@ -81,7 +81,7 @@ can exploit the shared memory.
 
 
 
-\subsection{Implementation}
+\section{Implementation}
 
 After a quick time profiling, we found that \texttt{Reinitialize} is
 where our program spends most of its time, so this was the first to be
@@ -198,7 +198,7 @@ void cu_Reinit(float* data,
 
 \end{lstlisting}
 
-\subsection{Results \& Conclusion}
+\section{Results \& Conclusion}
 
 The results in table \ref{tbl:cudaRes} are taken from a system with a
 1.8 Ghz Intel Core 2 Duo CPU, 4 GB RAM and a 512MB nVidia GeForce
