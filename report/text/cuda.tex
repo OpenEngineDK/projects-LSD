@@ -226,11 +226,11 @@ algorithm.
 \begin{table}[h]
   \centering
   \begin{tabular}{|l|r|r|r|}
-    \hline    Algorithm & CPU & GPU & Speedup \\
+    \hline    Algorithm & CPU ($\mu s$) & GPU ($\mu s$) & Speedup ($\times$) \\
     % BEGIN RECEIVE ORGTBL numbers
 \hline
-Reinitialization & 417825 usec & 136675 usec & 3.0570697 \\
-- with textures & - & 100006 usec & 4.1779993 \\
+Reinitialization & 417825 & 136675 & 3.0570697 \\
+- with textures & - & 100006 & 4.1779993 \\
 \hline
     % END RECEIVE ORGTBL numbers
   \end{tabular}
@@ -242,12 +242,12 @@ Reinitialization & 417825 usec & 136675 usec & 3.0570697 \\
 
 \begin{comment}
 #+ORGTBL: SEND numbers orgtbl-to-latex :splice t :skip 2
-|------------------+-------------+-------------+-----------|
-|                  | CPU         | GPU         |   Speedup |
-|------------------+-------------+-------------+-----------|
-| Reinitialization | 417825 usec | 136675 usec | 3.0570697 |
-| - with textures  | -           | 100006 usec | 4.1779993 |
-|------------------+-------------+-------------+-----------|
+|------------------+--------+--------+-----------|
+|                  | CPU    |    GPU |   Speedup |
+|------------------+--------+--------+-----------|
+| Reinitialization | 417825 | 136675 | 3.0570697 |
+| - with textures  | -      | 100006 | 4.1779993 |
+|------------------+--------+--------+-----------|
 #+TBLFM: @2$4=@2$2 / @2$3::@3$4=@2$2 / @3$3
 \end{comment}
 

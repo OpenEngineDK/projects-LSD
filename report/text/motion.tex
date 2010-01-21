@@ -3,7 +3,6 @@
 In contrast to section \vref{sec:extVel}, this section describes
 motion using a internally generated velocity field.
 
-\newpage
 
 \subsection{Motion in the normal direction}
 
@@ -124,20 +123,15 @@ If we respect these, then the  implementation is straight forward:
 \begin{lstlisting}
 for(unsigned int x=1; x<width-1; x++) {
     for(unsigned int y=1; y<height-1; y++) {
-
         const float dx = 1.0;
         float phi_xx = (phi(x+1,y) - 2*phi(x,y) + phi(x-1,y))/(dx*dx);
         float phi_yy = (phi(x,y+1) - 2*phi(x,y) + phi(x,y-1))/(dx*dx);
 
         float kappa = phi_xx + phi_yy;
- 
         phi(x,y) += kappa * a; //mean curvature
     }
 }
 \end{lstlisting}
-
-This is demonstrated in figure \ref{fig:auMean}. The logo becomes less
-sharp, and if continued long enough, it will disappear. 
 
 \begin{figure}[h]
   \centering
@@ -152,16 +146,54 @@ sharp, and if continued long enough, it will disappear.
   \label{fig:auMean}
 \end{figure}
 
-\subsection{Morph}
-Another simple way of evolving the interface is a technique called "morphing". Given two signed distance fields, we can "morph" one into the other simply by using the difference in fields in place of velocity of change. This is a simple idea which can yield visually impressive results.
 
-The operation of morphing $\phi_1$ to $\phi_2$ is captured in this equation:
+
+This is demonstrated in figure \ref{fig:auMean}. The logo becomes less
+sharp, and if continued long enough, it will disappear. 
+
+
+
+\subsection{Morph}
+Another simple way of evolving the interface is a technique called
+``morphing''. Given two signed distance fields, we can ``morph'' one
+into the other simply by using the difference in fields in place of
+velocity of change. This is a simple idea which can yield visually
+impressive results.
+
+The operation of morphing $\phi_1$ to $\phi_2$ is captured in this
+equation:
+
 \begin{align}
 \phi_t = \phi_1 + (\phi_2 - \phi_1) \cdot -a
 \end{align}
-Figure \vref{fig:morph} shows the intuition behind the equation. The parts of the field that are "inside" one curve and "outside" another yield higher differences than the parts that are inside or outside both curves. Depending on the sign of $a$, the equation adds a term to $\phi_1$ that increases or decreases its values in correspondance to the difference of the fields. The result of this is that the level sets of one field are evolved to resemble the curves of the other.
+
+
+Figure \vref{fig:morph} shows the intuition behind the equation. The
+parts of the field that are ``inside'' one curve and ``outside''
+another yield higher differences than the parts that are inside or
+outside both curves. Depending on the sign of $a$, the equation adds a
+term to $\phi_1$ that increases or decreases its values in
+correspondance to the difference of the fields. The result of this is
+that the level sets of one field are evolved to resemble the curves of
+the other.
+
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    \draw (0,0) ellipse (3cm and 1cm); \draw (0,0) ellipse (1cm and
+    3cm); \draw (0,0) node {$--$}; \draw (2,0) node {$+-$}; \draw
+    (-2,0) node {$+-$}; \draw (0,2) node {$-+$}; \draw (0,-2) node
+    {$-+$}; \draw (-2,-2) node {$++$}; \draw (1,2) node {$\phi_1$};
+    \draw (2,1) node {$\phi_2$};
+  \end{tikzpicture}  
+  \caption{Morphing two SDFs}
+\label{fig:morph}
+\end{figure}
+
 
 The implementation is simply as follows:
+
 \begin{lstlisting}
 for(unsigned int x=0; x<width; x++) {
     for(unsigned int y=0; y<height; y++) {
@@ -169,8 +201,6 @@ for(unsigned int x=0; x<width; x++) {
     }
 }
 \end{lstlisting}
-
-\todoPtx{picture here!}
 
 % \subsection{CFG condition (Stability)}
 % WTF is this?
