@@ -152,15 +152,16 @@ sharp, and if continued long enough, it will disappear.
   \label{fig:auMean}
 \end{figure}
 
-
-
-
 \subsection{Morph}
+Another simple way of evolving the interface is a technique called "morphing". Given two signed distance fields, we can "morph" one into the other simply by using the difference in fields in place of velocity of change. This is a simple idea which can yield visually impressive results.
 
-%\todoCpvc{Hvor står der noget om morph i vores pensum?}
+The operation of morphing $\phi_1$ to $\phi_2$ is captured in this equation:
+\begin{align}
+\phi_t = \phi_1 + (\phi_2 - \phi_1) \cdot -a
+\end{align}
+Figure \vref{fig:morph} shows the intuition behind the equation. The parts of the field that are "inside" one curve and "outside" another yield higher differences than the parts that are inside or outside both curves. Depending on the sign of $a$, the equation adds a term to $\phi_1$ that increases or decreases its values in correspondance to the difference of the fields. The result of this is that the level sets of one field are evolved to resemble the curves of the other.
 
-$\phi_t = \phi + (\phi - \phi_b \cdot -a)$
-
+The implementation is simply as follows:
 \begin{lstlisting}
 for(unsigned int x=0; x<width; x++) {
     for(unsigned int y=0; y<height; y++) {
