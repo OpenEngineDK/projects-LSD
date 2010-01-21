@@ -1,6 +1,31 @@
-%\image{image, scale, caption, label}
-\image{segmentation.png}{0.3}{A segmentation in
-  progress.}{segmentation:fig:intro}
+\begin{figure}[h]
+\begin{center}
+  \subfloat[]{
+    \includegraphics[width=0.2\textwidth]{imgs/segmentationnormal75.png}
+    \label{fig:segmentation75}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.2\textwidth]{imgs/segmentationnormal150.png}
+    \label{fig:segmentation150}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.2\textwidth]{imgs/segmentationnormal225.png}
+    \label{fig:segmentation225}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.2\textwidth]{imgs/segmentationnormal250.png}
+    \label{fig:segmentation250}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.2\textwidth]{imgs/segmentationnormal275.png}
+    \label{fig:segmentation275}
+  }
+\end{center}
+\caption{A segmentation method in progress showing the segmentation at
+  iteration 75, 150, 225, 250 and 275.}
+\label{fig:segmentation}
+\end{figure}
+
 
 Segmentation is an incredibly important area of interest when it comes
 to Medical Imaging. Segmentation is the problem of partitioning a
@@ -22,7 +47,9 @@ two different algorithms which are described in sections
 \vref{segmentation:sec:algorithm1} and
 \vref{segmentation:sec:algorithm2}.
 
+
 \section{Implicit vs. Explicit representation}
+
 
 Since segmentation techniques normally are used to locate organs in MR
 scans or measure the volume of tissue, eg. from real people, it is
@@ -50,6 +77,7 @@ the larger picture and not just the boundary of the current
 segmentation. Because we use a level set to solve the problem, when
 our algorithm reaches an artefact the solver simply goes around it and
 merge at the other side.
+
 
 \section{Algorithm 1 - Moving in the normal direction}
 \label{segmentation:sec:algorithm1}
@@ -136,6 +164,7 @@ other half is going to be decreased the factor should be approximately
 zero. \texttt{tThreshold} is set to 0.03 through experiments.
 
 
+
 \section{Algortihm 2 - Edge detection}
 \label{segmentation:sec:algorithm2}
 
@@ -198,6 +227,7 @@ When solving the level set equation, for every pixel we get a vector
 that goes away from the iso-surface and points at the closest edge in
 the normal direction.
 
+
 \section{Conclusion}
 \label{segmentation:conclusion}
 %% Wrap up.
@@ -219,10 +249,5 @@ get results that should scale to real data.
 %%% mode: latex
 %%% mode: auto-fill
 %%% TeX-PDF-mode: t
-%%% TeX-master: "../master.tex"
-%%% End: 
-
-%%% Local Variables: 
-%%% mode: latex
 %%% TeX-master: "../master.tex"
 %%% End: 
