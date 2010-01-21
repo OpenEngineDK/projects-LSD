@@ -79,7 +79,10 @@ pixel is on the border, its run by both blocks. This makes us run a
 few more threads than we have pixels, but it increases the speed as we
 can exploit the shared memory.
 
-
+A more simple type of optimization, is to use texture memory. GPUs
+often need fast access to textures, so it have a texture cache
+optimized for 2D spatial locality. This means that fetching data from
+a texture will make fetching the neighbouring pixels faster.
 
 \section{Implementation}
 
@@ -169,9 +172,12 @@ void cu_Reinit(float* data,
     cudaMalloc((void**)&phiData, sizeof(float)*w*h);
     cudaMalloc((void**)&phi0Data, sizeof(float)*w*h);
     cudaMalloc((void**)&phinData, sizeof(float)*w*h);
-    cudaMemcpy((void*)phiData,(void*)data, sizeof(float)*w*h,cudaMemcpyHostToDevice);
-    cudaMemcpy((void*)phi0Data,(void*)data, sizeof(float)*w*h,cudaMemcpyHostToDevice);
-    cudaMemcpy((void*)phinData,(void*)data, sizeof(float)*w*h,cudaMemcpyHostToDevice);
+    cudaMemcpy((void*)phiData,(void*)data, sizeof(float)*w*h,
+               cudaMemcpyHostToDevice);
+    cudaMemcpy((void*)phi0Data,(void*)data, sizeof(float)*w*h,
+               cudaMemcpyHostToDevice);
+    cudaMemcpy((void*)phinData,(void*)data, sizeof(float)*w*h,
+               cudaMemcpyHostToDevice);
 
 
     CHECK_FOR_CUDA_ERROR();
@@ -189,7 +195,8 @@ void cu_Reinit(float* data,
         CHECK_FOR_CUDA_ERROR();
     }
 
-    cudaMemcpy((void*)data,(void*)phiData, sizeof(float)*w*h,cudaMemcpyDeviceToHost);
+    cudaMemcpy((void*)data,(void*)phiData,
+                sizeof(float)*w*h,cudaMemcpyDeviceToHost);
     CHECK_FOR_CUDA_ERROR();
     cudaFree(phiData);
     cudaFree(phi0Data);
