@@ -128,10 +128,10 @@ the matrix telling which of the bands it is contained in. For
 simplicity we can in the same traversal check if it should be in the
 outer band if it isn't inside the inner band. As it does not matter if
 we take too much in the outer band, we here just check if it is in
-$\gamma$ range + 2 pixel. We take more than needed, but we are on the
+$\gamma$ range + 2 cells. We take more than needed, but we are on the
 safe side. The type of the cells in the outer band is of course added
-to the type matrix. This is done as shown by this code stump:
-\todoVester{Omformuler}
+to the type matrix. This is done as shown by this code:
+%\todoVester{Omformuler}
 %\subsection{Building the initial narrow band}
 \begin{lstlisting}
     for (unsigned int x=0; x<width; x++)
@@ -152,24 +152,24 @@ to the type matrix. This is done as shown by this code stump:
 \end{lstlisting}
 
 
-\section{Rebuilding the narrow band}
-\todoVester{3 linjer der forklarer hvad man gør}
-As we have defined a narrow band to work inside, it seems odd to
-rebuild this every time step by traversing the entire
-workspace. In \cit{peng1999pde} is described a solution where the
-rebuilding time of the narrow band has been optimized. We again use
-the fact that we know our interface only can move 1 pixel per time step,
-hence our new inner band must be within the old narrow band. Knowing
-this we only need to traverse the old narrow band to see which cells
-are within $\gamma$ distance of our new interface position. Whilst
-doing this we also update the type matrix, removing the cells which no
-longer reside inside a band. Now the tricky part comes; finding the
-outer band. This can be done in a separate step, where we traverse the
-new inner band, and for each cell visits the neighbors. If the
-neighbor is set to 0 in the type matrix, we change it to 2, and add it
-to the end of our narrow band list. Many of the visited cells will
-already be inside the narrow band, but the time spared not traversing
-the entire workspace is worth it. 
+%% \section{Rebuilding the narrow band}
+%% \todoVester{3 linjer der forklarer hvad man gør}
+%% As we have defined a narrow band to work inside, it seems odd to
+%% rebuild this every time step by traversing the entire
+%% workspace. In \cit{peng1999pde} is described a solution where the
+%% rebuilding time of the narrow band has been optimized. We again use
+%% the fact that we know our interface only can move 1 cell per time step,
+%% hence our new inner band must be within the old narrow band. Knowing
+%% this we only need to traverse the old narrow band to see which cells
+%% are within $\gamma$ distance of our new interface position. Whilst
+%% doing this we also update the type matrix, removing the cells which no
+%% longer reside inside a band. Now the tricky part comes; finding the
+%% outer band. This can be done in a separate step, where we traverse the
+%% new inner band, and for each cell visits the neighbors. If the
+%% neighbor is set to 0 in the type matrix, we change it to 2, and add it
+%% to the end of our narrow band list. Many of the visited cells will
+%% already be inside the narrow band, but the time spared not traversing
+%% the entire workspace is worth it. 
 
 
                 %% if ((*phi)(x,y) >= 0)
@@ -179,8 +179,22 @@ the entire workspace is worth it.
 
 
 
-\section{Conclusion}
-\todoVester[inline]{Skriv NB Conclution}
+\section{Discussion}
+%\todoVester[inline]{Skriv NB Conclution} 
+
+Testing the narrow band method we got an significant speedup. We did
+not get to implement a faster version for rebuilding the narrow band
+as explained in \cit{peng1999pde}. In this version of the narrow
+band they rebuild the narrow band inside the old narrow band. This can
+be done as the interface only moves one cell per time step. Therefore
+we can build the new inner band inside the old narrow band. The new
+outer band can then be found be traversing the neighbors of the new
+inner band. 
+
+%The next step of our implementation of the narrow band method will be
+%to integrate it with CUDA, hoping to obtain even faster run times.
+
+
 
 %%% Local Variables: 
 %%% mode: latex
