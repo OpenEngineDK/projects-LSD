@@ -68,10 +68,6 @@ point. The brighter the color the higher the point. Figure
 \end{figure}
 
 
-\todoHave{husk reference}
-
-%\image{hoejdekort.png}{0.25}{A topographic map indicating heights in the vermont region.}{introduction:fig:hoejdekort}
-
 For a level set representation there is an underlying function
 describing the topology. Each contour corresponds to a set of points
 in this function with the same value, thus we need a function which
@@ -227,23 +223,27 @@ level set case we get this for free do to the implicit representation.
 
 \newpage
 
-\section*{Outline of the report}\todoPtx{Denne er på en side for sige
-selv, så vref ikke crasher}
+\section*{Outline of the report}
 
 In chapter \vref{chap:sdf}, we give an in depth look on the signed
 distance function, describe what kinds of mathematical operations we
 have in our toolbox and describe the important reinitialize function,
 section \vref{sec:reinitialize}.
 
-In chapter \vref{chap:extensions}, we look at extension that can be
-made to the basic level set implementation that we have done. In
-section \vref{sec:segmentation}, we look at how to implement
-segmentation algorithms which can be used in mediacal imaging. In
-section \vref{sec:fluid}, we implement a fluid solver for computer
-graphics using the level set method. And finally, in section
-\vref{sec:imagereconstruction} \todoHave{Skal CPVC's afsnit være med i
-den endelige rapport? (have)} we use the level set to do computations
-on images.
+We have individually made a number of extensions to the basic level
+set implementation. These extensions should show the versatility of
+the method and show some practical applications.
+
+In chapter \vref{chap:extensions}, we look at these extensions. Each
+section has been written by the person responsible for it.
+In section \vref{sec:narrowband}, for efficiency, we improve the
+signed distance implementation to use the narrow band technique. 
+In section \vref{sec:cuda} we improve the reinitialization step by
+implementing it on the GPU.
+In section \vref{sec:segmentation}, we look at how to implement
+segmentation algorithms which can be used in mediacal imaging. 
+In section \vref{sec:fluid}, we implement a fluid solver for computer
+graphics using the level set method. 
 
 
 

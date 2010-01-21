@@ -32,11 +32,10 @@
 
 
 \lstset{language=C}
-%\lstset{backgroundcolor=listinggray}
-%\lstset{backgroundcolor=\color{listinggray}}
+%\lstset{backgroundcolor=\color{gray}}
 %\lstset{linewidth=90mm}
-%\lstset{frameround=tttt}
-%\lstset{frameround=trbl}
+\lstset{frameround=tttt}
+\lstset{frame=tLBr}
 %\lstset{labelstep=1}
 %\lstset{keywordstyle=\color{blue}\textbf}
 \lstset{keywordstyle=\textbf}
@@ -162,30 +161,33 @@
 \section{Motion}
 \input{text/motion}
 
+
 \chapter{Extensions}
 \label{chap:extensions}
+\input{text/extensionsintro}
 
 \section{Narrow-band}
 \label{sec:narrowband}
 \input{text/narrowband}
 
-% \section{3D}
-% \label{sec:3d}
-
+\newpage
 \section{CUDA}
 \label{sec:cuda}
 \input{text/cuda}
 
+\newpage
 \section{Segmentation}
 \label{sec:segmentation}
 \input{text/segmentation}
 
+\newpage
 \section{Simulating fluids using level sets}
 \input{text/fluid}
 \label{sec:fluid}
 
-\section{Image reconstruction}
-\label{sec:imagereconstruction}
+%\newpage
+%\section{Image reconstruction}
+%\label{sec:imagereconstruction}
 
 \appendix
 
@@ -198,10 +200,3 @@
 
 \end{document}
 
-
-%%% Local Variables: 
-%%% mode: latex
-%%% mode: auto-fill
-%%% TeX-PDF-mode: t
-%%% TeX-master: t
-%%% End: 
