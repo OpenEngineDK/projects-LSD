@@ -45,12 +45,12 @@ also encompasses motion derived from external forces like gravity.
 
 The incompressibility of the fluid is captured by equation
 \vref{eq:incomp}. This equation is derived from looking at the normal
-component of the velocity around the boundary of a given fluid. In
+component of the velocity at the boundary of a given fluid. In
 basic terms, it says that the amount of fluid flowing out of the fluid
 region is equal to the amount flowing in. This measure of change is
 called divergence, and by this restriction we seek to remove it with
-as much numerical precision as possible. When evolving the interface
-with the resulting veolocity field, the incompressibility constraint
+as much numerical accuracy as possible. When evolving the interface
+with the resulting velocity field, the incompressibility constraint
 ensures that the interface is never moved in a way that produces a
 larger or smaller fluid volume (or area, in the case of our two
 dimensional implementation).
@@ -81,6 +81,7 @@ algorithm:
 \item Advect velocities around the velocity field
 \item Add external forces
 \item Adjust the velocity field for pressure
+\item Use the resulting velocity field to move the fluid
 \end{itemize}
 As mentioned, we use a signed distance function to represent the
 position and layout of the fluid. The zero-level isocontour is the
@@ -90,8 +91,8 @@ occupied by the fluid while everything below zero represents the
 interior of the fluid.
 
 Our natural inclination at this point would be to represent the
-discrete velocity field as an identically sized double (or triple,
-depending on dimensionality) array of values. Each cell would hold the
+discrete velocity field as an identically sized double array (or triple,
+depending on dimensionality) of values. Each cell would hold the
 velocity of the fluid at that point, which seems the simplest way of
 storing it. However, to ease certain portions of later sections of the
 simulation we have chosen instead the "Marker and Cell" (or MAC for
@@ -108,8 +109,7 @@ the velocity at the \textit{edges} of cells.\image{mac.png}{0.3}{The
 cell in the signed distance field has associated with it a value
 indicating the component of the velocity vector in the corresponding
 direction. In practical terms, we store two grids in addition to the
-discretized signed distance field, one for the values aligned with the
-x-axis and one for the y-values.
+discretized signed distance field, one for each spatial dimension of the velocity field.
 
 The purpose of this initially unintuitive representation becomes
 apparent when need to calculate central differences in the velocity
