@@ -33,31 +33,25 @@ time, partial differential equations (PDEs) describing the physical
 phenomena needs to be solved to move the level sets.
 %
 Typical phenomena modeled by the LSM includes: computational fluid
-dynamics (CFG), and fire and explosion simulation. \todo{more examples
-please}
+dynamics (CFG), and fire and explosion simulation. 
 
 In this report, we will explain what the Level Set method is and what
 its applications are. Furthermore, we will provide code examples of
-how to implement the mathematical formulas needed to create a Level
-Set framework.
+how to implement the mathematical formulas.
 
-The Level Set method is a numerical technique used to move
-surfaces. The surfaces are moved by solving a partial differential
-equation(PDE) dependant on a time factor.
-
-In figure \vref{fig:heightmap} we see two figures describing a 2-d and
-3-d view of an island. Figure \vref{fig:isocontour-2d} describes an
+In figure \vref{fig:heightmap} we see two figures describing a two dimensional and
+three dimensional view of an island. Figure \vref{fig:isocontour-2d} describes an
 isocontour map of heights where the color indicates the height of each
 point. The brighter the color the higher the point. Figure
 \vref{fig:isocontour-3d} shows the corresponding 3d view.
 
 \begin{figure}[h]
 \begin{center}
-  \subfloat[2D view of an elevation isocontour map]{
+  \subfloat[Two dimensional view of an isocontour map]{
     \includegraphics[width=0.5\textwidth]{imgs/226171_226171.png}
     \label{fig:isocontour-2d}
   }
-  \subfloat[3D view of figure \ref{fig:isocontour-2d}]{
+  \subfloat[Three dimensional view of figure \ref{fig:isocontour-2d}]{
     \includegraphics[width=0.5\textwidth]{imgs/226170_226170.png}
     \label{fig:isocontour-3d}
   }
@@ -85,11 +79,9 @@ the zero isocontour.
 
 Since this function produces the straightforward euclidian distance,
 it increases linearly. 
-
 In order to use an implicit representation of the surface we use a
 signed distance field as the underlying function to the level set. We
 define the zero isocontour of this function to be the surface.
-
 The Level Set method can use implicit functions which means that the
 function is defined in the entire plane and not only on the surface.
 
