@@ -5,7 +5,7 @@ To generate the SDF we start by constructing two Cartesian grids of
 the same sizes as the image. One to hold the distances to the contour
 on the outside of the object, and one for the inside. The ``outer
 grid'' is populated with (0,0) if the pixel is dark and
-(``infinite'',``infinite'') if it's white, and opposite for the inner
+($\infty$,$\infty$) if it's white, and opposite for the inner
 grid. This way each entry in the grid has a vector.
 
 The next step is to calculate the actual distances to the iso-contour
