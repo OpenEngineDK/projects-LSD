@@ -22,7 +22,8 @@ compress to some degree. For graphical simulation purposes, however,
 it is adequate to assume complete incompressibility.
 
 
-Here, then, is how the incompressible Navier-Stokes equations are usually written:
+Here, then, is how the incompressible Navier-Stokes equations are
+usually written:
 \begin{align}
   \label{eq:momentum}
   \frac{\partial\vec{u}}{\partial t}+\vec{u} \cdot \nabla\vec{u} + \frac{1}{\rho}\Delta p &= \vec{g}+\nu\nabla\cdot\nabla\vec{u},\\
@@ -109,7 +110,8 @@ the velocity at the \textit{edges} of cells.\image{mac.png}{0.3}{The
 cell in the signed distance field has associated with it a value
 indicating the component of the velocity vector in the corresponding
 direction. In practical terms, we store two grids in addition to the
-discretized signed distance field, one for each spatial dimension of the velocity field.
+discretized signed distance field, one for each spatial dimension of
+the velocity field.
 
 The purpose of this initially unintuitive representation becomes
 apparent when need to calculate central differences in the velocity
