@@ -26,7 +26,7 @@ LevelSetMethod::LevelSetMethod(ITextureResourcePtr inputTex,
     testSDF->Reinitialize(width/2);
 
 
-    EmptyTextureResourcePtr ut_tex = EmptyTextureResource::Clone(inputTex);
+    //EmptyTextureResourcePtr ut_tex = EmptyTextureResource::Clone(inputTex);
 
     // Testing
     //Tex<float> phiTest = Subtract(phi,BuildPhi(inputTex2));
