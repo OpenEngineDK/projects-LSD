@@ -20,7 +20,7 @@
 
 #include <Resources/ResourceManager.h>
 #include <Resources/DirectoryManager.h>
-#include <Resources/ITextureResource.h>
+#include <Resources/ITexture2D.h>
 #include <Resources/CairoResource.h>
 
 #include <Renderers/TextureLoader.h>
@@ -127,7 +127,7 @@ static TransformationNode* CreateTextureBillboard(ITextureResourcePtr texture,
     faces->Add(rightside);
 
     MaterialPtr m = leftside->mat = rightside->mat = MaterialPtr(new Material());
-    m->texr = texture;
+    m->AddTexture(texture);
 
     GeometryNode* node = new GeometryNode();
     node->SetFaceSet(faces);
@@ -198,7 +198,7 @@ struct Wall {
 int main(int argc, char** argv) {
     // Create simple setup
     SDLEnvironment* env = new SDLEnvironment(1150,768);
-    SimpleSetup* setup = new SimpleSetup("LevelSet Method",NULL,env);
+    SimpleSetup* setup = new SimpleSetup("LevelSet Method",env);
 
     setup->GetRenderer().SetBackgroundColor(Vector<4,float>(0.0));
 
